@@ -6,7 +6,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.ljs.examinegoods.view.ExamineGoodsActivity;
 import com.sz.ljs.base.BaseActivity;
+import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.cargomanage.R;
 import com.sz.ljs.cargomanage.adapter.HomeMenuAdapter;
 import com.sz.ljs.cargomanage.model.HomeMenuModel;
@@ -43,9 +45,22 @@ public class MainActivity extends BaseActivity {
         gv_homeMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                if (null != homeMenuList && homeMenuList.size() > 0) {
+                    menuJump(homeMenuList.get(position).getId());
+                }
             }
         });
+    }
+
+    //TODO 点击菜单跳转，根据id来进行跳转
+    private void menuJump(int id) {
+        switch (id) {
+            case 0: {
+                //TODO 验货
+                BaseApplication.startActivity(ExamineGoodsActivity.class);
+            }
+            break;
+        }
     }
 
     //TODO 获取首页菜单，根据用户权限来获取
