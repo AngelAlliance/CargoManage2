@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_color_e7e7e7"
+    android:orientation="vertical">
+
+    <com.sz.ljs.common.view.TitleView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:backVisiable="false"
+        app:titleText="@string/app_name" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:minHeight="@dimen/class_circle_top"
+        android:orientation="vertical"
+        android:paddingBottom="15dp"
+        android:paddingTop="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/banner_default" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/login_edittext_bg"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/et_workNum"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="@dimen/title_bar_heighr"
+            android:layout_marginRight="5dp"
+            android:background="@null"
+            android:gravity="center_vertical"
+            android:hint="@string/str_gh"
+            android:inputType="number"
+            android:lines="1"
+            android:maxLength="20"
+            android:textColor="@color/secondary_color_333333"
+            android:textColorHint="@color/secondary_color_999999"
+            android:textSize="@dimen/majority_text" />
+        <ImageView
+            android:id="@+id/img_view_workNum_del"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/user_login_input_margin"
+            android:contentDescription="@string/app_name"
+            android:padding="3dp"
+            android:src="@mipmap/delete_et"
+            android:visibility="gone" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/login_edittext_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_bar_heighr"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:gravity="center_vertical"
+            android:hint="@string/str_login_psd"
+            android:textColor="@color/secondary_color_333333"
+            android:textColorHint="@color/secondary_color_999999"
+            android:textSize="@dimen/majority_text" />
+
+        <ImageView
+            android:id="@+id/img_view_pwd_del"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/user_login_input_margin"
+            android:contentDescription="@string/app_name"
+            android:padding="3dp"
+            android:src="@mipmap/delete_et"
+            android:visibility="gone" />
+
+        <ToggleButton
+            android:id="@+id/according_userPwd_tb"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/user_login_accordingpwd_selector"
+            android:text=""
+            android:textOff=""
+            android:textOn=""
+            android:visibility="visible" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/bt_login"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/large_fillet_button_height"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/loging_button_bg"
+        android:textColor="@color/secondary_color_ffffff"
+        android:textSize="@dimen/majority_text"
+        android:text="@string/str_login"/>
+</LinearLayout>

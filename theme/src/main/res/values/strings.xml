@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">IPS智慧包裹</string>
+    <string name="str_permissions_title">权限设置</string>
+    <string name="str_no_permissions_tip">应用程序需要被授权一些重要权限</string>
+    <string name="str_set_permissions_tip">请设置应用程序需要的重要权限</string>
+    <string name="str_to_setting">去设置</string>
+    <string name="str_runtime_permission_succ">授权重要权限成功</string>
+    <string name="str_yes">确定</string>
+    <string name="str_i_know">知道了</string>
+    <string name="str_gh">工号</string>
+    <string name="str_login_psd">登录密码</string>
+    <string name="str_login">登录</string>
+    <string name="str_ghbwk">工号不能为空</string>
+    <string name="str_mmbwk">密码不能为空</string>
+    <string name="str_dlsb">登录失败</string>
+    <string name="str_login_ing">登录中</string>
+    <string name="str_load_ing">加载中</string>
+</resources>

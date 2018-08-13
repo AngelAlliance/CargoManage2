@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 标题模板自定义属性 -->
+    <declare-styleable name="TitleView">
+        <!-- 标题文案 -->
+        <attr name="titleText" format="string" />
+        <!-- 左侧按钮文字 -->
+        <attr name="backText" format="string" />
+        <!-- 左侧按钮图片 -->
+        <attr name="backImg" format="reference" />
+        <!-- 左侧按钮是否显示 -->
+        <attr name="backVisiable" format="boolean" />
+        <!-- 是否自定义返回监听事件 -->
+        <attr name="canBack" format="boolean" />
+        <!-- 右侧更多功能按钮图片 -->
+        <attr name="moreImg" format="reference" />
+        <!-- 右侧更多功能按钮文字 -->
+        <attr name="moreText" format="string" />
+        <!-- 右侧侧按钮是否显示 -->
+        <attr name="moreVisiable" format="boolean" />
+        <attr name="TabPadding" format="dimension" /> <!-- TAB间的间隔 -->
+        <attr name="TabTextSelColor" format="color" /> <!-- TAB的选择文字颜色 -->
+        <attr name="TabTextUnSelColor" format="color" /> <!-- TABTAB的没有选择文字颜色 -->
+        <attr name="TabTextSize" format="dimension" /> <!-- TAB的字体大小 -->
+        <attr name="ViewBackGrounp" format="color" /> <!-- 背景 -->
+        <attr name="title_center_icon" format="reference" />  <!-- 中间的图标 -->
+    </declare-styleable>
+
+
+    <!-- 自定义仿IOS的AlertDialog的样式 -->
+    <style name="AlertDialogStyle" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="little_title">22dp</dimen>
+    <dimen name="important_text">18dp</dimen>
+    <dimen name="main_title">16dp</dimen>
+    <dimen name="majority_text">14dp</dimen>
+    <dimen name="secondary_text">12dp</dimen>
+    <!-- 按钮的高度 -->
+    <dimen name="large_fillet_button_height">42dp</dimen>
+    <!--标题栏高度-->
+    <dimen name="title_bar_heighr">47dp</dimen>
+    <dimen name="lst_menu_item_padding_left">15dp</dimen>
+    <dimen name="lst_menu_item_padding_top">4dp</dimen>
+    <dimen name="lst_menu_item_height">60dp</dimen>
+    <dimen name="lst_menu_item_icon_size">50dp</dimen>
+    <!--标题栏返回按钮内边距-->
+    <dimen name="title_bar_backimage_padding">20dp</dimen>
+    <dimen name="user_login_input_margin">10dp</dimen>
+    <dimen name="class_circle_top">120dp</dimen>
+</resources>
