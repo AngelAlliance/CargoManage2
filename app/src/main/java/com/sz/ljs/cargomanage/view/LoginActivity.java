@@ -246,5 +246,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
         et_password.setSelection(et_password.length());
     }
-
+    @Override
+    protected String[] getRuntimePermissions() {
+        return RUNTIME_PERMISSIONS;
+    }
 }

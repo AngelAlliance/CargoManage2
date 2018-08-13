@@ -15,4 +15,12 @@
     <string name="str_dlsb">登录失败</string>
     <string name="str_login_ing">登录中</string>
     <string name="str_load_ing">加载中</string>
+    <string name="str_yh">验货</string>
+    <string name="str_rk">入库</string>
+    <string name="str_db">打包</string>
+    <string name="str_ck">出库</string>
+    <string name="str_pk">盘库</string>
+    <string name="str_djsm">到件扫描</string>
+    <string name="str_bdbq">补打标签</string>
+    <string name="str_sz">设置</string>
 </resources>
