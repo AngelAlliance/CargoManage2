@@ -174,4 +174,9 @@ public class BaseApplication extends Application {
     public static Context getAppContext() {
         return AppContext;
     }
+
+    public static String getAuthority(){
+        return BaseApplication.getAppContext().getPackageName()+BaseApplication.getAppContext().getString(R.string.app_shard_file_provider_name);
+    }
+
 }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.qiloo.WBarcodeScan.view.WBarcodeScanView
+        android:id="@+id/scan_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:scanframebackground="@mipmap/addcard_scan_frame"
+        app:scanframeleft="@dimen/add_card_preview_box_left"
+        app:scanframesize="@dimen/add_card_preview_box_height"
+        app:scanframetop="@dimen/add_card_preview_box_top"
+        app:scanline="@mipmap/addcard_scan_line" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
+
+        <com.sz.ljs.common.view.TitleView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:titleText="@string/str_stxm" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="58dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="@string/str_qjtxmfrkn"
+            android:textColor="@color/secondary_color_ffffff"
+            android:textSize="@dimen/majority_text" />
+    </LinearLayout>
+</FrameLayout>

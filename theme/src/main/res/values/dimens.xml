@@ -17,4 +17,10 @@
     <dimen name="title_bar_backimage_padding">20dp</dimen>
     <dimen name="user_login_input_margin">10dp</dimen>
     <dimen name="class_circle_top">120dp</dimen>
+    <dimen name="add_card_preview_box_left">58dp</dimen>
+    <dimen name="add_card_flash_margin">15dp</dimen>
+    <dimen name="add_card_preview_box_top">128dp</dimen>
+    <dimen name="add_card_preview_box_height">218dp</dimen>
+    <dimen name="add_card_tips_img_top">288dp</dimen>
+    <dimen name="add_card_tips_left">45dp</dimen>
 </resources>

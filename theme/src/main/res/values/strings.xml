@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_shard_file_provider_name">.file.provider</string>
     <string name="app_name">IPS智慧包裹</string>
     <string name="str_permissions_title">权限设置</string>
     <string name="str_no_permissions_tip">应用程序需要被授权一些重要权限</string>
@@ -6,6 +7,7 @@
     <string name="str_to_setting">去设置</string>
     <string name="str_runtime_permission_succ">授权重要权限成功</string>
     <string name="str_yes">确定</string>
+    <string name="str_cancel">取消</string>
     <string name="str_i_know">知道了</string>
     <string name="str_gh">工号</string>
     <string name="str_login_psd">登录密码</string>
@@ -43,8 +45,13 @@
     <string name="str_sfwwjp">是否为违禁品</string>
     <string name="str_sfwysp">是否为易碎品</string>
     <string name="str_wtms">问题描述</string>
-    <string name="str_pz">拍照</string>
+    <string name="str_photograph">拍照</string>
+    <string name="str_select_album">从手机相册选择</string>
     <string name="str_yyhwwt">已验货，无问题！</string>
     <string name="str_gong">共</string>
     <string name="str_jian">件</string>
+    <string name="str_stxm">扫条形码/二维码</string>
+    <string name="str_qjtxmfrkn">请将条形码或二维码放入框内</string>
+    <string name="str_sel_photo_no_sd">没有找到存储位置，请检查是否插入了SD卡</string>
+    <string name="str_pszpsb">拍摄照片失败</string>
 </resources>

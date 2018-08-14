@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--底部弹窗 -->
+    <style name="ActionSheetDialogStyle" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>  <!-- 背景透明 -->
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item> <!-- 浮于Activity之上 -->
+        <item name="android:windowFrame">@null</item> <!-- 边框 -->
+        <item name="android:backgroundDimEnabled">true</item> <!-- Dialog以外的区域模糊效果 -->
+        <item name="android:windowNoTitle">true</item><!-- 无标题 -->
+        <item name="android:windowIsTranslucent">true</item><!-- 半透明 -->
+        <item name="android:windowAnimationStyle">@style/AnimBottom</item><!-- Dialog进入及退出动画 -->
+    </style>
+
+    <style name="AnimBottom" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/push_bottom_in</item>
+        <item name="android:windowExitAnimation">@anim/push_bottom_out</item>
+    </style>
+</resources>
