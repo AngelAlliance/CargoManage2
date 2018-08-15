@@ -17,8 +17,13 @@ import android.widget.TextView;
 import com.ljs.examinegoods.R;
 import com.ljs.examinegoods.adapter.PhotoGridAdapter;
 import com.sz.ljs.base.BaseActivity;
+import com.sz.ljs.common.model.ExpressPackageModel;
+import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
+import com.sz.ljs.common.view.FourSidesSlidingListView;
+import com.sz.ljs.common.view.NoscrollListView;
 import com.sz.ljs.common.view.PhotosUtils;
 import com.sz.ljs.common.view.ScanView;
+import com.sz.ljs.common.view.adapter.FourSidesSlidListTitleAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +45,9 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private boolean isYanHuo = false;
     private List<Bitmap> photoList = new ArrayList<>();
     private PhotoGridAdapter adapter;
-
+    private FourSidesSlidingListView fs_listView;
+    private List<FourSidesSlidListTitileModel> headerList = new ArrayList<>();
+    private List<ExpressPackageModel> listData=new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +58,12 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void initView() {
+        getHeaderData();
+        setContentData();
+        fs_listView = (FourSidesSlidingListView) findViewById(R.id.fs_listView);
+        fs_listView.setHeaderData(headerList);
+        fs_listView.setContentData(listData);
+
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         et_kehucankaodanhao = (EditText) findViewById(R.id.et_kehucankaodanhao);
         et_wenti = (EditText) findViewById(R.id.et_wenti);
@@ -114,6 +127,41 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         bt_yes = (Button) findViewById(R.id.bt_yes);
     }
 
+    private void getHeaderData(){
+        headerList.add(new FourSidesSlidListTitileModel(getResources().getString(R.string.str_gx)
+                ,getResources().getString(R.string.str_bbh),getResources().getString(R.string.str_zzzt)
+        ,getResources().getString(R.string.str_ydh),getResources().getString(R.string.str_zdtm)
+        ,getResources().getString(R.string.str_js),getResources().getString(R.string.str_shizhong)
+        ,getResources().getString(R.string.str_ckg)));
+    }
+    private void setContentData(){
+        listData.add(new ExpressPackageModel(false,true,1234567,10
+                    ,100,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,325235552,10
+                    ,110,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,352253565,10
+                    ,122,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,564564456,10
+                    ,133,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,767675675,10
+                    ,144,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,2424242,10
+                    ,155,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,243242,10
+                    ,166,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,2423534,10
+                    ,1230,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,545454,10
+                    ,1430,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,6565656,10
+                    ,4300,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,56565,10
+                    ,1200,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,1234343,10
+                    ,350,12,11,4,null));
+        listData.add(new ExpressPackageModel(false,true,5553,10
+                    ,550,12,11,4,null));
+    }
     private void initData() {
         adapter = new PhotoGridAdapter(this, photoList);
         gv_photo.setAdapter(adapter);
