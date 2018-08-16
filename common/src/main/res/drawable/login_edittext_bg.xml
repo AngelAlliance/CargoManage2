@@ -6,7 +6,7 @@
     android:width="1dp"
     android:color="@color/secondary_color_cccccc" />
     <!-- 填充 -->
-    <solid android:color="@color/secondary_color_ebebeb" />
+    <solid android:color="@color/secondary_color_e7e7e7" />
     <!-- 圆角 -->
     <corners android:radius="2dp" />
 </shape>

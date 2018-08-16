@@ -6,12 +6,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.example.shipments.view.ShipMentsActivity;
 import com.ljs.examinegoods.view.ExamineGoodsActivity;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.cargomanage.R;
 import com.sz.ljs.cargomanage.adapter.HomeMenuAdapter;
 import com.sz.ljs.cargomanage.model.HomeMenuModel;
+import com.sz.ljs.packgoods.view.PackGoodsActivity;
+import com.sz.ljs.patchlabel.view.PatchlabelActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +61,26 @@ public class MainActivity extends BaseActivity {
             case 0: {
                 //TODO 验货
                 BaseApplication.startActivity(ExamineGoodsActivity.class);
+            }
+            break;
+            case 1: {
+                //TODO 入库
+//                BaseApplication.startActivity(ExamineGoodsActivity.class);
+            }
+            break;
+            case 2:{
+                //TODO 打包
+                BaseApplication.startActivity(PackGoodsActivity.class);
+            }
+            break;
+            case 3:{
+                //TODO 出库
+                BaseApplication.startActivity(ShipMentsActivity.class);
+            }
+            break;
+            case 6:{
+                //TODO 补打标签
+                BaseApplication.startActivity(PatchlabelActivity.class);
             }
             break;
         }

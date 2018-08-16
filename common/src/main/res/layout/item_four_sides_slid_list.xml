@@ -25,7 +25,7 @@
                 android:id="@+id/iv_isOpen"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:src="@mipmap/back_png" />
+                android:src="@mipmap/down_icon" />
         </LinearLayout>
 
         <LinearLayout

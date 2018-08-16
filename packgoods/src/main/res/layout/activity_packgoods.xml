@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.sz.ljs.common.view.TitleView
+        android:id="@+id/tv_titles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleText="@string/str_db" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tv_titles"
+        android:layout_marginBottom="@dimen/large_fillet_button_height"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:orientation="vertical">
+        <!--服务渠道-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/title_bar_heighr"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/login_edittext_bg"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:text="@string/str_fwqd"
+                android:textColor="@color/secondary_color_333333"
+                android:textSize="@dimen/majority_text" />
+
+            <EditText
+                android:id="@+id/et_qudao"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="@string/str_qxz"
+                android:singleLine="true"
+                android:textColor="@color/secondary_color_333333"
+                android:textColorHint="@color/secondary_color_cccccc"
+                android:textSize="@dimen/majority_text" />
+
+            <LinearLayout
+                android:id="@+id/ll_qudao"
+                android:layout_width="@dimen/title_bar_heighr"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/iv_qudao"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:padding="5dp"
+                    android:src="@mipmap/down_icon" />
+            </LinearLayout>
+        </LinearLayout>
+        <!--包编号-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="@dimen/title_bar_heighr"
+                android:layout_weight="5"
+                android:background="@drawable/login_edittext_bg"
+                android:orientation="horizontal"
+                android:paddingLeft="5dp">
+
+                <TextView
+                    android:id="@+id/tv_yundanhao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/str_bbh"
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+
+                <EditText
+                    android:id="@+id/et_yundanhao"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/str_qsr"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:textColor="@color/secondary_color_333333"
+                    android:textColorHint="@color/secondary_color_cccccc"
+                    android:textSize="@dimen/majority_text" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/iv_scan"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/scan_bg"
+                    android:padding="5dp"
+                    android:src="@mipmap/ic_scan" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <!--待出运-->
+        <LinearLayout
+            android:id="@+id/ll_daichuyun"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingTop="10dp">
+            <!--按钮布局-->
+            <GridView
+                android:id="@+id/gv_daichuyun_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:horizontalSpacing="10dp"
+                android:numColumns="3"
+                android:scrollbars="none"
+                android:verticalSpacing="10dp" />
+
+            <com.sz.ljs.common.view.FourSidesSlidingListView
+                android:id="@+id/fs_daichuyun_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <!--已扫描包布局-->
+        <LinearLayout
+            android:id="@+id/ll_yisaomiao"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:paddingTop="10dp">
+            <!--按钮布局-->
+            <GridView
+                android:id="@+id/gv_yisaomiao_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:horizontalSpacing="10dp"
+                android:numColumns="3"
+                android:scrollbars="none"
+                android:verticalSpacing="10dp" />
+
+            <com.sz.ljs.common.view.FourSidesSlidingListView
+                android:id="@+id/fs_yisaomiao_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/large_fillet_button_height"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_daichuhuo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/secondary_color_e7e7e7"
+            android:gravity="center"
+            android:text="@string/str_dcy"
+            android:textColor="@color/secondary_color_333333"
+            android:textSize="@dimen/majority_text" />
+
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/secondary_color_cccccc" />
+
+        <Button
+            android:id="@+id/btn_yisaomiaobao"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/secondary_color_e7e7e7"
+            android:gravity="center"
+            android:text="@string/str_ysmb"
+            android:textColor="@color/secondary_color_333333"
+            android:textSize="@dimen/majority_text" />
+    </LinearLayout>
+</RelativeLayout>

@@ -80,16 +80,19 @@ public class FourSidesSlidListAdapter extends BaseAdapter {
         hodler.ll_ischecked.setVisibility(View.VISIBLE);
         if (null != listData && listData.size() > 0) {
             hodler.tv_packageNum.setText(""+listData.get(position).getPackageNumber());
-            if(String.valueOf(listData.get(position).getPackageNumber()).startsWith("PPNO")){ //表示为包单数据
+//            if(String.valueOf(listData.get(position).getPackageNumber()).startsWith("PPNO")){ //表示为包单数据
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
                 hodler.tv_yundanhao.setText("");
                 hodler.tv_zidantiaoma.setText("");
-            }
+//            }else {
+//
+//            }
             hodler.tv_jianshu.setText(""+listData.get(position).getNumber());
             hodler.tv_shizhong.setText(listData.get(position).getWeight()+"KG");
             hodler.tv_changkuaigao.setText(listData.get(position).getLength()+"*"
                                             +listData.get(position).getWidth()+"*"
                                             +listData.get(position).getHeight());
+
         }
 
         return convertView;

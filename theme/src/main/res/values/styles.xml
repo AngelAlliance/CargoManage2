@@ -17,4 +17,9 @@
         <item name="android:windowEnterAnimation">@anim/push_bottom_in</item>
         <item name="android:windowExitAnimation">@anim/push_bottom_out</item>
     </style>
+
+    <style name="AnimationPreview">
+        <item name="android:windowEnterAnimation">@anim/upload_in</item>
+        <item name="android:windowExitAnimation">@anim/upload_out</item>
+    </style>
 </resources>

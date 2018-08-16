@@ -60,4 +60,17 @@
     <string name="str_zdtm">子单条码</string>
     <string name="str_shizhong">实重</string>
     <string name="str_ckg">长宽高</string>
+    <string name="str_fwqd">服务渠道</string>
+    <string name="str_cx">撤销</string>
+    <string name="str_sx">刷新</string>
+    <string name="str_tc">提出</string>
+    <string name="str_cb">拆包</string>
+    <string name="str_cz">称重</string>
+    <string name="str_dcy">待出运</string>
+    <string name="str_ysmb">已扫描包</string>
+    <string name="str_tmbh">条码编号</string>
+    <string name="str_qxz">请选择</string>
+    <string name="str_sczd">生成主单</string>
+    <string name="zdh">子单号</string>
+    <string name="str_dybq">打印标签</string>
 </resources>

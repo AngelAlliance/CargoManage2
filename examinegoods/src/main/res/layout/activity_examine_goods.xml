@@ -13,7 +13,8 @@
     <com.sz.ljs.common.view.FourSidesSlidingListView
         android:id="@+id/fs_listView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -25,9 +26,9 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
-            <!--yundanhao-->
+            <!--运单号-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,9 +73,11 @@
                     android:gravity="center">
                     <ImageView
                         android:id="@+id/iv_scan"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@mipmap/common_lading_live1"/>
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="5dp"
+                        android:background="@drawable/scan_bg"
+                        android:src="@mipmap/ic_scan"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -123,9 +126,11 @@
                         android:gravity="center">
                         <ImageView
                             android:id="@+id/iv_scan2"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:src="@mipmap/common_lading_live1"/>
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:padding="5dp"
+                            android:background="@drawable/scan_bg"
+                            android:src="@mipmap/ic_scan"/>
                     </LinearLayout>
                 </LinearLayout>
 

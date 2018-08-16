@@ -37,4 +37,7 @@ dependencies {
     implementation project(':common')
     implementation project(':theme')
     implementation project(':examinegoods')
+    implementation project(':packgoods')
+    implementation project(':shipments')
+    implementation project(':patchlabel')
 }

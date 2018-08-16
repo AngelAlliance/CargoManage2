@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.shipments" >
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true">
+        <activity android:name=".view.ShipMentsActivity"></activity>
+    </application>
+</manifest>
