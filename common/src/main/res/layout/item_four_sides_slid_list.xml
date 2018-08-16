@@ -107,8 +107,17 @@
             android:text="" />
 
     </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/secondary_color_cccccc"/>
+        android:background="@color/secondary_color_cccccc" />
+
+    <com.sz.ljs.common.view.NoscrollListView
+        android:id="@+id/lv_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        android:visibility="gone" />
 </LinearLayout>

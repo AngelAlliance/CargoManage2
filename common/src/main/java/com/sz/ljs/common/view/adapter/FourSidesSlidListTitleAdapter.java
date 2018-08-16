@@ -35,7 +35,7 @@ public class FourSidesSlidListTitleAdapter extends BaseAdapter {
             this.listData.clear();
         }
         this.listData = list;
-        Log.i("这里的listData值大小","size="+listData.size());
+//        Log.i("这里的listData值大小","size="+listData.size());
         notifyDataSetChanged();
     }
 
@@ -74,9 +74,13 @@ public class FourSidesSlidListTitleAdapter extends BaseAdapter {
             hodler = (ViewHodler) convertView.getTag();
         }
         if (null != listData && listData.size() > 0) {
-            Log.i("设置值是否进来了","进来了");
             hodler.tv_gx.setText(listData.get(position).getChecked());
-            hodler.tv_packageNum.setText(listData.get(position).getPackageNumber());
+            if (TextUtils.isEmpty(listData.get(position).getPackageNumber())) {
+                hodler.tv_packageNum.setVisibility(View.GONE);
+            } else {
+                hodler.tv_packageNum.setVisibility(View.VISIBLE);
+                hodler.tv_packageNum.setText(listData.get(position).getPackageNumber());
+            }
             if (TextUtils.isEmpty(listData.get(position).getTransitState())) {
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
             } else {

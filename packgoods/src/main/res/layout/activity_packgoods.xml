@@ -144,7 +144,8 @@
                 android:id="@+id/fs_daichuyun_list"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                app:type="2"/>
         </LinearLayout>
         <!--已扫描包布局-->
         <LinearLayout
@@ -170,7 +171,8 @@
                 android:id="@+id/fs_yisaomiao_list"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                app:type="1"/>
         </LinearLayout>
 
     </LinearLayout>

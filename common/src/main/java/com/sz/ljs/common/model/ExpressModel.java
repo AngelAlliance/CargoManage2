@@ -4,7 +4,7 @@ package com.sz.ljs.common.model;
 public class ExpressModel {
 
     private boolean isChecked = false;//是否被勾选
-    private int packageNumber;//包编号
+    private String packageNumber;//包编号
     private int waybillNumber;//运单号
     private int bulletsBarcode;//子单条码
     private int number;//件数
@@ -14,6 +14,20 @@ public class ExpressModel {
     private int height;//高度
     private String transitState;//中转状态
 
+    public ExpressModel(boolean isChecked, String packageNumber, String transitState, int waybillNumber, int bulletsBarcode
+            , int number, int weight, int length, int width, int height) {
+        this.isChecked = isChecked;
+        this.packageNumber = packageNumber;
+        this.transitState = transitState;
+        this.waybillNumber = waybillNumber;
+        this.bulletsBarcode = bulletsBarcode;
+        this.number = number;
+        this.weight = weight;
+        this.length = length;
+        this.width = width;
+        this.height = height;
+    }
+
     public boolean isChecked() {
         return isChecked;
     }
@@ -22,11 +36,11 @@ public class ExpressModel {
         isChecked = checked;
     }
 
-    public int getPackageNumber() {
+    public String getPackageNumber() {
         return packageNumber;
     }
 
-    public void setPackageNumber(int packageNumber) {
+    public void setPackageNumber(String packageNumber) {
         this.packageNumber = packageNumber;
     }
 
@@ -93,8 +107,6 @@ public class ExpressModel {
     public void setTransitState(String transitState) {
         this.transitState = transitState;
     }
-
-
 
 
 }

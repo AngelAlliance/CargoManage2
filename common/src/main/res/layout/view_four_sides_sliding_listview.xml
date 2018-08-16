@@ -20,6 +20,23 @@
             android:visibility="visible" />
     </com.sz.ljs.common.view.SyncHorizontalScrollView>
 
+    <com.sz.ljs.common.view.SyncHorizontalScrollView
+        android:id="@+id/header_noPackagehorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <com.sz.ljs.common.view.NoscrollListView
+            android:id="@+id/lv_noPackageheader"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:overScrollMode="never"
+            android:scrollbars="none"
+            android:visibility="visible" />
+    </com.sz.ljs.common.view.SyncHorizontalScrollView>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
@@ -37,8 +54,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_alignParentTop="true"
+            android:layout_weight="1"
             android:orientation="horizontal">
 
             <com.sz.ljs.common.view.SyncHorizontalScrollView
@@ -54,6 +71,23 @@
                     android:layout_height="match_parent"
                     android:overScrollMode="never"
                     android:scrollbars="none" />
+
+            </com.sz.ljs.common.view.SyncHorizontalScrollView>
+
+            <com.sz.ljs.common.view.SyncHorizontalScrollView
+                android:id="@+id/data_noPackagehorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <com.sz.ljs.common.view.NoscrollListView
+                    android:id="@+id/lv_noPackagedata"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    android:visibility="gone" />
             </com.sz.ljs.common.view.SyncHorizontalScrollView>
         </LinearLayout>
     </ScrollView>

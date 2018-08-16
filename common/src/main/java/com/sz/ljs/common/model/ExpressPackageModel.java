@@ -8,7 +8,7 @@ public class ExpressPackageModel {
 
     private boolean isChecked=false;//是否勾选状态
     private boolean isOpen=false;//是否展开
-    private int packageNumber;//包编号
+    private String packageNumber;//包编号
     private int number;//件数
     private int weight;//重量
     private int length;//长度
@@ -16,7 +16,7 @@ public class ExpressPackageModel {
     private int height;//高度
     private List<ExpressModel> expressModels=new ArrayList<ExpressModel>();
 
-    public ExpressPackageModel(boolean isChecked,boolean isOpen,int packageNumber,int number
+    public ExpressPackageModel(boolean isChecked,boolean isOpen,String packageNumber,int number
                                 ,int weight,int length,int width,int height,List<ExpressModel> expressModels){
         this.isChecked=isChecked;
         this.isOpen=isOpen;
@@ -44,11 +44,11 @@ public class ExpressPackageModel {
         isOpen = open;
     }
 
-    public int getPackageNumber() {
+    public String getPackageNumber() {
         return packageNumber;
     }
 
-    public void setPackageNumber(int packageNumber) {
+    public void setPackageNumber(String packageNumber) {
         this.packageNumber = packageNumber;
     }
 

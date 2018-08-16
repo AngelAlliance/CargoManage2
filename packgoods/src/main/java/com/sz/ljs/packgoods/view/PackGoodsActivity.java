@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sz.ljs.base.BaseActivity;
+import com.sz.ljs.common.model.ExpressModel;
 import com.sz.ljs.common.model.ExpressPackageModel;
 import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
 import com.sz.ljs.common.view.FourSidesSlidingListView;
@@ -35,8 +36,11 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     private GridView gv_daichuyun_menu, gv_yisaomiao_menu;
     private FourSidesSlidingListView fs_daichuyun_list, fs_yisaomiao_list;
     private Button btn_daichuhuo, btn_yisaomiaobao;
-    private List<FourSidesSlidListTitileModel> headerList = new ArrayList<>();
-    private List<ExpressPackageModel> listData = new ArrayList<>();
+    private List<FourSidesSlidListTitileModel> danChuYunHeaderList = new ArrayList<>();
+    private List<ExpressModel> danChuYunlistData = new ArrayList<>();
+
+    private List<FourSidesSlidListTitileModel> yiSaoMiaoHeaderList = new ArrayList<>();
+    private List<ExpressPackageModel> yiSaoMiaolistData = new ArrayList<>();
     private List<MenuModel> dcyMenuList = new ArrayList<>();
     private List<MenuModel> ysmMenuList = new ArrayList<>();
     private MenuAdapter dcyMenuAdapter;
@@ -54,6 +58,10 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     private void initView() {
         setDaiChuYunMenu();
         setYiSaoMiaoMenu();
+        getDaiChuYunHeaderData();
+        getYiSaoMiaoHeaderData();
+        setdanChuYunContentData();
+        setyiSaoMiaoContentData();
         et_qudao = (EditText) findViewById(R.id.et_qudao);
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         tv_yundanhao = (TextView) findViewById(R.id.tv_yundanhao);
@@ -102,10 +110,15 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
             ll_daichuyun.setVisibility(View.VISIBLE);
             ll_yisaomiao.setVisibility(View.GONE);
             tv_yundanhao.setText(getResources().getString(R.string.str_tmbh));
+            fs_daichuyun_list.setHeaderData(danChuYunHeaderList);
+            fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
+
         } else if (id == R.id.btn_yisaomiaobao) {  //已扫描
             ll_daichuyun.setVisibility(View.GONE);
             ll_yisaomiao.setVisibility(View.VISIBLE);
             tv_yundanhao.setText(getResources().getString(R.string.str_ydh));
+            fs_yisaomiao_list.setHeaderData(yiSaoMiaoHeaderList);
+            fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
         }
     }
 
@@ -123,5 +136,95 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         ysmMenuList.add(new MenuModel(3, getResources().getString(R.string.str_tc), R.mipmap.ic_tichu));
         ysmMenuList.add(new MenuModel(4, getResources().getString(R.string.str_cb), R.mipmap.ic_chaibao));
         ysmMenuList.add(new MenuModel(5, getResources().getString(R.string.str_cz), R.mipmap.ic_tichu));
+    }
+
+    private void getDaiChuYunHeaderData() {
+        danChuYunHeaderList.add(new FourSidesSlidListTitileModel(getResources().getString(R.string.str_gx)
+                , "", getResources().getString(R.string.str_zzzt)
+                , getResources().getString(R.string.str_ydh), getResources().getString(R.string.str_zdtm)
+                , getResources().getString(R.string.str_js), getResources().getString(R.string.str_shizhong)
+                , getResources().getString(R.string.str_ckg)));
+    }
+
+    private void getYiSaoMiaoHeaderData() {
+        yiSaoMiaoHeaderList.add(new FourSidesSlidListTitileModel(getResources().getString(R.string.str_gx)
+                , getResources().getString(R.string.str_bbh), ""
+                , getResources().getString(R.string.str_ydh), getResources().getString(R.string.str_zdtm)
+                , getResources().getString(R.string.str_js), getResources().getString(R.string.str_shizhong)
+                , getResources().getString(R.string.str_ckg)));
+    }
+
+    private void setdanChuYunContentData() {
+        danChuYunlistData.add(new ExpressModel(false, "", "正常走货", 104343
+                , 105550, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(true, "", "正常走货", 104343
+                , 2423423, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(true, "", "扣件中", 104343
+                , 545455, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(false, "", "正常走货", 104343
+                , 43222, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(true, "", "正常走货", 104343
+                , 43434, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(false, "", "扣件中", 104343
+                , 434343, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(true, "", "正常走货", 104343
+                , 1111, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(false, "", "扣件中", 104343
+                , 433, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(true, "", "扣件中", 104343
+                , 5454, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(false, "", "正常走货", 104343
+                , 565, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(true, "", "扣件中", 104343
+                , 7666, 12, 11, 4, 2, 1));
+        danChuYunlistData.add(new ExpressModel(false, "", "正常走货", 104343
+                , 5454, 12, 11, 4, 2, 1));
+    }
+
+    private void setyiSaoMiaoContentData() {
+        List<ExpressModel> list = new ArrayList<>();
+        list.add(new ExpressModel(false, "1234567", "", 104343
+                , 105550, 12, 11, 4, 2, 1));
+        list.add(new ExpressModel(true, "1234567", "", 104343
+                , 105550, 12, 11, 4, 2, 1));
+        list.add(new ExpressModel(false, "1234567", "", 104343
+                , 105550, 12, 11, 4, 2, 1));
+        list.add(new ExpressModel(true, "1234567", "", 104343
+                , 105550, 12, 11, 4, 2, 1));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 100, 12, 11, 4, list));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 110, 12, 11, 4, null));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 122, 12, 11, 4, null));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 133, 12, 11, 4, null));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 144, 12, 11, 4, null));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 155, 12, 11, 4, null));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 166, 12, 11, 4, null));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 1230, 12, 11, 4, null));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 1430, 12, 11, 4, null));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 4300, 12, 11, 4, null));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 1200, 12, 11, 4, null));
+        list.clear();
+        list.add(new ExpressModel(false, "1234567", "", 104343
+                , 105550, 12, 11, 4, 2, 1));
+        list.add(new ExpressModel(true, "1234567", "", 104343
+                , 105550, 12, 11, 4, 2, 1));
+        list.add(new ExpressModel(false, "1234567", "", 104343
+                , 105550, 12, 11, 4, 2, 1));
+        list.add(new ExpressModel(true, "1234567", "", 104343
+                , 105550, 12, 11, 4, 2, 1));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, false, "1234567", 10
+                , 350, 12, 11, 4, list));
+        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
+                , 550, 12, 11, 4, null));
     }
 }

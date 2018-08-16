@@ -38,4 +38,7 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
+    <declare-styleable name="FourSidesSlidingListView">
+        <attr name="type" format="integer" />
+    </declare-styleable>
 </resources>
