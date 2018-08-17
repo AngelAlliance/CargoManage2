@@ -83,6 +83,47 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         iv_scan.setOnClickListener(this);
         btn_daichuhuo.setOnClickListener(this);
         btn_yisaomiaobao.setOnClickListener(this);
+        fs_daichuyun_list.setSidesSlidNoGroupCheckListener(new FourSidesSlidingListView.SidesSlidNoGroupCheckListener() {
+            @Override
+            public void OnClick(int childPosition) {
+                if (null != danChuYunlistData && danChuYunlistData.size() > 0) {
+                    if (false == danChuYunlistData.get(childPosition).isChecked()) {
+                        danChuYunlistData.get(childPosition).setChecked(true);
+                    } else {
+                        danChuYunlistData.get(childPosition).setChecked(false);
+                    }
+                    fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
+                }
+            }
+        });
+        fs_yisaomiao_list.setSidesSlidGroupCheckListener(new FourSidesSlidingListView.SidesSlidGroupCheckListener() {
+            @Override
+            public void OnClick(int groupPosition) {
+                //TODO 点击父勾选按钮
+                if (null != yiSaoMiaolistData && yiSaoMiaolistData.size() > 0) {
+                    if (false == yiSaoMiaolistData.get(groupPosition).isChecked()) {
+                        yiSaoMiaolistData.get(groupPosition).setChecked(true);
+                        if (null != yiSaoMiaolistData.get(groupPosition).getExpressModels()
+                                && yiSaoMiaolistData.get(groupPosition).getExpressModels().size() > 0) {
+                            //TODO 将其所有子单状态全部设置成勾选状态
+                            for (int i = 0; i < yiSaoMiaolistData.get(groupPosition).getExpressModels().size(); i++) {
+                                yiSaoMiaolistData.get(groupPosition).getExpressModels().get(i).setChecked(true);
+                            }
+                        }
+                    } else {
+                        yiSaoMiaolistData.get(groupPosition).setChecked(false);
+                        if (null != yiSaoMiaolistData.get(groupPosition).getExpressModels()
+                                && yiSaoMiaolistData.get(groupPosition).getExpressModels().size() > 0) {
+                            //TODO 将其所有子单状态全部取消勾选状态
+                            for (int i = 0; i < yiSaoMiaolistData.get(groupPosition).getExpressModels().size(); i++) {
+                                yiSaoMiaolistData.get(groupPosition).getExpressModels().get(i).setChecked(false);
+                            }
+                        }
+                    }
+                    fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
+                }
+            }
+        });
     }
 
     private void initData() {
@@ -90,6 +131,10 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         gv_daichuyun_menu.setAdapter(dcyMenuAdapter);
         ysmMenuAdapter = new MenuAdapter(this, ysmMenuList);
         gv_yisaomiao_menu.setAdapter(ysmMenuAdapter);
+        fs_daichuyun_list.setHeaderData(danChuYunHeaderList);
+        fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
+        fs_yisaomiao_list.setHeaderData(yiSaoMiaoHeaderList);
+        fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
     }
 
     @Override
@@ -110,15 +155,10 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
             ll_daichuyun.setVisibility(View.VISIBLE);
             ll_yisaomiao.setVisibility(View.GONE);
             tv_yundanhao.setText(getResources().getString(R.string.str_tmbh));
-            fs_daichuyun_list.setHeaderData(danChuYunHeaderList);
-            fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
-
         } else if (id == R.id.btn_yisaomiaobao) {  //已扫描
             ll_daichuyun.setVisibility(View.GONE);
             ll_yisaomiao.setVisibility(View.VISIBLE);
             tv_yundanhao.setText(getResources().getString(R.string.str_ydh));
-            fs_yisaomiao_list.setHeaderData(yiSaoMiaoHeaderList);
-            fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
         }
     }
 

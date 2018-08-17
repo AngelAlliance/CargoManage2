@@ -21,13 +21,18 @@ public class ExpressAdapter extends BaseAdapter {
     private Context mContext;
     private List<ExpressModel> listData = new ArrayList<ExpressModel>();
     private LayoutInflater inflater;
-    private int index;
+    ChildCheckedImgOnclick childCheckedImgOnclick;
 
-    public ExpressAdapter(Context context, List<ExpressModel> list, int position) {
+    public interface ChildCheckedImgOnclick {
+        void onClick( int childPosition);
+    }
+    public void setChildCheckedImgOnclick(ChildCheckedImgOnclick listener) {
+        childCheckedImgOnclick = listener;
+    }
+    public ExpressAdapter(Context context, List<ExpressModel> list) {
         mContext = context;
         listData = list;
         inflater = LayoutInflater.from(context);
-        index = position;
     }
 
     public void setData(List<ExpressModel> list) {
@@ -54,7 +59,7 @@ public class ExpressAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHodler hodler = null;
         if (null == convertView) {
             hodler = new ViewHodler();
@@ -78,13 +83,15 @@ public class ExpressAdapter extends BaseAdapter {
         } else {
             hodler = (ViewHodler) convertView.getTag();
         }
+        hodler.ll_isOpen.setVisibility(View.VISIBLE);
+        hodler.iv_isOpen.setVisibility(View.GONE);
         hodler.ll_ischecked.setVisibility(View.VISIBLE);
         if (null != listData && listData.size() > 0) {
             if (false == listData.get(position).isChecked()) {
                 //TODO 表示没有被勾选
-                hodler.iv_isOpen.setImageResource(R.mipmap.fb_b);
+                hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
             } else {
-                hodler.iv_isOpen.setImageResource(R.mipmap.fb_g);
+                hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
             }
 
             if (TextUtils.isEmpty(listData.get(position).getPackageNumber())) {
@@ -112,6 +119,14 @@ public class ExpressAdapter extends BaseAdapter {
                     + listData.get(position).getHeight());
 
         }
+        hodler.ll_ischecked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(null!=childCheckedImgOnclick){
+                    childCheckedImgOnclick.onClick(position);
+                }
+            }
+        });
         return convertView;
     }
 

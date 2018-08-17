@@ -65,12 +65,13 @@
                 android:overScrollMode="never"
                 android:scrollbars="none">
 
-                <com.sz.ljs.common.view.NoscrollListView
+                <com.sz.ljs.common.view.NoscrollExpandableListView
                     android:id="@+id/lv_data"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:overScrollMode="never"
-                    android:scrollbars="none" />
+                    android:scrollbars="none"
+                    android:groupIndicator="@null"/>
 
             </com.sz.ljs.common.view.SyncHorizontalScrollView>
 

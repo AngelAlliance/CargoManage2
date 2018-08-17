@@ -2,23 +2,22 @@ package com.sz.ljs.common.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
 
 /**
- * Created by liujs on 2018/8/15.
- * 自定义实现ListView让其能跟着ScrollView滚动(禁止listview滑动)
+ * Created by Administrator on 2018/8/17.
  */
 
-public class NoscrollListView extends ListView {
-    public NoscrollListView(Context context) {
+public class NoscrollExpandableListView extends ExpandableListView {
+    public NoscrollExpandableListView(Context context) {
         super(context);
     }
 
-    public NoscrollListView(Context context, AttributeSet attrs) {
+    public NoscrollExpandableListView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public NoscrollListView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public NoscrollExpandableListView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -27,5 +26,4 @@ public class NoscrollListView extends ListView {
         int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
         super.onMeasure(widthMeasureSpec, expandSpec);
     }
-
 }
