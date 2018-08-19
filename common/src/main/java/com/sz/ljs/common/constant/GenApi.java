@@ -7,6 +7,6 @@ package com.sz.ljs.common.constant;
 
 public final class GenApi {
     // 统一服务器
-    public static final String URL = "http://localhost:62701/api/";
+    public static final String URL = "http://120.79.10.142:8854/api/";
 
 }

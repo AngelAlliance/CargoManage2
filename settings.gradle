@@ -1,1 +1,1 @@
-include ':app', ':common', ':base', ':theme', ':examinegoods', ':packgoods', ':shipments', ':patchlabel'
+include ':app', ':common', ':base', ':theme', ':examinegoods', ':packgoods', ':shipments', ':patchlabel', ':warehousing'

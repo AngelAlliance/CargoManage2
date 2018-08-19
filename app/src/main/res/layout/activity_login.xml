@@ -50,7 +50,6 @@
             android:background="@null"
             android:gravity="center_vertical"
             android:hint="@string/str_gh"
-            android:inputType="number"
             android:lines="1"
             android:maxLength="20"
             android:textColor="@color/secondary_color_333333"

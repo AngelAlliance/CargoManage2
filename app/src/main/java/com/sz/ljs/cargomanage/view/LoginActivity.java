@@ -160,30 +160,30 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             Utils.showToast(LoginActivity.this, getResources().getString(R.string.str_mmbwk));
             return;
         }
-        goHome();
-//        showWaiting(true);
-//        loginPresenter.doLogin(et_workNum.getText().toString().trim(), et_password.getText().toString().trim())
-//                .compose(this.<LoginModel>bindUntilEvent(ActivityEvent.DESTROY))
-//                .subscribeOn(Schedulers.newThread())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Consumer<LoginModel>() {
-//                    @Override
-//                    public void accept(LoginModel result) throws Exception {
-//                        showWaiting(false);
-//                        if (0 == result.getCode()) {
-//                            Utils.showToast(LoginActivity.this, result.getMsg());
-//                        } else if (1 == result.getCode()) {
-//                            handelLoginResult(result);
-//                        }
-//                    }
-//                }, new Consumer<Throwable>() {
-//                    @Override
-//                    public void accept(Throwable throwable) throws Exception {
-//                        //获取失败，提示
-//                        showWaiting(false);
-//                        Utils.showToast(getBaseActivity(), R.string.str_dlsb);
-//                    }
-//                });
+//        goHome();
+        showWaiting(true);
+        loginPresenter.doLogin(et_workNum.getText().toString().trim(), et_password.getText().toString().trim())
+                .compose(this.<LoginModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<LoginModel>() {
+                    @Override
+                    public void accept(LoginModel result) throws Exception {
+                        showWaiting(false);
+                        if (0 == result.getCode()) {
+                            Utils.showToast(LoginActivity.this, result.getMsg());
+                        } else if (1 == result.getCode()) {
+                            handelLoginResult(result);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        //获取失败，提示
+                        showWaiting(false);
+                        Utils.showToast(getBaseActivity(), R.string.str_dlsb);
+                    }
+                });
     }
 
     //TODO 处理登录返回的数据

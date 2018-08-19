@@ -73,4 +73,24 @@
     <string name="str_sczd">生成主单</string>
     <string name="zdh">子单号</string>
     <string name="str_dybq">打印标签</string>
+    <string name="str_aybkhcz">按预报客户操作</string>
+    <string name="str_khdm">客户代码</string>
+    <string name="str_mdgj">目的国家</string>
+    <string name="str_xscp">销售产品</string>
+    <string name="str_dj">多件</string>
+    <string name="str_dhzd">到货总单</string>
+    <string name="str_qr">签入</string>
+    <string name="str_fjfw">附加服务</string>
+    <string name="str_szqk">实重(KG)</string>
+    <string name="str_chang">长(CM)</string>
+    <string name="str_kuan">宽(CM)</string>
+    <string name="str_gao">高(CM)</string>
+    <string name="str_queren">确认</string>
+    <string name="str_shanchu">删除</string>
+    <string name="str_xinzeng">新增</string>
+    <string name="str_zjs">总件数:</string>
+    <string name="str_zsz">总实重:</string>
+    <string name="str_zcj">总材积:</string>
+    <string name="str_zfx">杂费项</string>
+    <string name="str_fy">费用(RMB)</string>
 </resources>

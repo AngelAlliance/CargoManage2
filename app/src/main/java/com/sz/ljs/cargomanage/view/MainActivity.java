@@ -15,6 +15,7 @@ import com.sz.ljs.cargomanage.adapter.HomeMenuAdapter;
 import com.sz.ljs.cargomanage.model.HomeMenuModel;
 import com.sz.ljs.packgoods.view.PackGoodsActivity;
 import com.sz.ljs.patchlabel.view.PatchlabelActivity;
+import com.sz.ljs.warehousing.view.WareHousingActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class MainActivity extends BaseActivity {
             break;
             case 1: {
                 //TODO 入库
-//                BaseApplication.startActivity(ExamineGoodsActivity.class);
+                BaseApplication.startActivity(WareHousingActivity.class);
             }
             break;
             case 2:{

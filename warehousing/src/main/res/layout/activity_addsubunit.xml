@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/secondary_color_ffffff">
+
+    <com.sz.ljs.common.view.TitleView
+        android:id="@+id/tv_titleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleText="@string/str_dj" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll_tongji"
+        android:layout_below="@+id/tv_titleView"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ll_addView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!--统计-->
+    <LinearLayout
+        android:id="@+id/ll_tongji"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ll_btn"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/secondary_color_e7e7e7" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/large_fillet_button_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_zjs"
+                android:textColor="@color/secondary_color_333333"
+                android:textSize="@dimen/majority_text" />
+
+            <TextView
+                android:id="@+id/tv_zongjianshu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text=""
+                android:textColor="@color/secondary_color_333333"
+                android:textSize="@dimen/majority_text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/large_fillet_button_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_zsz"
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+
+                <TextView
+                    android:id="@+id/tv_zongshizhong"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text=""
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_zcj"
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+
+                <TextView
+                    android:id="@+id/tv_zongcaiji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text=""
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!--按钮布局-->
+    <LinearLayout
+        android:id="@+id/ll_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/large_fillet_button_height"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_queren"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/loging_button_bg"
+            android:gravity="center"
+            android:text="@string/str_queren"
+            android:textColor="@color/secondary_color_ffffff"
+            android:textSize="@dimen/majority_text" />
+
+        <TextView
+            android:layout_width="3dp"
+            android:layout_height="match_parent"
+            android:background="@color/secondary_color_ffffff" />
+
+        <Button
+            android:id="@+id/btn_xinzeng"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/loging_button_bg"
+            android:gravity="center"
+            android:text="@string/str_xinzeng"
+            android:textColor="@color/secondary_color_ffffff"
+            android:textSize="@dimen/majority_text" />
+    </LinearLayout>
+</RelativeLayout>
