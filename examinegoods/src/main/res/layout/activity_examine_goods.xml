@@ -129,7 +129,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-            <!--货物类型-->
+            <!--检查项标题栏-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
@@ -201,6 +201,7 @@
 
             <!--是否带电-->
             <LinearLayout
+                android:id="@+id/ll_shifoudaidian"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -254,6 +255,7 @@
 
             <!--是否带磁-->
             <LinearLayout
+                android:id="@+id/ll_shifoudaici"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -307,6 +309,7 @@
 
             <!--是否带牌-->
             <LinearLayout
+                android:id="@+id/ll_shifoudaipai"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -360,6 +363,7 @@
 
             <!--件数-->
             <LinearLayout
+                android:id="@+id/ll_jianshu"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -413,6 +417,7 @@
 
             <!--是否有随货发票-->
             <LinearLayout
+                android:id="@+id/ll_suihuofapiao"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -466,6 +471,7 @@
 
             <!--发票资料是否正确-->
             <LinearLayout
+                android:id="@+id/ll_fapiaoziliao"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -519,6 +525,7 @@
 
             <!--有无报关资料-->
             <LinearLayout
+                android:id="@+id/ll_baoguanziliao"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -572,6 +579,7 @@
 
             <!--是否单独报关-->
             <LinearLayout
+                android:id="@+id/ll_dandubaoguan"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -625,6 +633,7 @@
 
             <!--货物是否有损坏-->
             <LinearLayout
+                android:id="@+id/ll_huowusunhuai"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -678,6 +687,7 @@
 
             <!--外包装是否破损-->
             <LinearLayout
+                android:id="@+id/ll_baozhuangposun"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -731,6 +741,7 @@
 
             <!--是否为违禁品-->
             <LinearLayout
+                android:id="@+id/ll_weijinpin"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"
@@ -784,6 +795,7 @@
 
             <!--是否为易碎品-->
             <LinearLayout
+                android:id="@+id/ll_yisuipin"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/title_bar_heighr"
                 android:layout_marginTop="10dp"

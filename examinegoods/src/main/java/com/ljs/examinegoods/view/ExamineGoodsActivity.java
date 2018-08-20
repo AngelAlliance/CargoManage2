@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import com.ljs.examinegoods.R;
 import com.ljs.examinegoods.adapter.PhotoGridAdapter;
+import com.ljs.examinegoods.model.DetectionByModel;
+import com.ljs.examinegoods.model.ItemTypeModel;
 import com.ljs.examinegoods.model.OrderModel;
 import com.ljs.examinegoods.presenter.ExamineGoodsPresenter;
 import com.sz.ljs.base.BaseActivity;
@@ -29,6 +31,8 @@ import com.sz.ljs.common.view.FourSidesSlidingListView;
 import com.sz.ljs.common.view.NoscrollListView;
 import com.sz.ljs.common.view.PhotosUtils;
 import com.sz.ljs.common.view.ScanView;
+import com.sz.ljs.common.view.SelectionPopForBottomView;
+import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.common.view.adapter.FourSidesSlidListTitleAdapter;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
@@ -51,13 +55,21 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private RadioGroup rg_shifoudaidian, rg_shifoudaici, rg_shifoudaipai, rg_jianshu, rg_suihuofapiao, rg_fapiaoziliao, rg_baoguanziliao, rg_dandubaoguan, rg_huowusunhuai, rg_baozhuangposun, rg_weijinpin, rg_yisuipin;
     private RadioButton yes_shifoudaidian, no_shifoudaidian, yes_shifoudaici, no_shifoudaici, yes_shifoudaipai, no_shifoudaipai, yes_jianshu, no_jianshu, yes_suihuofapiao, no_suihuofapiao, yes_fapiaoziliao, no_fapiaoziliao, yes_baoguanziliao, no_baoguanziliao, yes_dandubaoguan, no_dandubaoguan, yes_huowusunhuai, no_huowusunhuai, yes_baozhuangposun, no_baozhuangposun, yes_weijinpin, no_weijinpin, yes_yisuipin, no_yisuipin;
     private GridView gv_photo;
-    private LinearLayout ll_photo;
+    private LinearLayout ll_photo,ll_shifoudaidian,ll_shifoudaici,ll_shifoudaipai,ll_jianshu,ll_suihuofapiao
+            ,ll_fapiaoziliao,ll_baoguanziliao,ll_dandubaoguan,ll_huowusunhuai,ll_baozhuangposun,ll_weijinpin,ll_yisuipin;
     private Button bt_yes;
     private boolean isYanHuo = false;
     private List<Bitmap> photoList = new ArrayList<>();
     private PhotoGridAdapter adapter;
     private ExamineGoodsPresenter mPresenter;
-
+    private List<String> showList = new ArrayList<>();
+    private List<ItemTypeModel.DataBean> typeList = new ArrayList<>();
+    private List<DetectionByModel.DataBean> detectionList = new ArrayList<>();
+    private WaitingDialog waitingDialog;
+    private String isDaiDian,isDaiCi,isDaiPai,isSuiHuoFaPiao,isFaPiaoZiLiao,isBaoGuanZiLiao,isDanDuBaoGuan,isHuoWuSunHuai
+            ,isWaiBaoZhuangPoSun,isWeiJinPin,isYiSuiPin;
+    private boolean isHongKuang=false,isHongKuang1=false,isHongKuang2=false,isHongKuang3=false,isHongKuang4=false,isHongKuang5=false
+            ,isHongKuang6=false,isHongKuang7=false,isHongKuang8=false,isHongKuang9=false,isHongKuang10=false,isHongKuang11=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +80,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void initView() {
+        waitingDialog = new WaitingDialog(this);
         mPresenter = new ExamineGoodsPresenter();
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         et_kehucankaodanhao = (EditText) findViewById(R.id.et_kehucankaodanhao);
@@ -130,6 +143,18 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         gv_photo = (GridView) findViewById(R.id.gv_photo);
         ll_photo = (LinearLayout) findViewById(R.id.ll_photo);
         bt_yes = (Button) findViewById(R.id.bt_yes);
+        ll_shifoudaidian = (LinearLayout) findViewById(R.id.ll_shifoudaidian);
+        ll_shifoudaici = (LinearLayout) findViewById(R.id.ll_shifoudaici);
+        ll_shifoudaipai = (LinearLayout) findViewById(R.id.ll_shifoudaipai);
+        ll_jianshu = (LinearLayout) findViewById(R.id.ll_jianshu);
+        ll_suihuofapiao = (LinearLayout) findViewById(R.id.ll_suihuofapiao);
+        ll_fapiaoziliao = (LinearLayout) findViewById(R.id.ll_fapiaoziliao);
+        ll_baoguanziliao = (LinearLayout) findViewById(R.id.ll_baoguanziliao);
+        ll_dandubaoguan = (LinearLayout) findViewById(R.id.ll_dandubaoguan);
+        ll_huowusunhuai = (LinearLayout) findViewById(R.id.ll_huowusunhuai);
+        ll_baozhuangposun = (LinearLayout) findViewById(R.id.ll_baozhuangposun);
+        ll_weijinpin = (LinearLayout) findViewById(R.id.ll_weijinpin);
+        ll_yisuipin = (LinearLayout) findViewById(R.id.ll_yisuipin);
     }
 
 
@@ -161,10 +186,18 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         rg_shifoudaidian.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+
                 if (checkedId == R.id.yes_shifoudaidian) {
-
+                    isHongKuang=inspect(getResources().getString(R.string.str_sfdd),"Y");
+                    isDaiDian="Y";
                 } else if (checkedId == R.id.no_shifoudaidian) {
-
+                    isHongKuang=inspect(getResources().getString(R.string.str_sfdd),"N");
+                    isDaiDian="N";
+                }
+                if (true==isHongKuang){
+                    ll_shifoudaidian.setBackgroundResource(R.drawable.login_edittext2_bg);
+                }else {
+                    ll_shifoudaidian.setBackgroundResource(R.drawable.login_edittext_bg);
                 }
             }
         });
@@ -292,6 +325,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         iv_scan.setOnClickListener(this);
         iv_scan2.setOnClickListener(this);
         iv_yiyanhuo.setOnClickListener(this);
+//        tv_goods_type.setOnClickListener(this);
     }
 
     @Override
@@ -343,6 +377,106 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 iv_yiyanhuo.setImageResource(R.mipmap.fb_b);
             }
         }
+//        else if (id == R.id.tv_goods_type) {
+//            //TODO 货物类型
+//            getItemType();
+//        }
+    }
+
+    private boolean inspect(String inspectName,String inspectType){
+        boolean isChaYi=false;
+        if(null!=detectionList&&detectionList.size()>0){
+            for(int i=0;i<detectionList.size();i++){
+                if(inspectName.equals(detectionList.get(i).getDetection_en_name())){
+                    //如果有这一项检查
+                    if("D".equals(detectionList.get(i).getValue())){
+                        //表示不做限制的，这时候随便点哪项都没事
+                        isChaYi=false;
+                        break;
+                    }else if(inspectType.equals(detectionList.get(i).getValue())){
+                        isChaYi=false;
+                        break;
+                    }else {
+                        isChaYi=true;
+                        break;
+                    }
+                }
+            }
+        }
+        return isChaYi;
+    }
+    //TODO 查询所有得货物类型
+    private void getItemType() {
+        showWaiting(true);
+        mPresenter.getItemType()
+                .compose(this.<ItemTypeModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ItemTypeModel>() {
+                    @Override
+                    public void accept(ItemTypeModel result) throws Exception {
+                        if (0 == result.getCode()) {
+                            showWaiting(false);
+                            Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
+                        } else if (1 == result.getCode()) {
+                            showWaiting(false);
+                            if (null != result && null != result.getData() && result.getData().size() > 0) {
+                                typeList.clear();
+                                typeList.addAll(result.getData());
+                                showList.clear();
+                                for (ItemTypeModel.DataBean bean : result.getData()) {
+                                    showList.add(bean.getItem_cn_name());
+                                }
+                                SelectionPopForBottomView.SelectionPopForBottomView(ExamineGoodsActivity.this
+                                        , "请选择货物类型", showList, new SelectionPopForBottomView.ContentItemOnClickListener() {
+                                            @Override
+                                            public void ItemOclick(int position) {
+
+
+                                            }
+                                        });
+                            }
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        showWaiting(false);
+                        //获取失败，提示
+                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                    }
+                });
+    }
+
+    //TODO 根据货物类型差检查项  detection_name:货物类型中文名称
+    private void getDetectionBy(String detection_name) {
+        showWaiting(true);
+        mPresenter.getDetectionBy(detection_name)
+                .compose(this.<DetectionByModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<DetectionByModel>() {
+                    @Override
+                    public void accept(DetectionByModel result) throws Exception {
+                        if (0 == result.getCode()) {
+                            showWaiting(false);
+                            Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
+                        } else if (1 == result.getCode()) {
+                            showWaiting(false);
+                            if (null != result.getData() && result.getData().size() > 0) {
+                                detectionList.clear();
+                                detectionList.addAll(result.getData());
+                            }
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        showWaiting(false);
+                        //获取失败，提示
+                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                    }
+                });
     }
 
     //TODO 根据运单号请求运单数据
@@ -371,7 +505,22 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     }
 
     //TODO 处理运单数据
-    private void handelOrderResult(OrderModel result){
+    private void handelOrderResult(OrderModel result) {
+        if(null!=result&&null!=result.getData()){
+            if(!TextUtils.isEmpty(result.getData().getOrder_info())){
+                tv_goods_type.setText(result.getData().getOrder_info());
+                getDetectionBy(result.getData().getOrder_info());
+            }
+            if(!TextUtils.isEmpty(result.getData().getOrder_pieces())){
+                tv_goods_jianshu.setText(result.getData().getOrder_pieces());
+            }
 
+        }
+    }
+
+    private void showWaiting(boolean isShow) {
+        if (null != waitingDialog) {
+            waitingDialog.showDialog(isShow);
+        }
     }
 }
