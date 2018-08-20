@@ -12,7 +12,12 @@
             <option value="$PROJECT_DIR$/base" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/examinegoods" />
+            <option value="$PROJECT_DIR$/packgoods" />
+            <option value="$PROJECT_DIR$/patchlabel" />
+            <option value="$PROJECT_DIR$/setting" />
+            <option value="$PROJECT_DIR$/shipments" />
             <option value="$PROJECT_DIR$/theme" />
+            <option value="$PROJECT_DIR$/warehousing" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

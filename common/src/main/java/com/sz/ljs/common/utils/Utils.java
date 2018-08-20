@@ -98,6 +98,17 @@ public class Utils {
         return ver;
     }
 
+    //TODO 获取版本名称
+    public static String getVersionName(Context context){
+        try {
+            PackageManager manager = context.getPackageManager();
+            PackageInfo pi = manager.getPackageInfo(context.getPackageName(), PackageManager.GET_CONFIGURATIONS);
+            return pi.versionName;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "1.0.0.0";
+    }
     public interface IToastCallBack{
         public final static int STATE_CLICK = 1;
         public final static int STATE_DISMISSED = 2;

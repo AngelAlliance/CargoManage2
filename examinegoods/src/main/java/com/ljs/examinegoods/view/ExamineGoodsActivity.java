@@ -3,7 +3,10 @@ package com.ljs.examinegoods.view;
 import android.Manifest;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,17 +19,25 @@ import android.widget.TextView;
 
 import com.ljs.examinegoods.R;
 import com.ljs.examinegoods.adapter.PhotoGridAdapter;
+import com.ljs.examinegoods.model.OrderModel;
+import com.ljs.examinegoods.presenter.ExamineGoodsPresenter;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.common.model.ExpressPackageModel;
 import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
+import com.sz.ljs.common.utils.Utils;
 import com.sz.ljs.common.view.FourSidesSlidingListView;
 import com.sz.ljs.common.view.NoscrollListView;
 import com.sz.ljs.common.view.PhotosUtils;
 import com.sz.ljs.common.view.ScanView;
 import com.sz.ljs.common.view.adapter.FourSidesSlidListTitleAdapter;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by liujs on 2018/8/13.
@@ -45,6 +56,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private boolean isYanHuo = false;
     private List<Bitmap> photoList = new ArrayList<>();
     private PhotoGridAdapter adapter;
+    private ExamineGoodsPresenter mPresenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +68,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void initView() {
+        mPresenter = new ExamineGoodsPresenter();
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         et_kehucankaodanhao = (EditText) findViewById(R.id.et_kehucankaodanhao);
         et_wenti = (EditText) findViewById(R.id.et_wenti);
@@ -125,6 +139,25 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void setListener() {
+        et_yundanhao.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 8) {
+                    //TODO 当运单号大于8位的时候就开始请求数据
+                    getOrderByNumber();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         rg_shifoudaidian.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -270,6 +303,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 @Override
                 public void onResult(Bitmap bitmap) {
                     if (null != bitmap) {
+                        String str = PhotosUtils.bitmapToHexString(bitmap);
+                        Log.i("图片转成16进制之后的字符串", "str=" + PhotosUtils.bitmapToHexString(bitmap));
                         photoList.add(bitmap);
                         adapter.notifyDataSetChanged();
                     }
@@ -310,5 +345,33 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         }
     }
 
+    //TODO 根据运单号请求运单数据
+    private void getOrderByNumber() {
 
+        mPresenter.getOrderByNumber(et_yundanhao.getText().toString().trim())
+                .compose(this.<OrderModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<OrderModel>() {
+                    @Override
+                    public void accept(OrderModel result) throws Exception {
+                        if (0 == result.getCode()) {
+                            Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
+                        } else if (1 == result.getCode()) {
+                            handelOrderResult(result);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        //获取失败，提示
+                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                    }
+                });
+    }
+
+    //TODO 处理运单数据
+    private void handelOrderResult(OrderModel result){
+
+    }
 }

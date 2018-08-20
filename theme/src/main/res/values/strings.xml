@@ -93,4 +93,25 @@
     <string name="str_zcj">总材积:</string>
     <string name="str_zfx">杂费项</string>
     <string name="str_fy">费用(RMB)</string>
+    <string name="str_fhz">发货站</string>
+    <string name="str_xyz">下一站</string>
+    <string name="str_shfws">收货服务商</string>
+    <string name="str_fhsj">发货时间</string>
+    <string name="str_ysbh">运输编号</string>
+    <string name="str_gb">关闭</string>
+    <string name="str_xgmm">修改密码</string>
+    <string name="str_tsy">提示音</string>
+    <string name="str_zd">震动</string>
+    <string name="str_gy">关于</string>
+    <string name="str_bbgx">版本更新</string>
+    <string name="str_yszxbb">已是最新版本</string>
+    <string name="str_ymm">原密码</string>
+    <string name="str_xmm">新密码</string>
+    <string name="str_qrmm">确认密码</string>
+    <string name="str_login_out">退出登录</string>
+    <string name="str_name">姓名</string>
+    <string name="str_companyName">深圳智慧包裹服务股份有限公司 版权所有</string>
+    <string name="str_bqdm">Copyright © 2017-2018 Intelligent Parcel \n Service Co.,Ltd. All Rights Reserved.</string>
+    <string name="str_dqbb">当前版本</string>
+    <string name="str_qqsb">请求失败</string>
 </resources>

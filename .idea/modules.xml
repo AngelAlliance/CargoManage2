@@ -7,7 +7,12 @@
       <module fileurl="file://$PROJECT_DIR$/base/base.iml" filepath="$PROJECT_DIR$/base/base.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/examinegoods/examinegoods.iml" filepath="$PROJECT_DIR$/examinegoods/examinegoods.iml" />
+      <module fileurl="file://$PROJECT_DIR$/packgoods/packgoods.iml" filepath="$PROJECT_DIR$/packgoods/packgoods.iml" />
+      <module fileurl="file://$PROJECT_DIR$/patchlabel/patchlabel.iml" filepath="$PROJECT_DIR$/patchlabel/patchlabel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/setting/setting.iml" filepath="$PROJECT_DIR$/setting/setting.iml" />
+      <module fileurl="file://$PROJECT_DIR$/shipments/shipments.iml" filepath="$PROJECT_DIR$/shipments/shipments.iml" />
       <module fileurl="file://$PROJECT_DIR$/theme/theme.iml" filepath="$PROJECT_DIR$/theme/theme.iml" />
+      <module fileurl="file://$PROJECT_DIR$/warehousing/warehousing.iml" filepath="$PROJECT_DIR$/warehousing/warehousing.iml" />
     </modules>
   </component>
 </project>

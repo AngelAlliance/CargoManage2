@@ -24,7 +24,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
     private EditText et_yundanhao, et_kehudaima, et_kehucankaodanhao, et_mudiguojia, et_xiaoshouchanpin, et_shizhong, et_chang, et_kuan, et_gao, et_daohuozongdan;
     private LinearLayout ll_mudiguojia, ll_xiaoshouchanpin, ll_duojian;
     private Button btn_qianru, btn_fujiafuwu;
-
+    private String countryCode;//国家简码
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

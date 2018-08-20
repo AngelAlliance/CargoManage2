@@ -15,6 +15,7 @@ import com.sz.ljs.cargomanage.adapter.HomeMenuAdapter;
 import com.sz.ljs.cargomanage.model.HomeMenuModel;
 import com.sz.ljs.packgoods.view.PackGoodsActivity;
 import com.sz.ljs.patchlabel.view.PatchlabelActivity;
+import com.sz.ljs.setting.view.SettingActivity;
 import com.sz.ljs.warehousing.view.WareHousingActivity;
 
 import java.util.ArrayList;
@@ -82,6 +83,10 @@ public class MainActivity extends BaseActivity {
             case 6:{
                 //TODO 补打标签
                 BaseApplication.startActivity(PatchlabelActivity.class);
+            }
+            case 7:{
+                //TODO 设置
+                BaseApplication.startActivity(SettingActivity.class);
             }
             break;
         }
