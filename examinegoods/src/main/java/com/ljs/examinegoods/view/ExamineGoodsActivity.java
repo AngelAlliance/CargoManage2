@@ -399,7 +399,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             public void CallBack(int position) {
                 if (null != photoList && photoList.size() > 0) {
                     photoList.remove(position);
-                    Imagelist.get(position).setType("D");
+                    Imagelist.get(position).setImage_type("D");
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -435,6 +435,13 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             });
         } else if (id == R.id.bt_yes) {
             //TODO 确认
+            if (isHongKuang || isHongKuang1 || isHongKuang2 || isHongKuang3 || isHongKuang4 || isHongKuang5 || isHongKuang6
+                    || isHongKuang7 || isHongKuang8 || isHongKuang9 || isHongKuang10 || isHongKuang11) {
+                //TODO 表示为问题件，不给点击已验货按钮
+                isWenTiJian = true;
+            }else {
+                isWenTiJian=false;
+            }
             saveDetecTionOrder();
         } else if (id == R.id.iv_scan) {
             //TODO 运单号扫描
@@ -460,10 +467,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             if (isHongKuang || isHongKuang1 || isHongKuang2 || isHongKuang3 || isHongKuang4 || isHongKuang5 || isHongKuang6
                     || isHongKuang7 || isHongKuang8 || isHongKuang9 || isHongKuang10 || isHongKuang11) {
                 //TODO 表示为问题件，不给点击已验货按钮
-                isWenTiJian = true;
                 return;
-            }else {
-                isWenTiJian=false;
             }
             //TODO 已验货按钮
             if (false == isYanHuo) {
@@ -527,6 +531,10 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         if (true == isWenTiJian) {
             if (TextUtils.isEmpty(et_wenti.getText().toString().trim())) {
                 Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_wtmsbnwk));
+                return;
+            }
+            if(null==Imagelist&&Imagelist.size()<=0){
+                Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_zpbnwk));
                 return;
             }
         }else {

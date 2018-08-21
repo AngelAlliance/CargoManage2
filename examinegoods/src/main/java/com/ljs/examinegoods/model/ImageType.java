@@ -5,26 +5,28 @@ package com.ljs.examinegoods.model;
  */
 
 public class ImageType {
-    private String url;//图片地址
-    private String Type;//图片类型，D为删除，A为正常
+    private String image_url;//图片地址
+    private String image_type;//图片类型，D为删除，A为正常
 
     public ImageType(String url,String Type){
-        this.url=url;
-        this.Type=Type;
+        this.image_url=url;
+        this.image_type=Type;
     }
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+    public String getImage_url() {
+        return image_url;
     }
 
-    public String getType() {
-        return Type;
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 
-    public void setType(String type) {
-        Type = type;
+    public String getImage_type() {
+        return image_type;
     }
+
+    public void setImage_type(String image_type) {
+        this.image_type = image_type;
+    }
+
+
 }
