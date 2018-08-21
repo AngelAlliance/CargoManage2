@@ -29,11 +29,16 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['**.*'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     testImplementation 'junit:junit:4.12'
     compile(name: 'WBarcodeScan-1.0.3', ext: 'aar')
     compile 'com.google.zxing:core:3.3.0'
+    compile files('libs/bluetooth.jar')
+    compile files('libs/ethernet.jar')
+    //下面两个是科大讯飞语言
+    compile files('libs/Msc.jar')
+    compile files('libs/Sunflower.jar')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':base')

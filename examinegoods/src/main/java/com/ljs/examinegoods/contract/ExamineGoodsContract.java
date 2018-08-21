@@ -4,6 +4,7 @@ import com.ljs.examinegoods.model.DetectionByModel;
 import com.ljs.examinegoods.model.ItemTypeModel;
 import com.ljs.examinegoods.model.OrderModel;
 import com.ljs.examinegoods.model.SaveDetecTionOrderResultModel;
+import com.ljs.examinegoods.model.UploadFileResultModel;
 import com.sz.ljs.common.utils.MD5Util;
 
 import java.util.Map;
@@ -53,8 +54,13 @@ public interface ExamineGoodsContract {
     public static final String IMAGE_URL = "image_url";               //图片集合 LISt<string>
     public static final String ORDER_ID = "order_id";                // 订单id
     public static final String USERID = "userId";                    //用户id
-
-    @POST("user/SaveDetecTionOrder")
+    @POST("user/SaveDetection")
     @Headers({"Content-Type: application/json","Accept: application/json"})//需要添加头
-    Flowable<SaveDetecTionOrderResultModel> saveDetecTionOrder(@Body RequestBody route);
+    Flowable<SaveDetecTionOrderResultModel> saveDetecTionOrder(@Header("token") String token,@Body RequestBody route);
+
+    public static final String HEXADECIMAL_STR = "hexadecimal_str";                    //十六进制字符串
+
+    @POST("user/UploadFile")
+    @Headers({"Content-Type: application/json","Accept: application/json"})//需要添加头
+    Flowable<UploadFileResultModel> uploadFile(@Header("token") String token, @Body RequestBody route);
 }

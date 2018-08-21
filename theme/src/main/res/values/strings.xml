@@ -114,4 +114,10 @@
     <string name="str_bqdm">Copyright © 2017-2018 Intelligent Parcel \n Service Co.,Ltd. All Rights Reserved.</string>
     <string name="str_dqbb">当前版本</string>
     <string name="str_qqsb">请求失败</string>
+    <string name="str_zpzds">拍照已到达最大数量</string>
+    <string name="str_ydhbnwk">运单号不能为空</string>
+    <string name="str_khckdhbnwk">客户参考单号不能为空</string>
+    <string name="str_jsbnwk">件数不能为空</string>
+    <string name="str_wtmsbnwk">问题描述不能为空</string>
+    <string name="str_qgxyyh">请勾选已验货</string>
 </resources>

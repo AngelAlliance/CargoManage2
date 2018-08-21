@@ -871,7 +871,6 @@
                     android:layout_height="@dimen/class_circle_top"
                     android:layout_marginLeft="10dp"
                     android:background="@null"
-                    android:inputType="number"
                     android:singleLine="true"
                     android:gravity="left|top"
                     android:textColor="@color/secondary_color_333333"

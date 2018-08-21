@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.base.BaseApplication;
@@ -21,7 +22,8 @@ import java.util.List;
 public class WareHousingActivity extends BaseActivity implements View.OnClickListener {
 
     private ImageView iv_yubaokehu, iv_scan, iv_mudiguojia, iv_xiaoshouchanpin;
-    private EditText et_yundanhao, et_kehudaima, et_kehucankaodanhao, et_mudiguojia, et_xiaoshouchanpin, et_shizhong, et_chang, et_kuan, et_gao, et_daohuozongdan;
+    private EditText et_yundanhao, et_kehudaima, et_kehucankaodanhao, et_shizhong, et_chang, et_kuan, et_gao, et_daohuozongdan;
+    private TextView et_mudiguojia, et_xiaoshouchanpin;
     private LinearLayout ll_mudiguojia, ll_xiaoshouchanpin, ll_duojian;
     private Button btn_qianru, btn_fujiafuwu;
     private String countryCode;//国家简码
@@ -43,8 +45,8 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         et_kehudaima = (EditText) findViewById(R.id.et_kehudaima);
         et_kehucankaodanhao = (EditText) findViewById(R.id.et_kehucankaodanhao);
-        et_mudiguojia = (EditText) findViewById(R.id.et_mudiguojia);
-        et_xiaoshouchanpin = (EditText) findViewById(R.id.et_xiaoshouchanpin);
+        et_mudiguojia = (TextView) findViewById(R.id.et_mudiguojia);
+        et_xiaoshouchanpin = (TextView) findViewById(R.id.et_xiaoshouchanpin);
         et_shizhong = (EditText) findViewById(R.id.et_shizhong);
         et_chang = (EditText) findViewById(R.id.et_chang);
         et_kuan = (EditText) findViewById(R.id.et_kuan);

@@ -227,6 +227,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     //TODO 进入主界面
     private void goHome() {
         BaseApplication.startActivity(MainActivity.class);
+        finish();
     }
 
     private void showWaiting(boolean isShow) {

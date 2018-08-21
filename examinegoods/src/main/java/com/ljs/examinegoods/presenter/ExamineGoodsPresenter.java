@@ -7,6 +7,7 @@ import com.ljs.examinegoods.model.ItemTypeModel;
 import com.ljs.examinegoods.model.OrderModel;
 import com.ljs.examinegoods.model.SaveDeteTionOrderRequestModel;
 import com.ljs.examinegoods.model.SaveDetecTionOrderResultModel;
+import com.ljs.examinegoods.model.UploadFileResultModel;
 import com.sz.ljs.common.base.HDateGsonAdapter;
 import com.sz.ljs.common.constant.ApiTimestampToken;
 import com.sz.ljs.common.constant.GenApi;
@@ -77,7 +78,7 @@ public class ExamineGoodsPresenter {
         } else {
             token = "";
         }
-        return mContract.getDetectionBy(token,param);
+        return mContract.getDetectionBy(token, param);
     }
 
     //TODO 添加问题件或者保存验货结果
@@ -88,7 +89,29 @@ public class ExamineGoodsPresenter {
         } else {
             json = "";
         }
+        String token = "";
+        if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
+            token = UserModel.getInstance().getTokenModel().getToken();
+        } else {
+            token = "";
+        }
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), json);
-        return mContract.saveDetecTionOrder(requestBody);
+        return mContract.saveDetecTionOrder(token, requestBody);
+    }
+
+    //TODO 图片上传
+    public Flowable<UploadFileResultModel> uploadFile(String imageUrl) {
+        Map<String, String> param = new HashMap<>();
+        param.put(ExamineGoodsContract.HEXADECIMAL_STR, imageUrl);
+        param.put(ExamineGoodsContract.SUMMARY, ExamineGoodsContract.summary);
+        String token = "";
+        if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
+            token = UserModel.getInstance().getTokenModel().getToken();
+        } else {
+            token = "";
+        }
+        String json = new Gson().toJson(param);
+        RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), json);
+        return mContract.uploadFile(token, requestBody);
     }
 }

@@ -9,10 +9,11 @@ public class SaveDeteTionOrderRequestModel {
     private String reference_number;  //客户参考单号
     private String request_type;     //问题件还是不是问题件 Y问题件N不是问题件
     private String detection_note;  // 	检测结果 如（带电，没有发票……….）
-    private List<String> image_url; //图片集合 LISt<string>
+    private List<ImageType> image_url; //图片集合 LISt<string>
     private String order_id;       //订单id
     private String userId;         //用户id
     private String summary;       //zhbg_ips2018_cn得MD532位小写加密
+    private String quest_note;   //问题描述
 
     public String getNumber() {
         return number;
@@ -46,11 +47,11 @@ public class SaveDeteTionOrderRequestModel {
         this.detection_note = detection_note;
     }
 
-    public List<String> getImage_url() {
+    public List<ImageType> getImage_url() {
         return image_url;
     }
 
-    public void setImage_url(List<String> image_url) {
+    public void setImage_url(List<ImageType> image_url) {
         this.image_url = image_url;
     }
 
@@ -78,6 +79,13 @@ public class SaveDeteTionOrderRequestModel {
         this.summary = summary;
     }
 
+    public String getQuest_note() {
+        return quest_note;
+    }
+
+    public void setQuest_note(String quest_note) {
+        this.quest_note = quest_note;
+    }
 
 
 }
