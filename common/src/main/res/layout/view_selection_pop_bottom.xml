@@ -6,16 +6,15 @@
     >
 
     <LinearLayout
+        android:id="@+id/ll_kb"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="120dp"
         android:orientation="vertical"
         android:background="@android:color/transparent"/>
     <LinearLayout
         android:id="@+id/ll_content"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="8dp"
         android:background="@color/secondary_color_e7e7e7">
@@ -33,6 +32,7 @@
             android:id="@+id/lv_content"
             android:layout_marginTop="5dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></ListView>
+            android:layout_height="match_parent"
+            ></ListView>
     </LinearLayout>
 </LinearLayout>

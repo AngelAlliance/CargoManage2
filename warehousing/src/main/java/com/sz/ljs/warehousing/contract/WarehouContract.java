@@ -1,5 +1,6 @@
 package com.sz.ljs.warehousing.contract;
 
+import com.sz.ljs.common.model.OrderModel;
 import com.sz.ljs.common.utils.MD5Util;
 import com.sz.ljs.warehousing.model.CalculationVolumeWeightModel;
 import com.sz.ljs.warehousing.model.CountryModel;
@@ -65,5 +66,9 @@ public interface WarehouContract {
     Flowable<CalculationVolumeWeightModel> calculationVolumeWeight(@Header("token") String token, @Body RequestBody route);
 
 
+    public static final String NUMBER = "number";   //运单号码
+    @POST("user/GetOrderbyNumber")
+    @FormUrlEncoded
+    Flowable<OrderModel> getOrderByNumber(@Header("token") String token, @FieldMap Map<String, String> param);
 
 }

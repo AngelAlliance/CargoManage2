@@ -2,7 +2,7 @@ package com.ljs.examinegoods.contract;
 
 import com.ljs.examinegoods.model.DetectionByModel;
 import com.ljs.examinegoods.model.ItemTypeModel;
-import com.ljs.examinegoods.model.OrderModel;
+import com.sz.ljs.common.model.OrderModel;
 import com.ljs.examinegoods.model.SaveDetecTionOrderResultModel;
 import com.ljs.examinegoods.model.UploadFileResultModel;
 import com.sz.ljs.common.utils.MD5Util;

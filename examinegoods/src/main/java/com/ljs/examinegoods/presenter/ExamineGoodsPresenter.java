@@ -4,18 +4,15 @@ import com.google.gson.Gson;
 import com.ljs.examinegoods.contract.ExamineGoodsContract;
 import com.ljs.examinegoods.model.DetectionByModel;
 import com.ljs.examinegoods.model.ItemTypeModel;
-import com.ljs.examinegoods.model.OrderModel;
+import com.sz.ljs.common.model.OrderModel;
 import com.ljs.examinegoods.model.SaveDeteTionOrderRequestModel;
 import com.ljs.examinegoods.model.SaveDetecTionOrderResultModel;
 import com.ljs.examinegoods.model.UploadFileResultModel;
 import com.sz.ljs.common.base.HDateGsonAdapter;
-import com.sz.ljs.common.constant.ApiTimestampToken;
 import com.sz.ljs.common.constant.GenApi;
 import com.sz.ljs.common.model.UserModel;
-import com.sz.ljs.common.utils.MD5Util;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Flowable;

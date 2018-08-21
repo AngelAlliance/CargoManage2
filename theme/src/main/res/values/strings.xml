@@ -121,4 +121,6 @@
     <string name="str_zpbnwk">照片不能为空</string>
     <string name="str_wtmsbnwk">问题描述不能为空</string>
     <string name="str_qgxyyh">请勾选已验货</string>
+    <string name="str_xzkh">选择客户</string>
+    <string name="str_qsrkhdm">请输入客户代码</string>
 </resources>

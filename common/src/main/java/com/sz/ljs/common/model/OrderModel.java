@@ -1,4 +1,4 @@
-package com.ljs.examinegoods.model;
+package com.sz.ljs.common.model;
 
 import java.util.List;
 

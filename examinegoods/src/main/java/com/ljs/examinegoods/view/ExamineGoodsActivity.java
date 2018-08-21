@@ -1,6 +1,5 @@
 package com.ljs.examinegoods.view;
 
-import android.Manifest;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
@@ -23,23 +22,18 @@ import com.ljs.examinegoods.contract.ExamineGoodsContract;
 import com.ljs.examinegoods.model.DetectionByModel;
 import com.ljs.examinegoods.model.ImageType;
 import com.ljs.examinegoods.model.ItemTypeModel;
-import com.ljs.examinegoods.model.OrderModel;
+import com.sz.ljs.common.model.OrderModel;
 import com.ljs.examinegoods.model.SaveDeteTionOrderRequestModel;
 import com.ljs.examinegoods.model.SaveDetecTionOrderResultModel;
 import com.ljs.examinegoods.model.UploadFileResultModel;
 import com.ljs.examinegoods.presenter.ExamineGoodsPresenter;
 import com.sz.ljs.base.BaseActivity;
-import com.sz.ljs.common.model.ExpressPackageModel;
-import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
 import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.Utils;
-import com.sz.ljs.common.view.FourSidesSlidingListView;
-import com.sz.ljs.common.view.NoscrollListView;
 import com.sz.ljs.common.view.PhotosUtils;
 import com.sz.ljs.common.view.ScanView;
 import com.sz.ljs.common.view.SelectionPopForBottomView;
 import com.sz.ljs.common.view.WaitingDialog;
-import com.sz.ljs.common.view.adapter.FourSidesSlidListTitleAdapter;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;

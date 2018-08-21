@@ -21,7 +21,7 @@ import java.util.List;
 //TODO 底部弹出选择空间
 public class SelectionPopForBottomView extends BaseActivity {
     private static Context mContext;
-    private LinearLayout ll_content;
+    private LinearLayout ll_content,ll_kb;
     private TextView tv_titleView;
     private ListView lv_content;
     private static List<String> listData = new ArrayList<>();
@@ -51,6 +51,7 @@ public class SelectionPopForBottomView extends BaseActivity {
 
     private void initView() {
         ll_content = (LinearLayout) findViewById(R.id.ll_content);
+        ll_kb = (LinearLayout) findViewById(R.id.ll_kb);
         tv_titleView = (TextView) findViewById(R.id.tv_titleView);
         lv_content = (ListView) findViewById(R.id.lv_content);
         adapter = new ListAdapter();
@@ -65,6 +66,12 @@ public class SelectionPopForBottomView extends BaseActivity {
             }
         });
         tv_titleView.setText(title);
+        ll_kb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
 

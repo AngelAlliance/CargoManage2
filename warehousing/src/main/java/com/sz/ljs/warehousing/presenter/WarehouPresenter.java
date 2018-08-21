@@ -3,6 +3,7 @@ package com.sz.ljs.warehousing.presenter;
 import com.google.gson.Gson;
 import com.sz.ljs.common.base.HDateGsonAdapter;
 import com.sz.ljs.common.constant.GenApi;
+import com.sz.ljs.common.model.OrderModel;
 import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.MD5Util;
 import com.sz.ljs.warehousing.contract.WarehouContract;
@@ -95,14 +96,14 @@ public class WarehouPresenter {
     }
 
     //TODO 入库时选择客户生成到货总单 customer_id:客户id  customer_code:客户代码  userId:员工id   og_id:机构id 深圳、广州  og_short_code:地区简码
-    public Flowable<SelectCurrentDayBatchModel> selectCurrentDayBatch(String customer_id,String customer_code,String userId,String og_id,String og_short_code){
+    public Flowable<SelectCurrentDayBatchModel> selectCurrentDayBatch(String customer_id,String customer_code){
         Map<String, String> param = new HashMap<>();
         param.put(WarehouContract.SUMMARY, WarehouContract.summary);
         param.put(WarehouContract.CUSTOMER_ID, customer_id);
         param.put(WarehouContract.CUSTOMER_CODE, customer_code);
-        param.put(WarehouContract.USERID, userId);
-        param.put(WarehouContract.OG_ID, og_id);
-        param.put(WarehouContract.OG_SHORT_CODE, og_short_code);
+        param.put(WarehouContract.USERID, ""+UserModel.getInstance().getSt_id());
+        param.put(WarehouContract.OG_ID, ""+UserModel.getInstance().getOg_id());
+        param.put(WarehouContract.OG_SHORT_CODE, ""+UserModel.getInstance().getOg_shortcode());
         String token = "";
         if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
             token = UserModel.getInstance().getTokenModel().getToken();
@@ -136,5 +137,21 @@ public class WarehouPresenter {
         String json = new Gson().toJson(param);
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), json);
         return warehouContract.calculationVolumeWeight(token,requestBody);
+    }
+
+    //TODO 根据订单号查询订单信息
+    public Flowable<OrderModel> getOrderByNumber(String number) {
+        Map<String, String> param = new HashMap<>();
+        String token = "";
+        if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
+            token = UserModel.getInstance().getTokenModel().getToken();
+        } else {
+            token = "";
+        }
+        param.put(WarehouContract.NUMBER, number);
+        param.put(WarehouContract.SUMMARY, WarehouContract.summary);
+//        String json= new Gson().toJson(param);
+//        RequestBody requestBody= RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),json);
+        return warehouContract.getOrderByNumber(token, param);
     }
 }
