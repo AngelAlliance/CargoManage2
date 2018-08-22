@@ -14,9 +14,12 @@ import android.widget.TextView;
 
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.base.BaseApplication;
+import com.sz.ljs.common.constant.GenApi;
+import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.OrderModel;
 import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.Utils;
+import com.sz.ljs.common.view.ListDialog;
 import com.sz.ljs.common.view.ScanView;
 import com.sz.ljs.common.view.SelectionPopForBottomView;
 import com.sz.ljs.common.view.WaitingDialog;
@@ -43,9 +46,9 @@ import io.reactivex.schedulers.Schedulers;
 public class WareHousingActivity extends BaseActivity implements View.OnClickListener {
 
     private ImageView iv_yubaokehu, iv_scan, iv_mudiguojia, iv_xiaoshouchanpin;
-    private EditText et_yundanhao, et_kehucankaodanhao, et_shizhong, et_chang, et_kuan, et_gao, et_daohuozongdan;
-    private TextView et_mudiguojia, et_xiaoshouchanpin, et_kehudaima;
-    private LinearLayout ll_mudiguojia, ll_xiaoshouchanpin, ll_duojian;
+    private EditText et_yundanhao, et_kehucankaodanhao, et_shizhong, et_chang, et_kuan, et_gao, et_daohuozongdan,et_jianshu;
+    private TextView et_mudiguojia, et_xiaoshouchanpin, et_kehudaima,tv_jianshu;
+    private LinearLayout ll_mudiguojia, ll_xiaoshouchanpin, ll_duojian,ll_jianshu,ll_changkuangao;
     private Button btn_qianru, btn_fujiafuwu;
     private String countryCode;//国家简码
     private boolean isYuBaoKeHu = false; //是否预报客户
@@ -56,6 +59,10 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
     private OrderModel orderModel;
     private List<CountryModel.DataEntity> countryList=new ArrayList<>();
     private List<ProductModel.DataEntity> productList=new ArrayList<>();
+    private ListDialog dialog;
+    private CountryModel.DataEntity countryModel;
+    private ProductModel.DataEntity productModel;
+    private int pice=0;//件数
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +92,10 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         ll_mudiguojia = (LinearLayout) findViewById(R.id.ll_mudiguojia);
         ll_xiaoshouchanpin = (LinearLayout) findViewById(R.id.ll_xiaoshouchanpin);
         ll_duojian = (LinearLayout) findViewById(R.id.ll_duojian);
+        ll_changkuangao = (LinearLayout) findViewById(R.id.ll_changkuangao);
+        ll_jianshu = (LinearLayout) findViewById(R.id.ll_jianshu);
+        et_jianshu = (EditText) findViewById(R.id.et_jianshu);
+        tv_jianshu = (TextView) findViewById(R.id.tv_jianshu);
         btn_qianru = (Button) findViewById(R.id.btn_qianru);
         btn_fujiafuwu = (Button) findViewById(R.id.btn_fujiafuwu);
     }
@@ -110,7 +121,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!TextUtils.isEmpty(s) && s.length() > 8) {
+                if (!TextUtils.isEmpty(s) && s.length() == GenApi.ScanNumberLeng) {
                     if (true == isYuBaoKeHu) {
                         //TODO 自动请求接口
                         getOrderByNumber();
@@ -118,6 +129,31 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         //TODO 不做任何处理
                     }
 
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et_jianshu.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!TextUtils.isEmpty(s) && 1==Integer.parseInt(s.toString())) {
+                    //TODO 当输入1件的时候当1件处理
+                    ll_changkuangao.setVisibility(View.VISIBLE);
+                    ll_duojian.setBackgroundResource(R.drawable.pack_btn_clickbg);
+                    ll_duojian.setClickable(false);
+                }else {
+                    ll_changkuangao.setVisibility(View.GONE);
+                    ll_duojian.setBackgroundResource(R.drawable.pack_btn_bg);
+                    ll_duojian.setClickable(true);
                 }
             }
 
@@ -218,6 +254,23 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 et_kehudaima.setText(result.getData().getCountry_code());
                 selectCurrentDayBatch(result.getData().getCustomer_id(),result.getData().getCountry_code());
             }
+            pice=Integer.parseInt(result.getData().getOrder_pieces());
+            if(1==Integer.parseInt(result.getData().getOrder_pieces())){
+                tv_jianshu.setText("1");
+                tv_jianshu.setVisibility(View.VISIBLE);
+                et_jianshu.setVisibility(View.GONE);
+                ll_changkuangao.setVisibility(View.VISIBLE);
+                ll_duojian.setBackgroundResource(R.drawable.pack_btn_clickbg);
+                ll_duojian.setClickable(false);
+
+            }else if(Integer.parseInt(result.getData().getOrder_pieces())>1){
+                tv_jianshu.setVisibility(View.GONE);
+                et_jianshu.setVisibility(View.VISIBLE);
+                ll_changkuangao.setVisibility(View.GONE);
+                et_jianshu.setText(result.getData().getOrder_pieces());
+                ll_duojian.setBackgroundResource(R.drawable.pack_btn_bg);
+                ll_duojian.setClickable(true);
+            }
 
         }
     }
@@ -272,17 +325,33 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                             if(null!=result.getData()&&result.getData().size()>0){
                                 countryList.clear();
                                 countryList.addAll(result.getData());
-                                final List<String> showList=new ArrayList<>();
+                                final List<ListialogModel> showList=new ArrayList<>();
                                 for (CountryModel.DataEntity model:result.getData()){
-                                    showList.add(model.getCountry_cnname());
+                                    showList.add(new ListialogModel(model.getCountry_cnname(),false));
                                 }
-                                SelectionPopForBottomView.SelectionPopForBottomView(WareHousingActivity.this, "请选择国家"
-                                        , showList, new SelectionPopForBottomView.ContentItemOnClickListener() {
+                                dialog =new ListDialog(WareHousingActivity.this,R.style.AlertDialogStyle)
+                                        .creatDialog()
+                                        .setTitle("请选择国家")
+                                        .setListData(showList)
+                                        .setCallBackListener(new ListDialog.CallBackListener() {
                                             @Override
-                                            public void ItemOclick(int position) {
-                                                et_mudiguojia.setText(showList.get(position));
+                                            public void Result(int position, String name) {
+                                                et_mudiguojia.setText(showList.get(position).getName());
+                                                if(null==countryModel){
+                                                    countryModel=new CountryModel.DataEntity();
+                                                }
+                                                countryModel=countryList.get(position);
+                                                dialog.dismiss();
                                             }
                                         });
+                                dialog.show();
+//                                SelectionPopForBottomView.SelectionPopForBottomView(WareHousingActivity.this, "请选择国家"
+//                                        , showList, new SelectionPopForBottomView.ContentItemOnClickListener() {
+//                                            @Override
+//                                            public void ItemOclick(int position) {
+//
+//                                            }
+//                                        });
                             }
                         }
                     }
@@ -314,17 +383,33 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                             if(null!=result.getData()&&result.getData().size()>0){
                                 productList.clear();
                                 productList.addAll(result.getData());
-                                final List<String> showList=new ArrayList<>();
+                                final List<ListialogModel> showList=new ArrayList<>();
                                 for (ProductModel.DataEntity model:result.getData()){
-                                    showList.add(model.getProduct_cnname());
+                                    showList.add(new ListialogModel(model.getProduct_cnname(),false));
                                 }
-                                SelectionPopForBottomView.SelectionPopForBottomView(WareHousingActivity.this, "请选择销售产品"
-                                        , showList, new SelectionPopForBottomView.ContentItemOnClickListener() {
+                                dialog =new ListDialog(WareHousingActivity.this,R.style.AlertDialogStyle)
+                                        .creatDialog()
+                                        .setTitle("请选择销售产品")
+                                        .setListData(showList)
+                                        .setCallBackListener(new ListDialog.CallBackListener() {
                                             @Override
-                                            public void ItemOclick(int position) {
-                                                et_mudiguojia.setText(showList.get(position));
+                                            public void Result(int position, String name) {
+                                                et_xiaoshouchanpin.setText(showList.get(position).getName());
+                                                if(null==productModel){
+                                                    productModel=new ProductModel.DataEntity();
+                                                }
+                                                productModel=productList.get(position);
+                                                dialog.dismiss();
                                             }
                                         });
+                                dialog.show();
+//                                SelectionPopForBottomView.SelectionPopForBottomView(WareHousingActivity.this, "请选择销售产品"
+//                                        , showList, new SelectionPopForBottomView.ContentItemOnClickListener() {
+//                                            @Override
+//                                            public void ItemOclick(int position) {
+//                                                et_mudiguojia.setText(showList.get(position));
+//                                            }
+//                                        });
                             }
                         }
                     }

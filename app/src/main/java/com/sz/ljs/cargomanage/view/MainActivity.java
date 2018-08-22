@@ -2,6 +2,8 @@ package com.sz.ljs.cargomanage.view;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -13,18 +15,30 @@ import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.cargomanage.R;
 import com.sz.ljs.cargomanage.adapter.HomeMenuAdapter;
 import com.sz.ljs.cargomanage.model.HomeMenuModel;
+import com.sz.ljs.cargomanage.model.ScanNumberLengModel;
+import com.sz.ljs.cargomanage.presenter.LoginPresenter;
+import com.sz.ljs.common.constant.GenApi;
+import com.sz.ljs.common.utils.Utils;
+import com.sz.ljs.common.view.SelectionPopForBottomView;
 import com.sz.ljs.packgoods.view.PackGoodsActivity;
 import com.sz.ljs.patchlabel.view.PatchlabelActivity;
 import com.sz.ljs.setting.view.SettingActivity;
+import com.sz.ljs.warehousing.model.CountryModel;
 import com.sz.ljs.warehousing.view.WareHousingActivity;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends BaseActivity {
     private GridView gv_homeMenu;
     private List<HomeMenuModel> homeMenuList = new ArrayList<>();
     private HomeMenuAdapter homeMenuAdapter;
+    private LoginPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +51,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initView() {
+        mPresenter = new LoginPresenter();
         gv_homeMenu = (GridView) findViewById(R.id.gv_homeMenu);
         homeMenuAdapter = new HomeMenuAdapter(this, homeMenuList);
         gv_homeMenu.setAdapter(homeMenuAdapter);
     }
 
     private void initData() {
-
+        getScanNumberLeng();
     }
 
     private void setListener() {
@@ -70,21 +85,21 @@ public class MainActivity extends BaseActivity {
                 BaseApplication.startActivity(WareHousingActivity.class);
             }
             break;
-            case 2:{
+            case 2: {
                 //TODO 打包
                 BaseApplication.startActivity(PackGoodsActivity.class);
             }
             break;
-            case 3:{
+            case 3: {
                 //TODO 出库
                 BaseApplication.startActivity(ShipMentsActivity.class);
             }
             break;
-            case 6:{
+            case 6: {
                 //TODO 补打标签
                 BaseApplication.startActivity(PatchlabelActivity.class);
             }
-            case 7:{
+            case 7: {
                 //TODO 设置
                 BaseApplication.startActivity(SettingActivity.class);
             }
@@ -109,4 +124,32 @@ public class MainActivity extends BaseActivity {
             break;
         }
     }
+
+    //TODO 返回输入运单N位得时候调用接口
+    private void getScanNumberLeng() {
+        mPresenter.getScanNumberLeng()
+                .compose(this.<ScanNumberLengModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ScanNumberLengModel>() {
+                    @Override
+                    public void accept(ScanNumberLengModel result) throws Exception {
+                        if (0 == result.getCode()) {
+                            Utils.showToast(MainActivity.this, result.getMsg());
+                        } else if (1 == result.getCode()) {
+                            if(!TextUtils.isEmpty(result.getData())){
+                                Log.i("请求运单号位数","length="+result.getData());
+                                GenApi.ScanNumberLeng=Integer.parseInt(result.getData());
+                            }
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        //获取失败，提示
+                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                    }
+                });
+    }
+
 }

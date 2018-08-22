@@ -22,6 +22,8 @@ import com.ljs.examinegoods.contract.ExamineGoodsContract;
 import com.ljs.examinegoods.model.DetectionByModel;
 import com.ljs.examinegoods.model.ImageType;
 import com.ljs.examinegoods.model.ItemTypeModel;
+import com.sz.ljs.common.constant.GenApi;
+import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.OrderModel;
 import com.ljs.examinegoods.model.SaveDeteTionOrderRequestModel;
 import com.ljs.examinegoods.model.SaveDetecTionOrderResultModel;
@@ -30,6 +32,7 @@ import com.ljs.examinegoods.presenter.ExamineGoodsPresenter;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.Utils;
+import com.sz.ljs.common.view.ListDialog;
 import com.sz.ljs.common.view.PhotosUtils;
 import com.sz.ljs.common.view.ScanView;
 import com.sz.ljs.common.view.SelectionPopForBottomView;
@@ -61,7 +64,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private List<Bitmap> photoList = new ArrayList<>();
     private PhotoGridAdapter adapter;
     private ExamineGoodsPresenter mPresenter;
-    private List<String> showList = new ArrayList<>();
+    private List<ListialogModel> showList = new ArrayList<>();
     private List<ItemTypeModel.DataBean> typeList = new ArrayList<>();
     private List<DetectionByModel.DataBean> detectionList = new ArrayList<>();
     private WaitingDialog waitingDialog;
@@ -69,6 +72,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private boolean isHongKuang = false, isHongKuang1 = false, isHongKuang2 = false, isHongKuang3 = false, isHongKuang4 = false, isHongKuang5 = false, isHongKuang6 = false, isHongKuang7 = false, isHongKuang8 = false, isHongKuang9 = false, isHongKuang10 = false, isHongKuang11 = false;
     private OrderModel orderModel;
     private List<ImageType> Imagelist = new ArrayList<>();
+    private ListDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,7 +176,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 8) {
+                if (s.length() == GenApi.ScanNumberLeng) {
                     //TODO 当运单号大于8位的时候就开始请求数据
                     getOrderByNumber();
                 }
@@ -514,10 +518,10 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_ydhbnwk));
             return;
         }
-        if (TextUtils.isEmpty(et_kehucankaodanhao.getText().toString().trim())) {
-            Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_khckdhbnwk));
-            return;
-        }
+//        if (TextUtils.isEmpty(et_kehucankaodanhao.getText().toString().trim())) {
+//            Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_khckdhbnwk));
+//            return;
+//        }
         if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
             Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_jsbnwk));
             return;
@@ -551,13 +555,14 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         } else {
             //TODO 不是问题件，不需要上传问题描述与图片集合，需要上传检验结果
             requestModel.setRequest_type("N");
+//            + "," + getResources().getString(R.string.str_js) + ":" + isJianShu
             String detection_note = getResources().getString(R.string.str_sfdd) + ":" + isDaiDian + "," + getResources().getString(R.string.str_sfdc) + ":" + isDaiCi
-                    + "," + getResources().getString(R.string.str_sfdp) + ":" + isDaiPai + "," + getResources().getString(R.string.str_js) + ":" + isJianShu
+                    + "," + getResources().getString(R.string.str_sfdp) + ":" + isDaiPai
                     + "," + getResources().getString(R.string.str_sfyshfp) + ":" + isSuiHuoFaPiao + "," + getResources().getString(R.string.str_fpzlsfzq) + ":" + isFaPiaoZiLiao
                     + "," + getResources().getString(R.string.str_ywbgzl) + ":" + isBaoGuanZiLiao + "," + getResources().getString(R.string.str_sfddbg) + ":" + isDanDuBaoGuan
                     + "," + getResources().getString(R.string.str_hwsfsh) + ":" + isHuoWuSunHuai + "," + getResources().getString(R.string.str_wbzsfps) + ":" + isWaiBaoZhuangPoSun
                     + "," + getResources().getString(R.string.str_sfwwjp) + ":" + isWeiJinPin + "," + getResources().getString(R.string.str_sfwysp) + ":" + isYiSuiPin
-                    + "," + getResources().getString(R.string.str_zjs) + ":" + et_jianshu.getText().toString().trim();
+                    + "," + getResources().getString(R.string.str_zjs) + et_jianshu.getText().toString().trim();
             requestModel.setDetection_note(detection_note);
         }
         if (null != orderModel && null != orderModel.getData() && !TextUtils.isEmpty(orderModel.getData().getOrder_id())) {
@@ -581,6 +586,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                         } else if (1 == result.getCode()) {
                             showWaiting(false);
                             Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
+                            finish();
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -613,16 +619,20 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                                 typeList.addAll(result.getData());
                                 showList.clear();
                                 for (ItemTypeModel.DataBean bean : result.getData()) {
-                                    showList.add(bean.getItem_cn_name());
+                                    showList.add(new ListialogModel(bean.getItem_cn_name(),false));
                                 }
-                                SelectionPopForBottomView.SelectionPopForBottomView(ExamineGoodsActivity.this
-                                        , "请选择货物类型", showList, new SelectionPopForBottomView.ContentItemOnClickListener() {
+                                dialog=new ListDialog(ExamineGoodsActivity.this)
+                                        .creatDialog()
+                                        .setTitle("请选择货物类型")
+                                        .setListData(showList)
+                                        .setCallBackListener(new ListDialog.CallBackListener() {
                                             @Override
-                                            public void ItemOclick(int position) {
-
+                                            public void Result(int position, String name) {
 
                                             }
                                         });
+                                dialog.show();
+
                             }
                         }
                     }

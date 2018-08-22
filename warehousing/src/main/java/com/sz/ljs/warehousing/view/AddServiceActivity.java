@@ -11,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.sz.ljs.base.BaseActivity;
+import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.utils.Utils;
+import com.sz.ljs.common.view.ListDialog;
 import com.sz.ljs.common.view.SelectionPopForBottomView;
 import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.warehousing.R;
@@ -37,8 +39,9 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
     private List<ServiceModel> serviceList = new ArrayList<>();
     private WaitingDialog mWaitingDialog = null;
     private List<GsonIncidentalModel.DataBean> beanList = new ArrayList<>();
-    private List<String> showList = new ArrayList<>();
+    private List<ListialogModel> showList = new ArrayList<>();
     private WarehouPresenter mPresenter;
+    private ListDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,17 +145,29 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
             beanList.clear();
             beanList.addAll(result.getData());
             for (GsonIncidentalModel.DataBean brean : beanList) {
-                showList.add(brean.getExtra_service_cnname());
+                showList.add(new ListialogModel(brean.getExtra_service_cnname(), false));
             }
-            SelectionPopForBottomView.SelectionPopForBottomView(AddServiceActivity.this, "请选择杂费项", showList, new SelectionPopForBottomView.ContentItemOnClickListener() {
-                @Override
-                public void ItemOclick(int position) {
-                    int index = (Integer) view.getTag();
-                    View view1 = ll_addView.getChildAt(index);
-                    EditText et_zafeixiang = (EditText) view1.findViewById(R.id.et_zafeixiang);
-                    et_zafeixiang.setText(showList.get(position));
-                }
-            });
+            dialog = new ListDialog(AddServiceActivity.this,R.style.AlertDialogStyle)
+                    .creatDialog()
+                    .setTitle("请选择杂费项")
+                    .setListData(showList)
+                    .setCallBackListener(new ListDialog.CallBackListener() {
+                        @Override
+                        public void Result(int position, String name) {
+                            int index = (Integer) view.getTag();
+                            View view1 = ll_addView.getChildAt(index);
+                            EditText et_zafeixiang = (EditText) view1.findViewById(R.id.et_zafeixiang);
+                            et_zafeixiang.setText(showList.get(position).getName());
+                            dialog.dismiss();
+                        }
+                    });
+            dialog.show();
+//            SelectionPopForBottomView.SelectionPopForBottomView(AddServiceActivity.this, "请选择杂费项", showList, new SelectionPopForBottomView.ContentItemOnClickListener() {
+//                @Override
+//                public void ItemOclick(int position) {
+//
+//                }
+//            });
         }
     }
 

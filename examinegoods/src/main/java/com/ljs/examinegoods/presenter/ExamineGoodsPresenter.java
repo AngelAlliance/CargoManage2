@@ -1,5 +1,7 @@
 package com.ljs.examinegoods.presenter;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.ljs.examinegoods.contract.ExamineGoodsContract;
 import com.ljs.examinegoods.model.DetectionByModel;
@@ -80,20 +82,47 @@ public class ExamineGoodsPresenter {
 
     //TODO 添加问题件或者保存验货结果
     public Flowable<SaveDetecTionOrderResultModel> saveDetecTionOrder(SaveDeteTionOrderRequestModel requestModel) {
-        String json = "";
-        if (null != requestModel) {
-            json = new Gson().toJson(requestModel);
-        } else {
-            json = "";
+//        String json = "";
+////        if (null != requestModel) {
+////            json = new Gson().toJson(requestModel);
+////        } else {
+////            json = "";
+////        }
+//        RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), json);
+        Map<String, String> param = new HashMap<>();
+        param.put(ExamineGoodsContract.NUMBER,requestModel.getNumber());
+        if(TextUtils.isEmpty(requestModel.getReference_number())){
+            param.put(ExamineGoodsContract.REFERENCE_NUMBER,"");
+        }else {
+            param.put(ExamineGoodsContract.REFERENCE_NUMBER,requestModel.getReference_number());
         }
+        param.put(ExamineGoodsContract.REQUEST_TYPE,requestModel.getRequest_type());
+        if(TextUtils.isEmpty(requestModel.getDetection_note())){
+            param.put(ExamineGoodsContract.DETECTION_NOTE,"");
+        }else {
+            param.put(ExamineGoodsContract.DETECTION_NOTE,requestModel.getDetection_note());
+        }
+        if(null==requestModel.getImage_url()||requestModel.getImage_url().size()<=0){
+            param.put(ExamineGoodsContract.IMAGE_LIST,"");
+        }else {
+            param.put(ExamineGoodsContract.IMAGE_LIST,new Gson().toJson(requestModel.getImage_url()));
+        }
+        param.put(ExamineGoodsContract.ORDER_ID,requestModel.getOrder_id());
+        param.put(ExamineGoodsContract.USERID,requestModel.getUserId());
+        param.put(ExamineGoodsContract.SUMMARY, ExamineGoodsContract.summary);
+        if(TextUtils.isEmpty(requestModel.getQuest_note())){
+            param.put(ExamineGoodsContract.QUEST_NOTE, "");
+        }else {
+            param.put(ExamineGoodsContract.QUEST_NOTE, requestModel.getQuest_note());
+        }
+
         String token = "";
         if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
             token = UserModel.getInstance().getTokenModel().getToken();
         } else {
             token = "";
         }
-        RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), json);
-        return mContract.saveDetecTionOrder(token, requestBody);
+        return mContract.saveDetecTionOrder(token, param);
     }
 
     //TODO 图片上传
