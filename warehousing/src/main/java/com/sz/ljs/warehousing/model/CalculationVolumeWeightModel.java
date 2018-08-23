@@ -52,10 +52,10 @@ public class CalculationVolumeWeightModel {
          * volume : 0.001728
          */
 
-        private int TotalGrossWeight;
-        private double TotalVolumeWeight;
-        private int TotalChargeWeight;
-        private double volume;
+        private int TotalGrossWeight;   //总实重
+        private double TotalVolumeWeight;  //总材积重
+        private double TotalChargeWeight;   //总计费重
+        private double volume;  //体积
         private List<LstCargoVolumeEntity> LstCargoVolume;
 
         public int getTotalGrossWeight() {
@@ -74,11 +74,11 @@ public class CalculationVolumeWeightModel {
             this.TotalVolumeWeight = TotalVolumeWeight;
         }
 
-        public int getTotalChargeWeight() {
+        public double getTotalChargeWeight() {
             return TotalChargeWeight;
         }
 
-        public void setTotalChargeWeight(int TotalChargeWeight) {
+        public void setTotalChargeWeight(double TotalChargeWeight) {
             this.TotalChargeWeight = TotalChargeWeight;
         }
 
@@ -119,10 +119,10 @@ public class CalculationVolumeWeightModel {
             private int Length; //长
             private int Width;  //宽
             private int Height;  //高
-            private int volume;  //体积
-            private int GrossWeight;  //重量
+            private double volume;  //体积
+            private double GrossWeight;  //重量
             private double VolumeWeight;  //材积重
-            private int ChargeWeight;  //计费重
+            private double ChargeWeight;  //计费重
             private String ChildNumber;  //总材积重
             private String GoodsName;   //总计费重
             private String TrackNo;
@@ -155,15 +155,15 @@ public class CalculationVolumeWeightModel {
                 this.Height = Height;
             }
 
-            public int getVolume() {
+            public double getVolume() {
                 return volume;
             }
 
-            public void setVolume(int volume) {
+            public void setVolume(double volume) {
                 this.volume = volume;
             }
 
-            public int getGrossWeight() {
+            public double getGrossWeight() {
                 return GrossWeight;
             }
 
@@ -179,7 +179,7 @@ public class CalculationVolumeWeightModel {
                 this.VolumeWeight = VolumeWeight;
             }
 
-            public int getChargeWeight() {
+            public double getChargeWeight() {
                 return ChargeWeight;
             }
 
