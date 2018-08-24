@@ -50,6 +50,7 @@ public class UserModel {
     private int st_id;
     private String ding_user_id;
     private String og_shortcode;
+    private String og_cityenname;
     private TokenModelEntity tokenModel;
     private List<PermissionEntity> permission;
 
@@ -165,6 +166,13 @@ public class UserModel {
         this.og_shortcode = og_shortcode;
     }
 
+    public String getOg_cityenname() {
+        return og_cityenname;
+    }
+
+    public void setOg_cityenname(String og_cityenname) {
+        this.og_cityenname = og_cityenname;
+    }
     public TokenModelEntity getTokenModel() {
         return tokenModel;
     }

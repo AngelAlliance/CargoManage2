@@ -141,7 +141,7 @@ public class WarehouPresenter {
         }
         String json = new Gson().toJson(param);
         RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), json);
-        return warehouContract.calculationVolumeWeight(token, requestBody);
+        return warehouContract.calculationVolumeWeight(token, param);
     }
 
     //TODO 根据订单号查询订单信息
@@ -258,6 +258,7 @@ public class WarehouPresenter {
         } else {
             param.put("m_lstExtraService", "");
         }
+        param.put(WarehouContract.SUMMARY, WarehouContract.summary);
         String token = "";
         if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
             token = UserModel.getInstance().getTokenModel().getToken();

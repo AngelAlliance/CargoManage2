@@ -13,9 +13,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.common.constant.GenApi;
+import com.sz.ljs.common.model.BaseResultModel;
 import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.OrderModel;
 import com.sz.ljs.common.model.UserModel;
@@ -25,10 +27,13 @@ import com.sz.ljs.common.view.ScanView;
 import com.sz.ljs.common.view.SelectionPopForBottomView;
 import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.warehousing.R;
+import com.sz.ljs.warehousing.model.CalculationVolumeWeightModel;
+import com.sz.ljs.warehousing.model.ChenckInRequestModel;
 import com.sz.ljs.warehousing.model.CountryModel;
 import com.sz.ljs.warehousing.model.CustomerModel;
 import com.sz.ljs.warehousing.model.ProductModel;
 import com.sz.ljs.warehousing.model.SelectCurrentDayBatchModel;
+import com.sz.ljs.warehousing.model.ServiceModel;
 import com.sz.ljs.warehousing.model.SubnitModel;
 import com.sz.ljs.warehousing.model.WareHouSingModel;
 import com.sz.ljs.warehousing.presenter.WarehouPresenter;
@@ -62,6 +67,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
     private List<CountryModel.DataEntity> countryList = new ArrayList<>();
     private List<ProductModel.DataEntity> productList = new ArrayList<>();
     private List<SubnitModel> subnitList = new ArrayList<>();
+    private List<ServiceModel> serviceList = new ArrayList<>();
     private ListDialog dialog;
     private CountryModel.DataEntity countryModel;
     private ProductModel.DataEntity productModel;
@@ -153,14 +159,18 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!TextUtils.isEmpty(s) && 1 == Integer.parseInt(s.toString())) {
+                    pice=Integer.parseInt(s.toString());
                     //TODO 当输入1件的时候当1件处理
                     ll_changkuangao.setVisibility(View.VISIBLE);
                     ll_duojian.setBackgroundResource(R.drawable.pack_btn_clickbg);
                     ll_duojian.setClickable(false);
                 } else {
-                    ll_changkuangao.setVisibility(View.GONE);
-                    ll_duojian.setBackgroundResource(R.drawable.pack_btn_bg);
-                    ll_duojian.setClickable(true);
+                    if(!TextUtils.isEmpty(s)){
+                        pice=Integer.parseInt(s.toString());
+                        ll_changkuangao.setVisibility(View.GONE);
+                        ll_duojian.setBackgroundResource(R.drawable.pack_btn_bg);
+                        ll_duojian.setClickable(true);
+                    }
                 }
             }
 
@@ -180,7 +190,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 isYuBaoKeHu = true;
                 iv_yubaokehu.setImageResource(R.mipmap.fb_g);
                 if (!TextUtils.isEmpty(et_yundanhao.getText().toString().trim())
-                        && et_yundanhao.getText().toString().trim().length() > 8) {
+                        && et_yundanhao.getText().toString().trim().length() == GenApi.ScanNumberLeng) {
                     //TODO 这里防止用户先填运单号后点击预报客户，因此这里也要做判断，如果满足上述条件一样得请求接口
                     getOrderByNumber();
                 }
@@ -217,6 +227,16 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
             startActivityForResult(intent, 1000);
         } else if (id == R.id.btn_qianru) {
             //TODO 签入
+            if(pice==1){
+                if (!TextUtils.isEmpty(et_shizhong.getText().toString().trim())&&!TextUtils.isEmpty(et_chang.getText().toString().trim())
+                &&!TextUtils.isEmpty(et_kuan.getText().toString().trim())&&!TextUtils.isEmpty(et_gao.getText().toString().trim())){
+                    calculationVolumeWeight(et_shizhong.getText().toString().trim(),et_chang.getText().toString().trim(),et_kuan.getText().toString().trim(),et_gao.getText().toString().trim());
+                }else {
+                    Utils.showToast(getBaseActivity(),"长宽高不能为空");
+                }
+            }else {
+                chenckIn();
+            }
         } else if (id == R.id.btn_fujiafuwu) {
             //TODO 附加服务
             Intent intent = new Intent(WareHousingActivity.this, AddServiceActivity.class);
@@ -240,9 +260,170 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
+    //TODO 获取材积重等
+    private void calculationVolumeWeight(String grossweight,String length, String width, String height){
+        mPresenter.calculationVolumeWeight(grossweight, length, width, height, "", "", ""
+                , "" + customerId)
+                .compose(this.<CalculationVolumeWeightModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<CalculationVolumeWeightModel>() {
+                    @Override
+                    public void accept(CalculationVolumeWeightModel result) throws Exception {
+                        if (0 == result.getCode()) {
+                            showWaiting(false);
+                            Utils.showToast(WareHousingActivity.this, result.getMsg());
+                        } else if (1 == result.getCode()) {
+                            showWaiting(false);
+                            SubnitModel model = new SubnitModel();
+                            if (null != result.getData() && null != result.getData().getLstCargoVolume()) {
+                                model.setList(result.getData().getLstCargoVolume());
+                            }
+                            subnitList.add(model);
+                            chenckIn();
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        showWaiting(false);
+                        //获取失败，提示
+                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                    }
+                });
+    };
     //TODO 入库
     private void chenckIn(){
-//        if (TextUtils.isEmpty())
+        if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())){
+            Utils.showToast(getBaseActivity(),"运单号不能为空");
+            return;
+        }
+        if (TextUtils.isEmpty(et_kehudaima.getText().toString().trim())){
+            Utils.showToast(getBaseActivity(),"客户代码不能为空");
+            return;
+        }
+        if (TextUtils.isEmpty(et_kehucankaodanhao.getText().toString().trim())){
+            Utils.showToast(getBaseActivity(),"客户参考单号不能为空");
+            return;
+        }
+        if (TextUtils.isEmpty(et_mudiguojia.getText().toString().trim())){
+            Utils.showToast(getBaseActivity(),"目的国家不能为空");
+            return;
+        }
+        if (TextUtils.isEmpty(et_xiaoshouchanpin.getText().toString().trim())){
+            Utils.showToast(getBaseActivity(),"销售产品不能为空");
+            return;
+        }
+        if (TextUtils.isEmpty(et_shizhong.getText().toString().trim())){
+            Utils.showToast(getBaseActivity(),"实重不能为空");
+            return;
+        }
+        if(1==pice){
+            //TODO 只有一件
+            if (TextUtils.isEmpty(et_chang.getText().toString().trim())){
+                Utils.showToast(getBaseActivity(),"长度不能为空");
+                return;
+            }
+            if (TextUtils.isEmpty(et_kuan.getText().toString().trim())){
+                Utils.showToast(getBaseActivity(),"宽度不能为空");
+                return;
+            }
+            if (TextUtils.isEmpty(et_gao.getText().toString().trim())){
+                Utils.showToast(getBaseActivity(),"高度不能为空");
+                return;
+            }
+        }else {
+            if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())){
+                Utils.showToast(getBaseActivity(),"件数不能为空");
+                return;
+            }
+        }
+        showWaiting(true);
+        ChenckInRequestModel requestModel=new ChenckInRequestModel();
+        if(null!=orderModel&&null!=orderModel.getData()){
+            requestModel.setOrder_id(orderModel.getData().getOrder_id());
+        }else {
+            requestModel.setOrder_id("");
+        }
+        requestModel.setShipper_number(et_yundanhao.getText().toString().trim());
+        requestModel.setReference_number(et_kehucankaodanhao.getText().toString().trim());
+        requestModel.setCustomer_id(""+customerId);
+        if(null!=productModel){
+            requestModel.setPk_code(productModel.getProduct_code());
+        }else {
+            requestModel.setPk_code("");
+        }
+        if(null!=countryModel){
+            requestModel.setCountry_code(countryModel.getCountry_code());
+        }else {
+            requestModel.setCountry_code("");
+        }
+        if(null!=selectCurrentDayBatchEntity){
+            requestModel.setArrivalbatch_id(""+selectCurrentDayBatchEntity.getArrivalbatch_id());
+            requestModel.setArrival_date(selectCurrentDayBatchEntity.getArrival_date());
+            requestModel.setCustomer_channelid(""+selectCurrentDayBatchEntity.getCustomer_channelid());
+        }else {
+            requestModel.setArrivalbatch_id("");
+            requestModel.setArrival_date("");
+            requestModel.setCustomer_channelid("");
+        }
+        requestModel.setCheckin_og_id(""+UserModel.getInstance().getOg_id());
+        requestModel.setShipper_weight(et_shizhong.getText().toString().trim());
+        if(TextUtils.isEmpty(et_jianshu.getText().toString())){
+            requestModel.setShipper_pieces(""+pice);
+        }else {
+            requestModel.setShipper_pieces(et_jianshu.getText().toString());
+        }
+        if(1==pice){
+            requestModel.setLen(et_chang.getText().toString().trim());
+            requestModel.setHeight(et_gao.getText().toString().trim());
+            requestModel.setWidth(et_kuan.getText().toString().trim());
+        }else {
+            requestModel.setLen("");
+            requestModel.setHeight("");
+            requestModel.setWidth("");
+        }
+        requestModel.setUser_Name(UserModel.getInstance().getSt_name());
+        requestModel.setOG_CityEnName(UserModel.getInstance().getOg_cityenname());
+        if(null!=subnitList&&subnitList.size()>0){
+            List<CalculationVolumeWeightModel.DataEntity.LstCargoVolumeEntity> list=new ArrayList<>();
+            for (SubnitModel model:subnitList){
+                list.add(model.getList().get(0));
+            }
+            requestModel.setCargoVolumes(new Gson().toJson(list));
+        }else {
+            requestModel.setCargoVolumes("");
+        }
+        if(null!=serviceList&&serviceList.size()>0){
+            requestModel.setM_lstExtraService(new Gson().toJson(serviceList));
+        }else {
+            requestModel.setM_lstExtraService("");
+        }
+        mPresenter.chenckIn(requestModel)
+                .compose(this.<BaseResultModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<BaseResultModel>() {
+                    @Override
+                    public void accept(BaseResultModel result) throws Exception {
+                        if (0 == result.getCode()) {
+                            showWaiting(false);
+                            Utils.showToast(WareHousingActivity.this, result.getMsg());
+                        } else if (1 == result.getCode()) {
+                            showWaiting(false);
+                            Utils.showToast(WareHousingActivity.this, result.getMsg());
+                            WareHouSingModel.getInstance().release(); //情况入库缓存
+                            finish();
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        showWaiting(false);
+                        //获取失败，提示
+                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                    }
+                });
     }
     //TODO 根据运单号请求运单数据
     private void getOrderByNumber() {
@@ -257,6 +438,21 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         if (0 == result.getCode()) {
                             showWaiting(false);
                             Utils.showToast(WareHousingActivity.this, result.getMsg());
+                            if("没有数据".equals(result.getMsg())){
+                                //TODO 没有返回订单详情的时候
+                                isWenTiDan=true;
+                                et_kehudaima.setClickable(false);
+                                et_kehucankaodanhao.setFocusable(false);
+                                ll_mudiguojia.setClickable(false);
+                                ll_xiaoshouchanpin.setClickable(false);
+                                et_jianshu.setFocusable(false);
+                                et_shizhong.setFocusable(false);
+                                et_chang.setFocusable(false);
+                                et_kuan.setFocusable(false);
+                                et_gao.setFocusable(false);
+                                btn_fujiafuwu.setClickable(false);
+                                btn_qianru.setClickable(false);
+                            }
                         } else if (1 == result.getCode()) {
                             showWaiting(false);
                             handelOrderResult(result);
@@ -496,7 +692,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 }
                 break;
                 case 1001: {
-
+                    serviceList.clear();
+                    serviceList=WareHouSingModel.getInstance().getServiceModelList();
+                    Log.i("服务费返回后", "serviceList.size()=" + serviceList.size());
                 }
                 break;
                 case 1002: {

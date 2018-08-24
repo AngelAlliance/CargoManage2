@@ -63,9 +63,10 @@ public interface WarehouContract {
     public static final String COUNTRY_CODE="country_code";
     public static final String ARRIVAL_DATE="arrival_date";
     @POST("user/CalculationVolumeWeight")
-    @Headers({"Content-Type: application/json","Accept: application/json"})//需要添加头
-    Flowable<CalculationVolumeWeightModel> calculationVolumeWeight(@Header("token") String token, @Body RequestBody route);
-
+//    @Headers({"Content-Type: application/json","Accept: application/json"})//需要添加头
+//    Flowable<CalculationVolumeWeightModel> calculationVolumeWeight(@Header("token") String token, @Body RequestBody route);
+    @FormUrlEncoded
+    Flowable<CalculationVolumeWeightModel> calculationVolumeWeight(@Header("token") String token, @FieldMap Map<String, String> param);
 
     public static final String NUMBER = "number";   //运单号码
     @POST("user/GetOrderbyNumber")

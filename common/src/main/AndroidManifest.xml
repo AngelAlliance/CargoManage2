@@ -1,24 +1,27 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sz.ljs.common">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
     <application
         android:allowBackup="true"
         android:supportsRtl="true">
         <activity android:name=".view.ScanView"></activity>
         <activity
-            android:theme="@style/ActionSheetDialogStyle"
-            android:name=".view.PhotosUtils">
+            android:name=".view.PhotosUtils"
+            android:theme="@style/ActionSheetDialogStyle">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:theme="@style/ActionSheetDialogStyle"
-            android:name=".view.SelectionPopForBottomView">
+            android:name=".view.SelectionPopForBottomView"
+            android:theme="@style/ActionSheetDialogStyle">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
     </application>

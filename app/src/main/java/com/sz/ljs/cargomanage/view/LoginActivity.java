@@ -203,6 +203,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             UserModel.getInstance().setSt_id(dataEntity.getUserModel().getSt_id());
             UserModel.getInstance().setDing_user_id(dataEntity.getUserModel().getDing_user_id());
             UserModel.getInstance().setOg_shortcode(dataEntity.getUserModel().getOg_shortcode());
+            UserModel.getInstance().setOg_cityenname(dataEntity.getUserModel().getOg_cityenname());
             UserModel.TokenModelEntity tokenModelEntity = new UserModel.TokenModelEntity();
             tokenModelEntity.setCreate_date(dataEntity.getTokenModel().getCreate_date());
             tokenModelEntity.setFailure_time(dataEntity.getTokenModel().getFailure_time());

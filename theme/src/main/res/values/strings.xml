@@ -123,4 +123,6 @@
     <string name="str_qgxyyh">请勾选已验货</string>
     <string name="str_xzkh">选择客户</string>
     <string name="str_qsrkhdm">请输入客户代码</string>
+    <string name="str_bluetooth_is_close">手机蓝牙未开启,点击开启蓝牙</string>
+    <string name="confirm">确认</string>
 </resources>

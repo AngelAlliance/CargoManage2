@@ -24,12 +24,24 @@ public class WareHouSingModel {
     private double TotalChargeWeight;   //总计费重
     private double TotalGrossWeight;   //总实重
 
+    public void release(){
+        serviceModelList.clear();
+        customerList.clear();
+        subnitList.clear();
+        volume=0;
+        TotalVolumeWeight=0;
+        TotalChargeWeight=0;
+        TotalGrossWeight=0;
+    }
 
     public void setServiceModelList(List<ServiceModel> list) {
         List<ServiceModel> list1 = new ArrayList<>();
         list1.addAll(list);
         serviceModelList.clear();
         serviceModelList.addAll(list1);
+    }
+    public List<ServiceModel> getServiceModelList(){
+        return serviceModelList;
     }
 
     public void removeServiceModel(int position) {

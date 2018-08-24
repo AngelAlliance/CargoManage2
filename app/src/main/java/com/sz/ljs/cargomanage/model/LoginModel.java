@@ -109,6 +109,7 @@ public class LoginModel {
             private int st_id;
             private String ding_user_id;
             private String og_shortcode;
+            private String og_cityenname;
 
             public Object getAuthentication_code() {
                 return authentication_code;
@@ -220,6 +221,14 @@ public class LoginModel {
 
             public void setOg_shortcode(String og_shortcode) {
                 this.og_shortcode = og_shortcode;
+            }
+
+            public String getOg_cityenname() {
+                return og_cityenname;
+            }
+
+            public void setOg_cityenname(String og_cityenname) {
+                this.og_cityenname = og_cityenname;
             }
         }
 

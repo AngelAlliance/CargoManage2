@@ -22,4 +22,5 @@
         <item name="android:windowEnterAnimation">@anim/upload_in</item>
         <item name="android:windowExitAnimation">@anim/upload_out</item>
     </style>
+
 </resources>

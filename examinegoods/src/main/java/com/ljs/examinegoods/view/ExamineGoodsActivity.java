@@ -1,7 +1,10 @@
 package com.ljs.examinegoods.view;
 
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -22,6 +25,8 @@ import com.ljs.examinegoods.contract.ExamineGoodsContract;
 import com.ljs.examinegoods.model.DetectionByModel;
 import com.ljs.examinegoods.model.ImageType;
 import com.ljs.examinegoods.model.ItemTypeModel;
+import com.qiloo.ble.AndBleScanner;
+import com.qiloo.ble.bean.ScanInfo;
 import com.sz.ljs.common.constant.GenApi;
 import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.OrderModel;
@@ -31,7 +36,9 @@ import com.ljs.examinegoods.model.UploadFileResultModel;
 import com.ljs.examinegoods.presenter.ExamineGoodsPresenter;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.common.model.UserModel;
+import com.sz.ljs.common.utils.BluetoothManager;
 import com.sz.ljs.common.utils.Utils;
+import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ListDialog;
 import com.sz.ljs.common.view.PhotosUtils;
 import com.sz.ljs.common.view.ScanView;
@@ -43,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -52,6 +60,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class ExamineGoodsActivity extends BaseActivity implements View.OnClickListener {
+    public static final String TAG="ExamineGoodsActivity";
     private EditText et_yundanhao, et_kehucankaodanhao, et_wenti, et_jianshu;
     private ImageView iv_scan, iv_yiyanhuo, iv_scan2;
     private TextView tv_goods_type, tv_goods_shifoudaidian, tv_goods_shifoudaici, tv_goods_shifoudaipai, tv_goods_jianshu, tv_goods_suihuofapiao, tv_goods_fapiaoziliao, tv_goods_baoguanziliao, tv_goods_dandubaoguan, tv_goods_huowusunhuai, tv_goods_baozhuangposun, tv_goods_weijinpin, tv_goods_yisuipin;
@@ -73,7 +82,11 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private OrderModel orderModel;
     private List<ImageType> Imagelist = new ArrayList<>();
     private ListDialog dialog;
-
+    private BluetoothManager bluetoothManager;
+    private AlertDialog alertDialog;
+    private AndBleScanner mScanner;
+    private List<ScanInfo> bleList=new ArrayList<ScanInfo>();
+    private Handler handl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +97,9 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void initView() {
+        mScanner = new AndBleScanner.Builder()
+                .setScanTimeOut(30)
+                .build();
         waitingDialog = new WaitingDialog(this);
         mPresenter = new ExamineGoodsPresenter();
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
@@ -850,6 +866,105 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         return isChaYi;
     }
 
+
+    //TODO 打印
+    private void Printing(){
+        bluetoothManager=new BluetoothManager(ExamineGoodsActivity.this)
+                .setStateChangCallBack(new BluetoothManager.IBluetoothStateChangCallBack() {
+                    @Override
+                    public void onStateChang(int state) {
+                        switch (state) {
+                            case BluetoothAdapter.STATE_ON: {
+                                Scan();
+                            }
+                            break;
+                            case BluetoothAdapter.STATE_OFF: {
+                                stopScan();
+                            }
+                            break;
+                        }
+                    }
+                });
+        if (!BluetoothManager.BluetoothState()) { //表示未开启
+            alertDialog = new AlertDialog(ExamineGoodsActivity.this).builder()
+                    .setMsg(getString(R.string.str_bluetooth_is_close))
+                    .setPositiveButton(getString(R.string.str_yes), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            BluetoothManager.openBluetooth();
+                            alertDialog.dissmiss();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.str_cancel), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dissmiss();
+                        }
+                    });
+            alertDialog.show();
+        } else {
+            Scan();
+        }
+    }
+
+    //TODO 蓝牙搜索
+    private void Scan(){
+        mScanner.searchBle()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ScanInfo>() {
+
+                    @Override
+                    public void accept(ScanInfo scanInfo) throws Exception {
+                        String tmp = "Addr=" +scanInfo.getScanDevice().getAddress()
+                                + " Rssi=" + scanInfo.getRssi()
+                                + " UUID=" + scanInfo.getAdvData().getAdvData()
+                                + " LocalName=" + scanInfo.getAdvData().getLocalName();
+                        Log.i("设备信息","tmp="+tmp);
+                        for (final ScanInfo mdevice : bleList) { // 将设备储存进扫描列表
+                            if (mdevice.getScanDevice().getAddress().equals(scanInfo.getScanDevice().getAddress())) {
+                                handl.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            bleList.remove(mdevice);
+                                        } catch (Exception e) {
+                                            Log.e(TAG
+                                                    , e.toString());
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                        bleList.add(scanInfo);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {//出错的信息
+                    }
+                }, new Action() {
+                    @Override
+                    public void run() throws Exception {//扫描完成的
+                        handl.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Scan();
+                                } catch (Exception e) {
+
+                                    Log.e(TAG
+                                            , e.toString());
+                                }
+                            }
+                        });
+                    }
+                });
+    }
+
+    //TODO 停止搜索
+    private void stopScan() {
+        mScanner.stopScan();
+    }
     private void showWaiting(boolean isShow) {
         if (null != waitingDialog) {
             waitingDialog.showDialog(isShow);
