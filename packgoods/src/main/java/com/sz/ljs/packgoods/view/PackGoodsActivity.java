@@ -14,14 +14,24 @@ import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.common.model.ExpressModel;
 import com.sz.ljs.common.model.ExpressPackageModel;
 import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
+import com.sz.ljs.common.model.UserModel;
+import com.sz.ljs.common.utils.Utils;
 import com.sz.ljs.common.view.FourSidesSlidingListView;
 import com.sz.ljs.common.view.ScanView;
+import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.packgoods.R;
 import com.sz.ljs.common.adapter.MenuAdapter;
 import com.sz.ljs.common.model.MenuModel;
+import com.sz.ljs.packgoods.model.GsonDepltListModel;
+import com.sz.ljs.packgoods.presenter.PackgoodsPresenter;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by liujs on 2018/8/16.
@@ -45,6 +55,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     private List<MenuModel> ysmMenuList = new ArrayList<>();
     private MenuAdapter dcyMenuAdapter;
     private MenuAdapter ysmMenuAdapter;
+    private PackgoodsPresenter mPresnter;
+    private WaitingDialog waitingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +68,14 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void initView() {
+        waitingDialog=new WaitingDialog(this);
+        mPresnter=new PackgoodsPresenter();
         setDaiChuYunMenu();
         setYiSaoMiaoMenu();
         getDaiChuYunHeaderData();
         getYiSaoMiaoHeaderData();
-        setdanChuYunContentData();
-        setyiSaoMiaoContentData();
+//        setdanChuYunContentData();
+//        setyiSaoMiaoContentData();
         et_qudao = (EditText) findViewById(R.id.et_qudao);
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         tv_yundanhao = (TextView) findViewById(R.id.tv_yundanhao);
@@ -137,6 +151,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
     }
 
+
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
@@ -162,6 +178,35 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+
+
+    //TODO 获取打包界面初始化数据
+    private void getDepltList(){
+        mPresnter.getDepltList(""+UserModel.getInstance().getOg_id(),"","")
+                .compose(this.<GsonDepltListModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<GsonDepltListModel>() {
+                    @Override
+                    public void accept(GsonDepltListModel result) throws Exception {
+                        if (0 == result.getCode()) {
+                            showWaiting(false);
+                            Utils.showToast(PackGoodsActivity.this, result.getMsg());
+                        } else if (1 == result.getCode()) {
+                            showWaiting(false);
+
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        showWaiting(false);
+                        //获取失败，提示
+                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                    }
+                });
+    }
+
     //TODO 设置待出运菜单
     private void setDaiChuYunMenu() {
         dcyMenuList.add(new MenuModel(1, getResources().getString(R.string.str_cx), R.mipmap.ic_chexiao));
@@ -178,6 +223,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         ysmMenuList.add(new MenuModel(5, getResources().getString(R.string.str_cz), R.mipmap.ic_tichu));
     }
 
+    //TODO 设置打包界面待出运界面数据标题栏
     private void getDaiChuYunHeaderData() {
         danChuYunHeaderList.add(new FourSidesSlidListTitileModel(getResources().getString(R.string.str_gx)
                 , "", getResources().getString(R.string.str_zzzt)
@@ -186,6 +232,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 , getResources().getString(R.string.str_ckg)));
     }
 
+    //TODO 设置打包界面已扫描界面数据标题栏
     private void getYiSaoMiaoHeaderData() {
         yiSaoMiaoHeaderList.add(new FourSidesSlidListTitileModel(getResources().getString(R.string.str_gx)
                 , getResources().getString(R.string.str_bbh), ""
@@ -194,6 +241,12 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 , getResources().getString(R.string.str_ckg)));
     }
 
+
+    private void showWaiting(boolean isShow) {
+        if (null != waitingDialog) {
+            waitingDialog.showDialog(isShow);
+        }
+    }
     private void setdanChuYunContentData() {
         danChuYunlistData.add(new ExpressModel(false, "", "正常走货", 104343
                 , 105550, 12, 11, 4, 2, 1));

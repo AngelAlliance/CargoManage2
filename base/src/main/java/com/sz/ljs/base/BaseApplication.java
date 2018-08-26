@@ -10,6 +10,8 @@ import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -38,6 +40,7 @@ public class BaseApplication extends Application {
     private static DisplayImageOptions options = null;
     //腾讯bugly Appid
     public final String BUGLY_APP_ID = "112ab15512";//8ec6cc34-f6b4-4dc2-9e12-25f82cf6e666
+    public final String XUNFEI_ID="5b7a7165";
 
     @Override
     public void onCreate() {
@@ -47,6 +50,8 @@ public class BaseApplication extends Application {
         handlerDetectFileUriExposure();
         initImageLoader();
         startMainService();
+        SpeechUtility a=	SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID+"=5b7a7165");
+        Log.i("初始化讯飞","a="+a);
         Logger.addLogAdapter(new AndroidLogAdapter());
     }
     //启动主服务

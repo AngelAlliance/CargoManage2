@@ -24,7 +24,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
 }
 
 dependencies {
@@ -59,4 +63,7 @@ dependencies {
     // If you want to bind to Android-specific lifecycles
     compile 'com.trello.rxlifecycle2:rxlifecycle-android:2.2.1'
     implementation project(':theme')
+    //    //下面两个是科大讯飞语言
+    compile files('libs/Msc.jar')
+    compile files('libs/Sunflower.jar')
 }

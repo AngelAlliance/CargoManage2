@@ -21,7 +21,6 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:background="@null"
-            android:inputType="number"
             android:paddingLeft="5dp"
             android:textSize="@dimen/majority_text"
             android:textColor="@color/secondary_color_333333"

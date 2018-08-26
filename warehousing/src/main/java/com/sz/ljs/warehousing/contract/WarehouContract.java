@@ -4,6 +4,7 @@ import com.sz.ljs.common.model.BaseResultModel;
 import com.sz.ljs.common.model.OrderModel;
 import com.sz.ljs.common.utils.MD5Util;
 import com.sz.ljs.warehousing.model.CalculationVolumeWeightModel;
+import com.sz.ljs.warehousing.model.ChenckInModel;
 import com.sz.ljs.warehousing.model.CountryModel;
 import com.sz.ljs.warehousing.model.CustomerModel;
 import com.sz.ljs.warehousing.model.GsonIncidentalModel;
@@ -76,6 +77,6 @@ public interface WarehouContract {
 
     @POST("user/ChenckIn")
     @FormUrlEncoded
-    Flowable<BaseResultModel> chenckIn(@Header("token") String token, @FieldMap Map<String, String> param);
+    Flowable<ChenckInModel> chenckIn(@Header("token") String token, @FieldMap Map<String, String> param);
 
 }

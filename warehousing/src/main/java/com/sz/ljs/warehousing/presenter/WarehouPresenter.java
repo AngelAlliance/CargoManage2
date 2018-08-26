@@ -11,6 +11,7 @@ import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.MD5Util;
 import com.sz.ljs.warehousing.contract.WarehouContract;
 import com.sz.ljs.warehousing.model.CalculationVolumeWeightModel;
+import com.sz.ljs.warehousing.model.ChenckInModel;
 import com.sz.ljs.warehousing.model.ChenckInRequestModel;
 import com.sz.ljs.warehousing.model.CountryModel;
 import com.sz.ljs.warehousing.model.CustomerModel;
@@ -161,7 +162,7 @@ public class WarehouPresenter {
     }
 
     //TODO 入库接口
-    public Flowable<BaseResultModel> chenckIn(ChenckInRequestModel requestModel) {
+    public Flowable<ChenckInModel> chenckIn(ChenckInRequestModel requestModel) {
         Map<String, String> param = new HashMap<>();
         if (!TextUtils.isEmpty(requestModel.getOrder_id())) {
             param.put("order_id", requestModel.getOrder_id());

@@ -3,11 +3,16 @@ package com.ljs.examinegoods.view;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +24,13 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.iflytek.cloud.ErrorCode;
+import com.iflytek.cloud.InitListener;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechEvent;
+import com.iflytek.cloud.SpeechSynthesizer;
+import com.iflytek.cloud.SynthesizerListener;
 import com.ljs.examinegoods.R;
 import com.ljs.examinegoods.adapter.PhotoGridAdapter;
 import com.ljs.examinegoods.contract.ExamineGoodsContract;
@@ -87,6 +99,13 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private AndBleScanner mScanner;
     private List<ScanInfo> bleList=new ArrayList<ScanInfo>();
     private Handler handl;
+    // 语音合成对象
+    private SpeechSynthesizer mTts;
+    // 引擎类型
+    private String mEngineType = SpeechConstant.TYPE_CLOUD;
+    // 默认发音人
+    private String voicer = "vixy";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -181,7 +200,25 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private void initData() {
         adapter = new PhotoGridAdapter(this, photoList);
         gv_photo.setAdapter(adapter);
+        // 初始化合成对象
+        mTts = SpeechSynthesizer.createSynthesizer(this, new InitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i != ErrorCode.SUCCESS) {
+                    Utils.showToast(getBaseActivity(),"初始化失败,错误码："+i);
+                } else {
+                    // 初始化成功，之后可以调用startSpeaking方法
+                    // 注：有的开发者在onCreate方法中创建完合成对象之后马上就调用startSpeaking进行合成，
+                    // 正确的做法是将onCreate中的startSpeaking调用移至这里
+                }
+            }
+        });
+
+        // 设置参数
+        setParam();
     }
+
+
 
     private void setListener() {
         et_yundanhao.addTextChangedListener(new TextWatcher() {
@@ -192,7 +229,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == GenApi.ScanNumberLeng) {
+                if (s.length() >= GenApi.ScanNumberLeng) {
                     //TODO 当运单号大于8位的时候就开始请求数据
                     getOrderByNumber();
                 }
@@ -464,6 +501,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 public void onResult(String result) {
                     if (!TextUtils.isEmpty(result)) {
                         et_yundanhao.setText(result);
+                        int code = mTts.startSpeaking(result, mTtsListener);
+                        Log.i("语音播报","code="+code);
                     }
                 }
             });
@@ -969,5 +1008,105 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         if (null != waitingDialog) {
             waitingDialog.showDialog(isShow);
         }
+    }
+
+    /**
+     * 参数设置
+     * @return
+     */
+    private void setParam(){
+        // 清空参数
+        mTts.setParameter(SpeechConstant.PARAMS, null);
+        // 根据合成引擎设置相应参数
+        if(mEngineType.equals(SpeechConstant.TYPE_CLOUD)) {
+            mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
+            //onevent回调接口实时返回音频流数据
+            //mTts.setParameter(SpeechConstant.TTS_DATA_NOTIFY, "1");
+            // 设置在线合成发音人
+            mTts.setParameter(SpeechConstant.VOICE_NAME, voicer);
+            //设置合成语速
+            mTts.setParameter(SpeechConstant.SPEED, "50");
+            //设置合成音调
+            mTts.setParameter(SpeechConstant.PITCH, "50");
+            //设置合成音量
+            mTts.setParameter(SpeechConstant.VOLUME, "100");
+        }else {
+            mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_LOCAL);
+            // 设置本地合成发音人 voicer为空，默认通过语记界面指定发音人。
+            mTts.setParameter(SpeechConstant.VOICE_NAME, "");
+            /**
+             * TODO 本地合成不设置语速、音调、音量，默认使用语记设置
+             * 开发者如需自定义参数，请参考在线合成参数设置
+             */
+        }
+        //设置播放器音频流类型
+        mTts.setParameter(SpeechConstant.STREAM_TYPE, "3");
+        // 设置播放合成音频打断音乐播放，默认为true
+        mTts.setParameter(SpeechConstant.KEY_REQUEST_FOCUS, "true");
+
+        // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
+        // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
+        mTts.setParameter(SpeechConstant.AUDIO_FORMAT, "pcm");
+        mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory()+"/msc/tts.pcm");
+    }
+
+    /**
+     * 合成回调监听。
+     */
+    private SynthesizerListener mTtsListener = new SynthesizerListener() {
+
+        @Override
+        public void onSpeakBegin() {
+            showTip("开始播放");
+        }
+
+        @Override
+        public void onSpeakPaused() {
+            showTip("暂停播放");
+        }
+
+        @Override
+        public void onSpeakResumed() {
+            showTip("继续播放");
+        }
+
+        @Override
+        public void onBufferProgress(int percent, int beginPos, int endPos,
+                                     String info) {
+            // 合成进度
+        }
+
+        @Override
+        public void onSpeakProgress(int percent, int beginPos, int endPos) {
+            // 播放进度
+
+            if(!"henry".equals(voicer)||!"xiaoyan".equals(voicer)||
+                    !"xiaoyu".equals(voicer)||!"catherine".equals(voicer))
+                endPos++;
+            Log.e(TAG,"beginPos = "+beginPos +"  endPos = "+endPos);
+        }
+
+        @Override
+        public void onCompleted(SpeechError error) {
+            if (error == null) {
+                showTip("播放完成");
+            } else if (error != null) {
+                showTip(error.getPlainDescription(true));
+            }
+        }
+
+        @Override
+        public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
+            // 以下代码用于获取与云端的会话id，当业务出错时将会话id提供给技术支持人员，可用于查询会话日志，定位出错原因
+            // 若使用本地能力，会话id为null
+            Log.e(TAG,"TTS Demo onEvent >>>"+eventType);
+            if (SpeechEvent.EVENT_SESSION_ID == eventType) {
+                String sid = obj.getString(SpeechEvent.KEY_EVENT_SESSION_ID);
+                Log.d(TAG, "session id =" + sid);
+            }
+        }
+    };
+    private void showTip(final String str) {
+        Utils.showToast(getBaseActivity(),str);
     }
 }

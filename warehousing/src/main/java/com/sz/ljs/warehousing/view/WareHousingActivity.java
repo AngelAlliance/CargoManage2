@@ -28,6 +28,7 @@ import com.sz.ljs.common.view.SelectionPopForBottomView;
 import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.warehousing.R;
 import com.sz.ljs.warehousing.model.CalculationVolumeWeightModel;
+import com.sz.ljs.warehousing.model.ChenckInModel;
 import com.sz.ljs.warehousing.model.ChenckInRequestModel;
 import com.sz.ljs.warehousing.model.CountryModel;
 import com.sz.ljs.warehousing.model.CustomerModel;
@@ -134,7 +135,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!TextUtils.isEmpty(s) && s.length() == GenApi.ScanNumberLeng) {
+                if (!TextUtils.isEmpty(s) && s.length() >= GenApi.ScanNumberLeng) {
                     if (true == isYuBaoKeHu) {
                         //TODO 自动请求接口
                         getOrderByNumber();
@@ -190,7 +191,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 isYuBaoKeHu = true;
                 iv_yubaokehu.setImageResource(R.mipmap.fb_g);
                 if (!TextUtils.isEmpty(et_yundanhao.getText().toString().trim())
-                        && et_yundanhao.getText().toString().trim().length() == GenApi.ScanNumberLeng) {
+                        && et_yundanhao.getText().toString().trim().length() >= GenApi.ScanNumberLeng) {
                     //TODO 这里防止用户先填运单号后点击预报客户，因此这里也要做判断，如果满足上述条件一样得请求接口
                     getOrderByNumber();
                 }
@@ -400,12 +401,12 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
             requestModel.setM_lstExtraService("");
         }
         mPresenter.chenckIn(requestModel)
-                .compose(this.<BaseResultModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .compose(this.<ChenckInModel>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<BaseResultModel>() {
+                .subscribe(new Consumer<ChenckInModel>() {
                     @Override
-                    public void accept(BaseResultModel result) throws Exception {
+                    public void accept(ChenckInModel result) throws Exception {
                         if (0 == result.getCode()) {
                             showWaiting(false);
                             Utils.showToast(WareHousingActivity.this, result.getMsg());

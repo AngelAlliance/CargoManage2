@@ -37,9 +37,6 @@ dependencies {
     compile files('libs/bluetooth.jar')
     compile files('libs/ethernet.jar')
     compile(name: 'AndBLE-1.1.2', ext: 'aar')
-//    //下面两个是科大讯飞语言
-//    compile files('libs/Msc.jar')
-//    compile files('libs/Sunflower.jar')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':base')

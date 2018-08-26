@@ -23,7 +23,7 @@ android {
     }
     repositories{
         flatDir{
-            dirs 'libs','../common/libs'
+            dirs 'libs','../common/libs', '../base/libs'
         }
     }
 }
