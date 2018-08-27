@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -15,6 +16,7 @@ import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.cargomanage.R;
 import com.sz.ljs.cargomanage.adapter.HomeMenuAdapter;
 import com.sz.ljs.cargomanage.model.HomeMenuModel;
+import com.sz.ljs.inventory.view.InventoryActivity;
 import com.sz.ljs.cargomanage.model.ScanNumberLengModel;
 import com.sz.ljs.cargomanage.presenter.LoginPresenter;
 import com.sz.ljs.common.constant.GenApi;
@@ -85,21 +87,21 @@ public class MainActivity extends BaseActivity {
                 BaseApplication.startActivity(WareHousingActivity.class);
             }
             break;
-            case 2: {
+            case 2:{
                 //TODO 打包
                 BaseApplication.startActivity(PackGoodsActivity.class);
             }
             break;
-            case 3: {
+            case 3:{
                 //TODO 出库
                 BaseApplication.startActivity(ShipMentsActivity.class);
             }
             break;
-            case 6: {
+            case 6:{
                 //TODO 补打标签
                 BaseApplication.startActivity(PatchlabelActivity.class);
             }
-            case 7: {
+            case 7:{
                 //TODO 设置
                 BaseApplication.startActivity(SettingActivity.class);
             }
