@@ -2,6 +2,7 @@ package com.sz.ljs.packgoods.view;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,7 +23,7 @@ import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.packgoods.R;
 import com.sz.ljs.common.adapter.MenuAdapter;
 import com.sz.ljs.common.model.MenuModel;
-import com.sz.ljs.packgoods.model.GsonDepltListModel;
+import com.sz.ljs.common.model.GsonDepltListModel;
 import com.sz.ljs.packgoods.presenter.PackgoodsPresenter;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
@@ -68,14 +69,12 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void initView() {
-        waitingDialog=new WaitingDialog(this);
-        mPresnter=new PackgoodsPresenter();
+        waitingDialog = new WaitingDialog(this);
+        mPresnter = new PackgoodsPresenter();
         setDaiChuYunMenu();
         setYiSaoMiaoMenu();
         getDaiChuYunHeaderData();
         getYiSaoMiaoHeaderData();
-//        setdanChuYunContentData();
-//        setyiSaoMiaoContentData();
         et_qudao = (EditText) findViewById(R.id.et_qudao);
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         tv_yundanhao = (TextView) findViewById(R.id.tv_yundanhao);
@@ -101,10 +100,10 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
             @Override
             public void OnClick(int childPosition) {
                 if (null != danChuYunlistData && danChuYunlistData.size() > 0) {
-                    if (false == danChuYunlistData.get(childPosition).isChecked()) {
-                        danChuYunlistData.get(childPosition).setChecked(true);
-                    } else {
-                        danChuYunlistData.get(childPosition).setChecked(false);
+                    if (TextUtils.isEmpty(danChuYunlistData.get(childPosition).getIsSelect())||"false" == danChuYunlistData.get(childPosition).getIsSelect()) {
+                        danChuYunlistData.get(childPosition).setIsSelect("true");
+                    } else if("true" == danChuYunlistData.get(childPosition).getIsSelect()){
+                        danChuYunlistData.get(childPosition).setIsSelect("false");
                     }
                     fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
                 }
@@ -115,27 +114,45 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
             public void OnClick(int groupPosition) {
                 //TODO 点击父勾选按钮
                 if (null != yiSaoMiaolistData && yiSaoMiaolistData.size() > 0) {
-                    if (false == yiSaoMiaolistData.get(groupPosition).isChecked()) {
-                        yiSaoMiaolistData.get(groupPosition).setChecked(true);
-                        if (null != yiSaoMiaolistData.get(groupPosition).getExpressModels()
-                                && yiSaoMiaolistData.get(groupPosition).getExpressModels().size() > 0) {
+                    if (TextUtils.isEmpty(yiSaoMiaolistData.get(groupPosition).getIsSelect())
+                            ||"false" == yiSaoMiaolistData.get(groupPosition).getIsSelect()) {
+                        yiSaoMiaolistData.get(groupPosition).setIsSelect("true");
+                        if (null != yiSaoMiaolistData.get(groupPosition).getCn_list()
+                                && yiSaoMiaolistData.get(groupPosition).getCn_list().size() > 0) {
                             //TODO 将其所有子单状态全部设置成勾选状态
-                            for (int i = 0; i < yiSaoMiaolistData.get(groupPosition).getExpressModels().size(); i++) {
-                                yiSaoMiaolistData.get(groupPosition).getExpressModels().get(i).setChecked(true);
+                            for (int i = 0; i < yiSaoMiaolistData.get(groupPosition).getCn_list().size(); i++) {
+                                yiSaoMiaolistData.get(groupPosition).getCn_list().get(i).setIsSelect("true");
                             }
                         }
-                    } else {
-                        yiSaoMiaolistData.get(groupPosition).setChecked(false);
-                        if (null != yiSaoMiaolistData.get(groupPosition).getExpressModels()
-                                && yiSaoMiaolistData.get(groupPosition).getExpressModels().size() > 0) {
+                    } else if ("true" == yiSaoMiaolistData.get(groupPosition).getIsSelect()){
+                        yiSaoMiaolistData.get(groupPosition).setIsSelect("false");
+                        if (null != yiSaoMiaolistData.get(groupPosition).getCn_list()
+                                && yiSaoMiaolistData.get(groupPosition).getCn_list().size() > 0) {
                             //TODO 将其所有子单状态全部取消勾选状态
-                            for (int i = 0; i < yiSaoMiaolistData.get(groupPosition).getExpressModels().size(); i++) {
-                                yiSaoMiaolistData.get(groupPosition).getExpressModels().get(i).setChecked(false);
+                            for (int i = 0; i < yiSaoMiaolistData.get(groupPosition).getCn_list().size(); i++) {
+                                yiSaoMiaolistData.get(groupPosition).getCn_list().get(i).setIsSelect("false");
                             }
                         }
                     }
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
                 }
+            }
+        });
+        fs_yisaomiao_list.setSidesSlidChildCheckListener(new FourSidesSlidingListView.SidesSlidChildCheckListener() {
+            @Override
+            public void OnClick(int groupPosition, int childPosition) {
+                //TODO 点击包底下的子单勾选按钮
+                if (null != yiSaoMiaolistData && yiSaoMiaolistData.size() > 0
+                        &&null!=yiSaoMiaolistData.get(groupPosition).getCn_list()
+                        &&yiSaoMiaolistData.get(groupPosition).getCn_list().size()>0) {
+                    if(TextUtils.isEmpty(yiSaoMiaolistData.get(groupPosition).getCn_list().get(childPosition).getIsSelect())
+                            ||"false".equals(yiSaoMiaolistData.get(groupPosition).getCn_list().get(childPosition).getIsSelect())){
+                        yiSaoMiaolistData.get(groupPosition).getCn_list().get(childPosition).setIsSelect("true");
+                    }else  if("true".equals(yiSaoMiaolistData.get(groupPosition).getCn_list().get(childPosition).getIsSelect())){
+                        yiSaoMiaolistData.get(groupPosition).getCn_list().get(childPosition).setIsSelect("false");
+                    }
+                }
+                fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
             }
         });
     }
@@ -149,8 +166,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
         fs_yisaomiao_list.setHeaderData(yiSaoMiaoHeaderList);
         fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
+        getDepltList();
     }
-
 
 
     @Override
@@ -179,10 +196,10 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     }
 
 
-
     //TODO 获取打包界面初始化数据
-    private void getDepltList(){
-        mPresnter.getDepltList(""+UserModel.getInstance().getOg_id(),"","")
+    private void getDepltList() {
+        showWaiting(true);
+        mPresnter.getDepltList("" + UserModel.getInstance().getOg_id(), "", "")
                 .compose(this.<GsonDepltListModel>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -194,7 +211,9 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             Utils.showToast(PackGoodsActivity.this, result.getMsg());
                         } else if (1 == result.getCode()) {
                             showWaiting(false);
-
+                            if(null!=result.getData()){
+                                handDepltListResult(result);
+                            }
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -207,6 +226,21 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 });
     }
 
+    private void handDepltListResult(GsonDepltListModel result){
+        //TODO 先把子单数据遍历出来
+        if(null!=result.getData().getBaleList()&&result.getData().getBaleList().size()>0){
+            danChuYunlistData.clear();
+            danChuYunlistData.addAll(result.getData().getBaleList());
+            fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
+        }
+
+        if(null!=result.getData().getShppingCnList()&&result.getData().getShppingCnList().size()>0){
+                yiSaoMiaolistData.clear();
+                yiSaoMiaolistData.addAll(result.getData().getShppingCnList());
+                fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
+        }
+
+    }
     //TODO 设置待出运菜单
     private void setDaiChuYunMenu() {
         dcyMenuList.add(new MenuModel(1, getResources().getString(R.string.str_cx), R.mipmap.ic_chexiao));
@@ -225,7 +259,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
 
     //TODO 设置打包界面待出运界面数据标题栏
     private void getDaiChuYunHeaderData() {
-        danChuYunHeaderList.add(new FourSidesSlidListTitileModel(getResources().getString(R.string.str_gx)
+        danChuYunHeaderList.add(new FourSidesSlidListTitileModel(1,getResources().getString(R.string.str_gx)
                 , "", getResources().getString(R.string.str_zzzt)
                 , getResources().getString(R.string.str_ydh), getResources().getString(R.string.str_zdtm)
                 , getResources().getString(R.string.str_js), getResources().getString(R.string.str_shizhong)
@@ -234,7 +268,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
 
     //TODO 设置打包界面已扫描界面数据标题栏
     private void getYiSaoMiaoHeaderData() {
-        yiSaoMiaoHeaderList.add(new FourSidesSlidListTitileModel(getResources().getString(R.string.str_gx)
+        yiSaoMiaoHeaderList.add(new FourSidesSlidListTitileModel(2,getResources().getString(R.string.str_gx)
                 , getResources().getString(R.string.str_bbh), ""
                 , getResources().getString(R.string.str_ydh), getResources().getString(R.string.str_zdtm)
                 , getResources().getString(R.string.str_js), getResources().getString(R.string.str_shizhong)
@@ -247,77 +281,5 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
             waitingDialog.showDialog(isShow);
         }
     }
-    private void setdanChuYunContentData() {
-        danChuYunlistData.add(new ExpressModel(false, "", "正常走货", 104343
-                , 105550, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(true, "", "正常走货", 104343
-                , 2423423, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(true, "", "扣件中", 104343
-                , 545455, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(false, "", "正常走货", 104343
-                , 43222, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(true, "", "正常走货", 104343
-                , 43434, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(false, "", "扣件中", 104343
-                , 434343, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(true, "", "正常走货", 104343
-                , 1111, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(false, "", "扣件中", 104343
-                , 433, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(true, "", "扣件中", 104343
-                , 5454, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(false, "", "正常走货", 104343
-                , 565, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(true, "", "扣件中", 104343
-                , 7666, 12, 11, 4, 2, 1));
-        danChuYunlistData.add(new ExpressModel(false, "", "正常走货", 104343
-                , 5454, 12, 11, 4, 2, 1));
-    }
 
-    private void setyiSaoMiaoContentData() {
-        List<ExpressModel> list = new ArrayList<>();
-        list.add(new ExpressModel(false, "1234567", "", 104343
-                , 105550, 12, 11, 4, 2, 1));
-        list.add(new ExpressModel(true, "1234567", "", 104343
-                , 105550, 12, 11, 4, 2, 1));
-        list.add(new ExpressModel(false, "1234567", "", 104343
-                , 105550, 12, 11, 4, 2, 1));
-        list.add(new ExpressModel(true, "1234567", "", 104343
-                , 105550, 12, 11, 4, 2, 1));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 100, 12, 11, 4, list));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 110, 12, 11, 4, null));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 122, 12, 11, 4, null));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 133, 12, 11, 4, null));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 144, 12, 11, 4, null));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 155, 12, 11, 4, null));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 166, 12, 11, 4, null));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 1230, 12, 11, 4, null));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 1430, 12, 11, 4, null));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 4300, 12, 11, 4, null));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 1200, 12, 11, 4, null));
-        list.clear();
-        list.add(new ExpressModel(false, "1234567", "", 104343
-                , 105550, 12, 11, 4, 2, 1));
-        list.add(new ExpressModel(true, "1234567", "", 104343
-                , 105550, 12, 11, 4, 2, 1));
-        list.add(new ExpressModel(false, "1234567", "", 104343
-                , 105550, 12, 11, 4, 2, 1));
-        list.add(new ExpressModel(true, "1234567", "", 104343
-                , 105550, 12, 11, 4, 2, 1));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, false, "1234567", 10
-                , 350, 12, 11, 4, list));
-        yiSaoMiaolistData.add(new ExpressPackageModel(false, true, "1234567", 10
-                , 550, 12, 11, 4, null));
-    }
 }

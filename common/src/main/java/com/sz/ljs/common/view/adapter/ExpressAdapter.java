@@ -69,10 +69,11 @@ public class ExpressAdapter extends BaseAdapter {
             hodler.iv_isOpen = (ImageView) convertView.findViewById(R.id.iv_isOpen);
             hodler.iv_ischecked = (ImageView) convertView.findViewById(R.id.iv_ischecked);
             hodler.tv_kongbai = (TextView) convertView.findViewById(R.id.tv_kongbai);
-            hodler.tv_kongbai.setVisibility(View.VISIBLE);
+            hodler.tv_kongbai.setVisibility(View.GONE);
             hodler.tv_gx = (TextView) convertView.findViewById(R.id.tv_gx);
             hodler.tv_gx.setVisibility(View.GONE);
             hodler.tv_packageNum = (TextView) convertView.findViewById(R.id.tv_packageNum);
+            hodler.tv_packageNum.setVisibility(View.GONE);
             hodler.tv_zhongzhuanzhuangtai = (TextView) convertView.findViewById(R.id.tv_zhongzhuanzhuangtai);
             hodler.tv_yundanhao = (TextView) convertView.findViewById(R.id.tv_yundanhao);
             hodler.tv_zidantiaoma = (TextView) convertView.findViewById(R.id.tv_zidantiaoma);
@@ -83,40 +84,40 @@ public class ExpressAdapter extends BaseAdapter {
         } else {
             hodler = (ViewHodler) convertView.getTag();
         }
-        hodler.ll_isOpen.setVisibility(View.VISIBLE);
+        hodler.ll_isOpen.setVisibility(View.GONE);
         hodler.iv_isOpen.setVisibility(View.GONE);
         hodler.ll_ischecked.setVisibility(View.VISIBLE);
         if (null != listData && listData.size() > 0) {
-            if (false == listData.get(position).isChecked()) {
+            if ("false" == listData.get(position).getIsSelect()) {
                 //TODO 表示没有被勾选
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
-            } else {
+            } else  if ("true" == listData.get(position).getIsSelect()){
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
             }
+//            if (TextUtils.isEmpty(listData.get(position).getPackageNumber())) {
+//                //TODO 没有包编号，证明这些数据全是没有打包的子单,这个时候就不需要显示包编号一栏
+//                hodler.tv_packageNum.setVisibility(View.GONE);
+//            } else {
+//                //TODO 有包编号，这里也不显示
+//                hodler.tv_packageNum.setVisibility(View.VISIBLE);
+//                hodler.tv_packageNum.setText("");
+//            }
 
-            if (TextUtils.isEmpty(listData.get(position).getPackageNumber())) {
-                //TODO 没有包编号，证明这些数据全是没有打包的子单,这个时候就不需要显示包编号一栏
-                hodler.tv_packageNum.setVisibility(View.GONE);
-            } else {
-                //TODO 有包编号，这里也不显示
-                hodler.tv_packageNum.setVisibility(View.VISIBLE);
-                hodler.tv_packageNum.setText("");
-            }
-
-            if (TextUtils.isEmpty(listData.get(position).getTransitState())) {
+            if (TextUtils.isEmpty(listData.get(position).getHolding())) {
                 //TODO 没有中转状态这一项，则直接隐藏掉
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
             } else {
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.VISIBLE);
-                hodler.tv_zhongzhuanzhuangtai.setText(listData.get(position).getTransitState());
+                hodler.tv_zhongzhuanzhuangtai.setText(listData.get(position).getHolding());
             }
-            hodler.tv_yundanhao.setText("" + listData.get(position).getWaybillNumber());
-            hodler.tv_zidantiaoma.setText("" + listData.get(position).getBulletsBarcode());
-            hodler.tv_jianshu.setText("" + listData.get(position).getNumber());
-            hodler.tv_shizhong.setText(listData.get(position).getWeight() + "KG");
-            hodler.tv_changkuaigao.setText(listData.get(position).getLength() + "*"
-                    + listData.get(position).getWidth() + "*"
-                    + listData.get(position).getHeight());
+            hodler.tv_yundanhao.setText("" + listData.get(position).getShipper_hawbcode());
+            hodler.tv_zidantiaoma.setText("" + listData.get(position).getChild_number());
+            hodler.tv_jianshu.setText("" + listData.get(position).getShipper_pieces());
+            hodler.tv_shizhong.setText(listData.get(position).getOutvolume_grossweight() + "KG");
+            hodler.tv_changkuaigao.setText(listData.get(position).getOutvolume_length() + "*"
+                    + listData.get(position).getOutvolume_width() + "*"
+                    + listData.get(position).getOutvolume_length());
+           
 
         }
         hodler.ll_ischecked.setOnClickListener(new View.OnClickListener() {

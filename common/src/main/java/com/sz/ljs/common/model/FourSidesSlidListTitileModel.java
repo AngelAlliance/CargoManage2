@@ -3,7 +3,7 @@ package com.sz.ljs.common.model;
 
 //TODO 双向移动List头部菜单实体类
 public class FourSidesSlidListTitileModel {
-
+    private int type; //1表示子单的，2表示有包的
     private String Checked ;//勾选
     private String packageNumber;//包编号
     private String transitState;//中转状态
@@ -13,8 +13,9 @@ public class FourSidesSlidListTitileModel {
     private String weight;//重量
     private String volume;//长宽高
 
-    public FourSidesSlidListTitileModel(String Checked,String packageNumber,String transitState,String waybillNumber
+    public FourSidesSlidListTitileModel(int type ,String Checked,String packageNumber,String transitState,String waybillNumber
                                         ,String bulletsBarcode,String number,String weight,String volume){
+        this.type=type;
         this.Checked=Checked;
         this.packageNumber=packageNumber;
         this.transitState=transitState;
@@ -88,5 +89,11 @@ public class FourSidesSlidListTitileModel {
         this.volume = volume;
     }
 
+    public int getType() {
+        return type;
+    }
 
+    public void setType(int type) {
+        this.type = type;
+    }
 }

@@ -3,7 +3,9 @@ package com.sz.ljs.common.view;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +13,9 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -33,9 +37,15 @@ public class ListDialog extends AlertDialog implements View.OnClickListener {
     private TextView tv_titleView;
     private Button bt_queren;
     private ImageView iv_del;
+    private LinearLayout ll_seach;
+    private EditText et_seach;
+    private ImageView iv_clean;
     private List<ListialogModel> listData = new ArrayList<>();
     private ListAdapter adapter;
     private int index = 0;
+    private boolean isShowEdite = false;
+    private List<ListialogModel> lists = new ArrayList<>(); //用来记录传入进来的数据
+
 
     public interface CallBackListener {
         void Result(int position, String name);
@@ -65,8 +75,12 @@ public class ListDialog extends AlertDialog implements View.OnClickListener {
         tv_titleView = (TextView) view.findViewById(R.id.tv_titleView);
         iv_del = (ImageView) view.findViewById(R.id.iv_del);
         bt_queren = (Button) view.findViewById(R.id.bt_queren);
+        ll_seach = (LinearLayout) view.findViewById(R.id.ll_seach);
+        et_seach = (EditText) view.findViewById(R.id.et_seach);
+        iv_clean = (ImageView) view.findViewById(R.id.iv_clean);
         iv_del.setOnClickListener(this);
         bt_queren.setOnClickListener(this);
+        iv_clean.setOnClickListener(this);
         adapter = new ListAdapter();
         lv_list.setAdapter(adapter);
         lv_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -80,6 +94,39 @@ public class ListDialog extends AlertDialog implements View.OnClickListener {
                     listData.get(position).setChecked(true);
                     adapter.notifyDataSetChanged();
                 }
+            }
+        });
+        et_seach.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (TextUtils.isEmpty(s)) {
+                    listData.clear();
+                    listData.addAll(lists);
+                    adapter.notifyDataSetChanged();
+                } else {
+                    if (s.length() >= 2) {
+                        //TODO 开始检索
+                        if (null != listData && listData.size() > 0 && null != lists && lists.size() > 0) {
+                            listData.clear();
+                            for (ListialogModel model:lists){
+                                if(model.getName().contains(s)||model.getId().contains(s)||model.getEn_name().contains(s)){
+                                    listData.add(model);
+                                }
+                            }
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
         super.show();
@@ -103,8 +150,21 @@ public class ListDialog extends AlertDialog implements View.OnClickListener {
         List<ListialogModel> list1 = new ArrayList<>();
         list1.addAll(list);
         listData.clear();
+        lists.clear();
         listData.addAll(list1);
+        lists.addAll(list1);
         adapter.notifyDataSetChanged();
+        return this;
+    }
+
+    //TODO 检索框是否显示
+    public ListDialog setSeachEditTextShow(boolean isShow) {
+        isShowEdite = isShow;
+        if (false == isShow) {
+            ll_seach.setVisibility(View.GONE);
+        } else {
+            ll_seach.setVisibility(View.VISIBLE);
+        }
         return this;
     }
 
@@ -128,6 +188,9 @@ public class ListDialog extends AlertDialog implements View.OnClickListener {
         } else if (id == R.id.bt_queren) {
             //TODO 确认
             CallBack();
+        } else if (id == R.id.iv_clean) {
+            //TODO 清空搜索输入框内容
+            et_seach.setText("");
         }
     }
 

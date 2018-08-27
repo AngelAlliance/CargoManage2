@@ -46,6 +46,7 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
     private ListDialog dialog;
     private int feiyongIndex = 0;
     private boolean isXinZen = false, isQueRen = false;
+    private int pice = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +57,15 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
     }
 
     private void initView() {
+        pice = getIntent().getIntExtra("pice", 1);
         mPresenter = new WarehouPresenter();
         mWaitingDialog = new WaitingDialog(this);
         ll_addView = (LinearLayout) findViewById(R.id.ll_addView);
         btn_queren = (Button) findViewById(R.id.btn_queren);
         btn_xinzeng = (Button) findViewById(R.id.btn_xinzeng);
-        addView();
+        for (int i = 0; i < pice; i++) {
+            addView();
+        }
     }
 
     private void setListener() {
@@ -155,12 +159,14 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
         if (null != result && null != result.getData() && result.getData().size() > 0) {
             beanList.clear();
             beanList.addAll(result.getData());
+            showList.clear();
             for (GsonIncidentalModel.DataBean brean : beanList) {
-                showList.add(new ListialogModel(brean.getExtra_service_cnname(), false));
+                showList.add(new ListialogModel(brean.getExtra_service_kind(), brean.getExtra_service_cnname(), brean.getExtra_service_enname(), false));
             }
             dialog = new ListDialog(AddServiceActivity.this, R.style.AlertDialogStyle)
                     .creatDialog()
                     .setTitle("请选择杂费项")
+                    .setSeachEditTextShow(true)
                     .setListData(showList)
                     .setCallBackListener(new ListDialog.CallBackListener() {
                         @Override
@@ -169,8 +175,13 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
                             View view1 = ll_addView.getChildAt(index);
                             TextView et_zafeixiang = (TextView) view1.findViewById(R.id.et_zafeixiang);
                             TextView tv_zfx_code = (TextView) view1.findViewById(R.id.tv_zfx_code);
-                            tv_zfx_code.setText(beanList.get(position).getExtra_service_kind());
-                            et_zafeixiang.setText(showList.get(position).getName());
+                            for (GsonIncidentalModel.DataBean brean : beanList){
+                                if(name.equals(brean.getExtra_service_cnname())){
+                                    tv_zfx_code.setText(brean.getExtra_service_kind());
+                                    et_zafeixiang.setText(brean.getExtra_service_cnname());
+                                    break;
+                                }
+                            }
                             dialog.dismiss();
                         }
                     });
@@ -220,6 +231,14 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
         LinearLayout ll_zafeixiang = (LinearLayout) view.findViewById(R.id.ll_zafeixiang);
         ll_zafeixiang.setTag(position);
         ll_zafeixiang.setOnClickListener(this);
+        TextView et_zafeixiang = (TextView) view.findViewById(R.id.et_zafeixiang);
+        TextView tv_zfx_code = (TextView) view.findViewById(R.id.tv_zfx_code);
+        TextView tv_zfx_sftj = (TextView) view.findViewById(R.id.tv_zfx_sftj);
+        if(null!=WareHouSingModel.getInstance().getExtrasList()&&WareHouSingModel.getInstance().getExtrasList().size()>0){
+            tv_zfx_code.setText(WareHouSingModel.getInstance().getExtrasList().get(position).getExtra_servicecode());
+            tv_zfx_sftj.setText("已经添加");
+            et_zafeixiang.setText(WareHouSingModel.getInstance().getExtrasList().get(position).getExtra_service_cnname());
+        }
         ll_addView.addView(view);
     }
 
@@ -231,11 +250,13 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
             TextView et_zafeixiang = (TextView) view.findViewById(R.id.et_zafeixiang);
             TextView tv_zfx_code = (TextView) view.findViewById(R.id.tv_zfx_code);
             EditText et_feiyong = (EditText) view.findViewById(R.id.et_feiyong);
-            if (TextUtils.isEmpty(tv_zfx_code.getText().toString().trim())) {
+            TextView tv_zfx_sftj = (TextView) view.findViewById(R.id.tv_zfx_sftj);
+            if (TextUtils.isEmpty(tv_zfx_sftj.getText().toString().trim())) {
                 //TODO 表示还有没添加的
                 if (!TextUtils.isEmpty(et_zafeixiang.getText().toString().trim()) && !TextUtils.isEmpty(et_feiyong.getText().toString().trim())) {
                     serviceList.add(new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
                             , "", Double.valueOf(et_feiyong.getText().toString().trim()), tv_zfx_code.getText().toString().trim(), ""));
+                    tv_zfx_sftj.setText("已经添加");
                 } else {
                     Utils.showToast(getBaseActivity(), "杂费项或费用不能为空");
                 }
@@ -259,6 +280,7 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
         TextView et_zafeixiang = (TextView) view.findViewById(R.id.et_zafeixiang);
         TextView tv_zfx_code = (TextView) view.findViewById(R.id.tv_zfx_code);
         EditText et_feiyong = (EditText) view.findViewById(R.id.et_feiyong);
+        TextView tv_zfx_sftj = (TextView) view.findViewById(R.id.tv_zfx_sftj);
         if (!TextUtils.isEmpty(et_zafeixiang.getText().toString().trim()) && !TextUtils.isEmpty(et_feiyong.getText().toString().trim())) {
             //TODO 这时候先检测列表中是否含有这个数据
             for (int i = 0; i < serviceList.size(); i++) {
@@ -272,6 +294,7 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
             //如果集合中没有此数据，那么直接添加到集合中去
             serviceList.add(new ServiceModel(position, "", "" + UserModel.getInstance().getSt_id(), "", ""
                     , "", Double.valueOf(et_feiyong.getText().toString().trim()), tv_zfx_code.getText().toString().trim(), ""));
+            tv_zfx_sftj.setText("已经添加");
         } else {
             Utils.showToast(getBaseActivity(), "杂费项或费用不能为空");
         }

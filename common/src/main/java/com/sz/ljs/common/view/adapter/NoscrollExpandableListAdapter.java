@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.sz.ljs.common.R;
 import com.sz.ljs.common.model.ExpressPackageModel;
+import com.sz.ljs.common.model.GsonDepltListModel;
 import com.sz.ljs.common.view.NoscrollListView;
 
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
     //  获得某个父项的子项数目
     @Override
     public int getChildrenCount(int groupPosition) {
-        return null == listData.get(groupPosition).getExpressModels() ? 0 : listData.get(groupPosition).getExpressModels().size();
+        return null == listData.get(groupPosition).getCn_list() ? 0 : listData.get(groupPosition).getCn_list().size();
     }
 
     //  获得某个父项
@@ -81,7 +82,7 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
     //  获得某个父项的某个子项
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return null == listData.get(groupPosition).getExpressModels() ? null : listData.get(groupPosition).getExpressModels().get(childPosition);
+        return null == listData.get(groupPosition).getCn_list() ? null : listData.get(groupPosition).getCn_list().get(childPosition);
     }
 
     //  获得某个父项的id
@@ -131,18 +132,18 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
         hodler.ll_isOpen.setVisibility(View.VISIBLE);
         hodler.ll_ischecked.setVisibility(View.VISIBLE);
         if (null != listData && listData.size() > 0) {
-            if (false == listData.get(groupPosition).isChecked()) {
+            if ("false" == listData.get(groupPosition).getIsSelect()) {
                 //TODO 表示没有被勾选
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
-            } else {
+            } else  if ("true" == listData.get(groupPosition).getIsSelect()){
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
             }
-            hodler.tv_packageNum.setText("" + listData.get(groupPosition).getPackageNumber());
+            hodler.tv_packageNum.setText("" + listData.get(groupPosition).getBag_lable_code());
             hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
             hodler.tv_yundanhao.setText("");
             hodler.tv_zidantiaoma.setText("");
-            hodler.tv_jianshu.setText("" + listData.get(groupPosition).getNumber());
-            hodler.tv_shizhong.setText(listData.get(groupPosition).getWeight() + "KG");
+            hodler.tv_jianshu.setText("" + listData.get(groupPosition).getBag_pieces());
+            hodler.tv_shizhong.setText(listData.get(groupPosition).getBag_weight() + "KG");
             hodler.tv_changkuaigao.setText(listData.get(groupPosition).getLength() + "*"
                     + listData.get(groupPosition).getWidth() + "*"
                     + listData.get(groupPosition).getHeight());
@@ -174,6 +175,7 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
             hodler.tv_gx = (TextView) convertView.findViewById(R.id.tv_gx);
             hodler.tv_gx.setVisibility(View.GONE);
             hodler.tv_packageNum = (TextView) convertView.findViewById(R.id.tv_packageNum);
+            hodler.tv_packageNum.setVisibility(View.VISIBLE);
             hodler.tv_zhongzhuanzhuangtai = (TextView) convertView.findViewById(R.id.tv_zhongzhuanzhuangtai);
             hodler.tv_yundanhao = (TextView) convertView.findViewById(R.id.tv_yundanhao);
             hodler.tv_zidantiaoma = (TextView) convertView.findViewById(R.id.tv_zidantiaoma);
@@ -187,37 +189,36 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
         hodler.ll_isOpen.setVisibility(View.VISIBLE);
         hodler.iv_isOpen.setVisibility(View.GONE);
         hodler.ll_ischecked.setVisibility(View.VISIBLE);
-        if (null != listData.get(groupPosition).getExpressModels() && listData.get(groupPosition).getExpressModels().size() > 0) {
-            if (false == listData.get(groupPosition).getExpressModels().get(childPosition).isChecked()) {
+        if (null != listData.get(groupPosition).getCn_list() && listData.get(groupPosition).getCn_list().size() > 0) {
+            if ("false" == listData.get(groupPosition).getCn_list().get(childPosition).getIsSelect()) {
                 //TODO 表示没有被勾选
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
-            } else {
+            } else if ("true" == listData.get(groupPosition).getCn_list().get(childPosition).getIsSelect()){
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
             }
+            hodler.tv_packageNum.setText("");
+//            if (TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getPackageNumber())) {
+//                //TODO 没有包编号，证明这些数据全是没有打包的子单,这个时候就不需要显示包编号一栏
+//            } else {
+//                //TODO 有包编号，这里也不显示
+//                hodler.tv_packageNum.setVisibility(View.VISIBLE);
+//                hodler.tv_packageNum.setText("");
+//            }
 
-            if (TextUtils.isEmpty(listData.get(groupPosition).getExpressModels().get(childPosition).getPackageNumber())) {
-                //TODO 没有包编号，证明这些数据全是没有打包的子单,这个时候就不需要显示包编号一栏
-                hodler.tv_packageNum.setVisibility(View.GONE);
-            } else {
-                //TODO 有包编号，这里也不显示
-                hodler.tv_packageNum.setVisibility(View.VISIBLE);
-                hodler.tv_packageNum.setText("");
-            }
-
-            if (TextUtils.isEmpty(listData.get(groupPosition).getExpressModels().get(childPosition).getTransitState())) {
+            if (TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getHolding())) {
                 //TODO 没有中转状态这一项，则直接隐藏掉
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
             } else {
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.VISIBLE);
-                hodler.tv_zhongzhuanzhuangtai.setText(listData.get(groupPosition).getExpressModels().get(childPosition).getTransitState());
+                hodler.tv_zhongzhuanzhuangtai.setText(listData.get(groupPosition).getCn_list().get(childPosition).getHolding());
             }
-            hodler.tv_yundanhao.setText("" + listData.get(groupPosition).getExpressModels().get(childPosition).getWaybillNumber());
-            hodler.tv_zidantiaoma.setText("" + listData.get(groupPosition).getExpressModels().get(childPosition).getBulletsBarcode());
-            hodler.tv_jianshu.setText("" + listData.get(groupPosition).getExpressModels().get(childPosition).getNumber());
-            hodler.tv_shizhong.setText(listData.get(groupPosition).getExpressModels().get(childPosition).getWeight() + "KG");
-            hodler.tv_changkuaigao.setText(listData.get(groupPosition).getExpressModels().get(childPosition).getLength() + "*"
-                    + listData.get(groupPosition).getExpressModels().get(childPosition).getWidth() + "*"
-                    + listData.get(groupPosition).getExpressModels().get(childPosition).getHeight());
+            hodler.tv_yundanhao.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getShipper_hawbcode());
+            hodler.tv_zidantiaoma.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getChild_number());
+            hodler.tv_jianshu.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getShipper_pieces());
+            hodler.tv_shizhong.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_grossweight() + "KG");
+            hodler.tv_changkuaigao.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_length() + "*"
+                    + listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_width() + "*"
+                    + listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_length());
         }
         hodler.ll_ischecked.setOnClickListener(new View.OnClickListener() {
             @Override

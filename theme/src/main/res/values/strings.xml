@@ -125,4 +125,6 @@
     <string name="str_qsrkhdm">请输入客户代码</string>
     <string name="str_bluetooth_is_close">手机蓝牙未开启,点击开启蓝牙</string>
     <string name="confirm">确认</string>
+    <string name="str_qsrssnr">请输入搜索内容</string>
+    <string name="str_alter">提示</string>
 </resources>

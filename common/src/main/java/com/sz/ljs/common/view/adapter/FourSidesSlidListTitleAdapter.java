@@ -74,6 +74,11 @@ public class FourSidesSlidListTitleAdapter extends BaseAdapter {
             hodler = (ViewHodler) convertView.getTag();
         }
         if (null != listData && listData.size() > 0) {
+            if(1==listData.get(position).getType()){
+                hodler.tv_kongbai.setVisibility(View.GONE);
+            }else {
+                hodler.tv_kongbai.setVisibility(View.VISIBLE);
+            }
             hodler.tv_gx.setText(listData.get(position).getChecked());
             if (TextUtils.isEmpty(listData.get(position).getPackageNumber())) {
                 hodler.tv_packageNum.setVisibility(View.GONE);

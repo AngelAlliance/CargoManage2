@@ -5,100 +5,107 @@ import java.util.List;
 
 //TODO 物流包模型
 public class ExpressPackageModel {
+    private String bag_pieces;  //件数
+    private String number_pieces;//运单数量
+    private String bag_weight;//包的重量
+    private String weighing;//称重的重量
+    private String bag_lable_code;//包号码
+    private String IsSelect;
+    private String length;//包的长
+    private String width;//包的宽
+    private String height;//包的高
+    private List<ExpressModel> cn_list;
 
-    private boolean isChecked=false;//是否勾选状态
-    private boolean isOpen=false;//是否展开
-    private String packageNumber;//包编号
-    private int number;//件数
-    private int weight;//重量
-    private int length;//长度
-    private int width;//宽度
-    private int height;//高度
-    private List<ExpressModel> expressModels=new ArrayList<ExpressModel>();
-
-    public ExpressPackageModel(boolean isChecked,boolean isOpen,String packageNumber,int number
-                                ,int weight,int length,int width,int height,List<ExpressModel> expressModels){
-        this.isChecked=isChecked;
-        this.isOpen=isOpen;
-        this.packageNumber=packageNumber;
-        this.number=number;
-        this.weight=weight;
-        this.length=length;
-        this.width=width;
-        this.height=height;
-        this.expressModels=expressModels;
-    }
-    public boolean isChecked() {
-        return isChecked;
+    public ExpressPackageModel(String bag_pieces, String number_pieces, String bag_weight, String weighing, String bag_lable_code, String isSelect, String length, String width, String height, List<ExpressModel> cn_list) {
+        this.bag_pieces = bag_pieces;
+        this.number_pieces = number_pieces;
+        this.bag_weight = bag_weight;
+        this.weighing = weighing;
+        this.bag_lable_code = bag_lable_code;
+        IsSelect = isSelect;
+        this.length = length;
+        this.width = width;
+        this.height = height;
+        this.cn_list = cn_list;
     }
 
-    public void setChecked(boolean checked) {
-        isChecked = checked;
+    public String getBag_pieces() {
+        return bag_pieces;
     }
 
-    public boolean isOpen() {
-        return isOpen;
+    public void setBag_pieces(String bag_pieces) {
+        this.bag_pieces = bag_pieces;
     }
 
-    public void setOpen(boolean open) {
-        isOpen = open;
+    public String getNumber_pieces() {
+        return number_pieces;
     }
 
-    public String getPackageNumber() {
-        return packageNumber;
+    public void setNumber_pieces(String number_pieces) {
+        this.number_pieces = number_pieces;
     }
 
-    public void setPackageNumber(String packageNumber) {
-        this.packageNumber = packageNumber;
+    public String getBag_weight() {
+        return bag_weight;
     }
 
-    public int getNumber() {
-        return number;
+    public void setBag_weight(String bag_weight) {
+        this.bag_weight = bag_weight;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public String getWeighing() {
+        return weighing;
     }
 
-    public int getWeight() {
-        return weight;
+    public void setWeighing(String weighing) {
+        this.weighing = weighing;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public String getBag_lable_code() {
+        return bag_lable_code;
     }
 
-    public int getLength() {
+    public void setBag_lable_code(String bag_lable_code) {
+        this.bag_lable_code = bag_lable_code;
+    }
+
+    public String getIsSelect() {
+        return IsSelect;
+    }
+
+    public void setIsSelect(String isSelect) {
+        IsSelect = isSelect;
+    }
+
+    public String getLength() {
         return length;
     }
 
-    public void setLength(int length) {
+    public void setLength(String length) {
         this.length = length;
     }
 
-    public int getWidth() {
+    public String getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(String width) {
         this.width = width;
     }
 
-    public int getHeight() {
+    public String getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(String height) {
         this.height = height;
     }
 
-    public List<ExpressModel> getExpressModels() {
-        return expressModels;
+    public List<ExpressModel> getCn_list() {
+        return cn_list;
     }
 
-    public void setExpressModels(List<ExpressModel> expressModels) {
-        this.expressModels = expressModels;
+    public void setCn_list(List<ExpressModel> cn_list) {
+        this.cn_list = cn_list;
     }
-
-
 }

@@ -1,5 +1,7 @@
 package com.sz.ljs.warehousing.model;
 
+import com.sz.ljs.common.model.OrderModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +21,7 @@ public class WareHouSingModel {
     private List<ServiceModel> serviceModelList = new ArrayList<>();
     private List<CustomerModel.DataEntity> customerList=new ArrayList<>();
     private List<SubnitModel> subnitList=new ArrayList<>();
+    private List<OrderModel.DataEntity.ExtraserviceEntity> extrasList=new ArrayList<>();
     private double volume = 0;  //总材积
     private double TotalVolumeWeight;//总材积重
     private double TotalChargeWeight;   //总计费重
@@ -28,6 +31,7 @@ public class WareHouSingModel {
         serviceModelList.clear();
         customerList.clear();
         subnitList.clear();
+        extrasList.clear();
         volume=0;
         TotalVolumeWeight=0;
         TotalChargeWeight=0;
@@ -44,10 +48,22 @@ public class WareHouSingModel {
         return serviceModelList;
     }
 
+
     public void removeServiceModel(int position) {
         if (serviceModelList.size() > position) {
             serviceModelList.remove(position);
         }
+    }
+
+    public List<OrderModel.DataEntity.ExtraserviceEntity> getExtrasList() {
+        return extrasList;
+    }
+
+    public void setExtrasList(List<OrderModel.DataEntity.ExtraserviceEntity> list) {
+        List<OrderModel.DataEntity.ExtraserviceEntity> list1 = new ArrayList<>();
+        list1.addAll(list);
+        extrasList.clear();
+        extrasList.addAll(list1);
     }
 
     public void setCustomerList(List<CustomerModel.DataEntity> list){

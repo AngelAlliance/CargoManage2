@@ -674,7 +674,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                                 typeList.addAll(result.getData());
                                 showList.clear();
                                 for (ItemTypeModel.DataBean bean : result.getData()) {
-                                    showList.add(new ListialogModel(bean.getItem_cn_name(),false));
+                                    showList.add(new ListialogModel("",bean.getItem_cn_name(),bean.getItem_en_name(),false));
                                 }
                                 dialog=new ListDialog(ExamineGoodsActivity.this)
                                         .creatDialog()

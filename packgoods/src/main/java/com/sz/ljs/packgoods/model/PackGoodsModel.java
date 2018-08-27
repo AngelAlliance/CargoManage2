@@ -1,6 +1,9 @@
 package com.sz.ljs.packgoods.model;
 
 
+import com.sz.ljs.common.model.ExpressModel;
+import com.sz.ljs.common.model.GsonDepltListModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +21,7 @@ public class PackGoodsModel {
     }
 
 
-    private List<GsonDepltListModel.DataBean.BaleListBean> baleList=new ArrayList<>();
+    private List<ExpressModel> baleList=new ArrayList<>();
 
 
 

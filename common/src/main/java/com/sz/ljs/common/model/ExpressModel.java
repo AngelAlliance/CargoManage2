@@ -2,111 +2,147 @@ package com.sz.ljs.common.model;
 
 //TODO 子快件模型（物流包下的小包）
 public class ExpressModel {
+    private String bs_id; //业务id
+    private String shipper_hawbcode; //运单号码
+    private String child_number; //子单号码
+    private String server_id;  //服务id
+    private String server_channelid;  //服务渠道id
+    private String checkin_date; //签入时间
+    private String shipper_pieces;  //件数
+    private String outvolume_grossweight;  //重量
+    private String outvolume_length;  //长
+    private String outvolume_width; //宽
+    private String outvolume_height;  //高
+    private String balance_sign;   //欠费状态
+    private String holding;  //扣件状态
+    private String IsSelect;
 
-    private boolean isChecked = false;//是否被勾选
-    private String packageNumber;//包编号
-    private int waybillNumber;//运单号
-    private int bulletsBarcode;//子单条码
-    private int number;//件数
-    private int weight;//重量
-    private int length;//长度
-    private int width;//宽度
-    private int height;//高度
-    private String transitState;//中转状态
-
-    public ExpressModel(boolean isChecked, String packageNumber, String transitState, int waybillNumber, int bulletsBarcode
-            , int number, int weight, int length, int width, int height) {
-        this.isChecked = isChecked;
-        this.packageNumber = packageNumber;
-        this.transitState = transitState;
-        this.waybillNumber = waybillNumber;
-        this.bulletsBarcode = bulletsBarcode;
-        this.number = number;
-        this.weight = weight;
-        this.length = length;
-        this.width = width;
-        this.height = height;
+    public ExpressModel(String bs_id, String shipper_hawbcode, String child_number, String server_id, String server_channelid, String checkin_date, String shipper_pieces, String outvolume_grossweight, String outvolume_length, String outvolume_width, String outvolume_height, String balance_sign, String holding, String isSelect) {
+        this.bs_id = bs_id;
+        this.shipper_hawbcode = shipper_hawbcode;
+        this.child_number = child_number;
+        this.server_id = server_id;
+        this.server_channelid = server_channelid;
+        this.checkin_date = checkin_date;
+        this.shipper_pieces = shipper_pieces;
+        this.outvolume_grossweight = outvolume_grossweight;
+        this.outvolume_length = outvolume_length;
+        this.outvolume_width = outvolume_width;
+        this.outvolume_height = outvolume_height;
+        this.balance_sign = balance_sign;
+        this.holding = holding;
+        IsSelect = isSelect;
     }
 
-    public boolean isChecked() {
-        return isChecked;
+    public String getBs_id() {
+        return bs_id;
     }
 
-    public void setChecked(boolean checked) {
-        isChecked = checked;
+    public void setBs_id(String bs_id) {
+        this.bs_id = bs_id;
     }
 
-    public String getPackageNumber() {
-        return packageNumber;
+    public String getShipper_hawbcode() {
+        return shipper_hawbcode;
     }
 
-    public void setPackageNumber(String packageNumber) {
-        this.packageNumber = packageNumber;
+    public void setShipper_hawbcode(String shipper_hawbcode) {
+        this.shipper_hawbcode = shipper_hawbcode;
     }
 
-    public int getWaybillNumber() {
-        return waybillNumber;
+    public String getChild_number() {
+        return child_number;
     }
 
-    public void setWaybillNumber(int waybillNumber) {
-        this.waybillNumber = waybillNumber;
+    public void setChild_number(String child_number) {
+        this.child_number = child_number;
     }
 
-    public int getBulletsBarcode() {
-        return bulletsBarcode;
+    public String getServer_id() {
+        return server_id;
     }
 
-    public void setBulletsBarcode(int bulletsBarcode) {
-        this.bulletsBarcode = bulletsBarcode;
+    public void setServer_id(String server_id) {
+        this.server_id = server_id;
     }
 
-    public int getNumber() {
-        return number;
+    public String getServer_channelid() {
+        return server_channelid;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public void setServer_channelid(String server_channelid) {
+        this.server_channelid = server_channelid;
     }
 
-    public int getWeight() {
-        return weight;
+    public String getCheckin_date() {
+        return checkin_date;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public void setCheckin_date(String checkin_date) {
+        this.checkin_date = checkin_date;
     }
 
-    public int getLength() {
-        return length;
+    public String getShipper_pieces() {
+        return shipper_pieces;
     }
 
-    public void setLength(int length) {
-        this.length = length;
+    public void setShipper_pieces(String shipper_pieces) {
+        this.shipper_pieces = shipper_pieces;
     }
 
-    public int getWidth() {
-        return width;
+    public String getOutvolume_grossweight() {
+        return outvolume_grossweight;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
+    public void setOutvolume_grossweight(String outvolume_grossweight) {
+        this.outvolume_grossweight = outvolume_grossweight;
     }
 
-    public int getHeight() {
-        return height;
+    public String getOutvolume_length() {
+        return outvolume_length;
     }
 
-    public void setHeight(int height) {
-        this.height = height;
+    public void setOutvolume_length(String outvolume_length) {
+        this.outvolume_length = outvolume_length;
     }
 
-    public String getTransitState() {
-        return transitState;
+    public String getOutvolume_width() {
+        return outvolume_width;
     }
 
-    public void setTransitState(String transitState) {
-        this.transitState = transitState;
+    public void setOutvolume_width(String outvolume_width) {
+        this.outvolume_width = outvolume_width;
     }
 
+    public String getOutvolume_height() {
+        return outvolume_height;
+    }
 
+    public void setOutvolume_height(String outvolume_height) {
+        this.outvolume_height = outvolume_height;
+    }
+
+    public String getBalance_sign() {
+        return balance_sign;
+    }
+
+    public void setBalance_sign(String balance_sign) {
+        this.balance_sign = balance_sign;
+    }
+
+    public String getHolding() {
+        return holding;
+    }
+
+    public void setHolding(String holding) {
+        this.holding = holding;
+    }
+
+    public String getIsSelect() {
+        return IsSelect;
+    }
+
+    public void setIsSelect(String isSelect) {
+        IsSelect = isSelect;
+    }
 }
