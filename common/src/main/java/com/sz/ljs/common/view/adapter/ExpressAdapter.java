@@ -1,6 +1,8 @@
 package com.sz.ljs.common.view.adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +67,7 @@ public class ExpressAdapter extends BaseAdapter {
             hodler = new ViewHodler();
             convertView = inflater.inflate(R.layout.item_four_sides_slid_list, null);
             hodler.ll_isOpen = (LinearLayout) convertView.findViewById(R.id.ll_isOpen);
+            hodler.ll_zge = (LinearLayout) convertView.findViewById(R.id.ll_zge);
             hodler.ll_ischecked = (LinearLayout) convertView.findViewById(R.id.ll_ischecked);
             hodler.iv_isOpen = (ImageView) convertView.findViewById(R.id.iv_isOpen);
             hodler.iv_ischecked = (ImageView) convertView.findViewById(R.id.iv_ischecked);
@@ -91,8 +94,11 @@ public class ExpressAdapter extends BaseAdapter {
             if ("false" == listData.get(position).getIsSelect()) {
                 //TODO 表示没有被勾选
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
+                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
             } else  if ("true" == listData.get(position).getIsSelect()){
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
+                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_ff0000);
+
             }
 //            if (TextUtils.isEmpty(listData.get(position).getPackageNumber())) {
 //                //TODO 没有包编号，证明这些数据全是没有打包的子单,这个时候就不需要显示包编号一栏
@@ -103,12 +109,12 @@ public class ExpressAdapter extends BaseAdapter {
 //                hodler.tv_packageNum.setText("");
 //            }
 
-            if (TextUtils.isEmpty(listData.get(position).getHolding())) {
+            if (TextUtils.isEmpty(listData.get(position).getOrder_status())) {
                 //TODO 没有中转状态这一项，则直接隐藏掉
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
             } else {
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.VISIBLE);
-                hodler.tv_zhongzhuanzhuangtai.setText(listData.get(position).getHolding());
+                hodler.tv_zhongzhuanzhuangtai.setText(listData.get(position).getOrder_status());
             }
             hodler.tv_yundanhao.setText("" + listData.get(position).getShipper_hawbcode());
             hodler.tv_zidantiaoma.setText("" + listData.get(position).getChild_number());
@@ -132,7 +138,7 @@ public class ExpressAdapter extends BaseAdapter {
     }
 
     class ViewHodler {
-        LinearLayout ll_isOpen, ll_ischecked;
+        LinearLayout ll_isOpen, ll_ischecked,ll_zge;
         ImageView iv_isOpen, iv_ischecked;
         TextView tv_kongbai, tv_gx, tv_packageNum, tv_zhongzhuanzhuangtai, tv_yundanhao, tv_zidantiaoma, tv_jianshu, tv_shizhong, tv_changkuaigao;
     }

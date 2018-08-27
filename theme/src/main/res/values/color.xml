@@ -16,4 +16,5 @@
     <color name="color_f6">#f6f6f6</color>
     <color name="alertdialog_line">#c6c6c6</color>
     <color name="blue_auxiliary_007aff">#007aff</color>
+    <color name="secondary_color_transparent">#00000000</color>
 </resources>

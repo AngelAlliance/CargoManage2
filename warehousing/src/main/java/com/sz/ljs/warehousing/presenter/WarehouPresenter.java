@@ -84,11 +84,11 @@ public class WarehouPresenter {
         return warehouContract.getProduct(token, requestBody);
     }
 
-    //TODO 根据客户代码或者客户名称查询客户资料 Customer_code:客户代码(必填) customer_name:客户名称(选填)
-    public Flowable<CustomerModel> getCustomer(String Customer_code, String customer_name) {
+    //TODO 根据客户名称查询客户资料  customer_name:客户名称(必填)
+    public Flowable<CustomerModel> getCustomer(String customer_name) {
         Map<String, String> param = new HashMap<>();
         param.put(WarehouContract.SUMMARY, WarehouContract.summary);
-        param.put(WarehouContract.CUSTOMER_CODE, Customer_code);
+//        param.put(WarehouContract.CUSTOMER_CODE, Customer_code);
         param.put(WarehouContract.CUSTOMER_NAME, customer_name);
         String token = "";
         if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {

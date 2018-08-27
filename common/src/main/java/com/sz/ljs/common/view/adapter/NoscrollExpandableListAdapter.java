@@ -110,6 +110,7 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
         if (null == convertView) {
             hodler = new ViewHodler();
             convertView = inflater.inflate(R.layout.item_four_sides_slid_list, null);
+            hodler.ll_zge = (LinearLayout) convertView.findViewById(R.id.ll_zge);
             hodler.ll_isOpen = (LinearLayout) convertView.findViewById(R.id.ll_isOpen);
             hodler.ll_ischecked = (LinearLayout) convertView.findViewById(R.id.ll_ischecked);
             hodler.iv_isOpen = (ImageView) convertView.findViewById(R.id.iv_isOpen);
@@ -134,8 +135,10 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
         if (null != listData && listData.size() > 0) {
             if ("false" == listData.get(groupPosition).getIsSelect()) {
                 //TODO 表示没有被勾选
+                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
             } else  if ("true" == listData.get(groupPosition).getIsSelect()){
+                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_ff0000);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
             }
             hodler.tv_packageNum.setText("" + listData.get(groupPosition).getBag_lable_code());
@@ -166,6 +169,7 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
         if (null == convertView) {
             hodler = new ChildViewHodler();
             convertView = inflater.inflate(R.layout.item_four_sides_slid_list, null);
+            hodler.ll_zge = (LinearLayout) convertView.findViewById(R.id.ll_zge);
             hodler.ll_isOpen = (LinearLayout) convertView.findViewById(R.id.ll_isOpen);
             hodler.ll_ischecked = (LinearLayout) convertView.findViewById(R.id.ll_ischecked);
             hodler.iv_isOpen = (ImageView) convertView.findViewById(R.id.iv_isOpen);
@@ -192,8 +196,10 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
         if (null != listData.get(groupPosition).getCn_list() && listData.get(groupPosition).getCn_list().size() > 0) {
             if ("false" == listData.get(groupPosition).getCn_list().get(childPosition).getIsSelect()) {
                 //TODO 表示没有被勾选
+                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
             } else if ("true" == listData.get(groupPosition).getCn_list().get(childPosition).getIsSelect()){
+                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_ff0000);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
             }
             hodler.tv_packageNum.setText("");
@@ -205,12 +211,12 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
 //                hodler.tv_packageNum.setText("");
 //            }
 
-            if (TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getHolding())) {
+            if (TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getOrder_status())) {
                 //TODO 没有中转状态这一项，则直接隐藏掉
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
             } else {
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.VISIBLE);
-                hodler.tv_zhongzhuanzhuangtai.setText(listData.get(groupPosition).getCn_list().get(childPosition).getHolding());
+                hodler.tv_zhongzhuanzhuangtai.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOrder_status());
             }
             hodler.tv_yundanhao.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getShipper_hawbcode());
             hodler.tv_zidantiaoma.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getChild_number());
@@ -238,13 +244,13 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     class ViewHodler {
-        LinearLayout ll_isOpen, ll_ischecked;
+        LinearLayout ll_isOpen, ll_ischecked,ll_zge;
         ImageView iv_isOpen, iv_ischecked;
         TextView tv_kongbai, tv_gx, tv_packageNum, tv_zhongzhuanzhuangtai, tv_yundanhao, tv_zidantiaoma, tv_jianshu, tv_shizhong, tv_changkuaigao;
     }
 
     class ChildViewHodler {
-        LinearLayout ll_isOpen, ll_ischecked;
+        LinearLayout ll_isOpen, ll_ischecked,ll_zge;
         ImageView iv_isOpen, iv_ischecked;
         TextView tv_kongbai, tv_gx, tv_packageNum, tv_zhongzhuanzhuangtai, tv_yundanhao, tv_zidantiaoma, tv_jianshu, tv_shizhong, tv_changkuaigao;
     }

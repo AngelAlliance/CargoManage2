@@ -112,10 +112,10 @@ public class CustomerRetrievalActivity extends BaseActivity implements View.OnCl
         }
     }
 
-    //TODO 根据客户代码或者客户名称查询客户资料
+    //TODO 根据客户名称查询客户资料
     private void getCustomer(){
         showWaiting(true);
-        mPresenter.getCustomer(et_seach.getText().toString().trim(),"")
+        mPresenter.getCustomer(et_seach.getText().toString().trim())
                 .compose(this.<CustomerModel>bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

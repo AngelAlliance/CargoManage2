@@ -53,8 +53,8 @@ public class InventoryActivity extends BaseActivity implements View.OnClickListe
 
     private void initView() {
         getPankuHeaderData();
-        panKulistData.add(new ExpressModel(false, "", "正常走货", 104343
-                , 105550, 12, 11, 4, 2, 1));
+//        panKulistData.add(new ExpressModel(false, "", "正常走货", 104343
+//                , 105550, 12, 11, 4, 2, 1));
         et_qudao = (EditText) findViewById(R.id.et_qudao);
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         ll_qudao = (LinearLayout) findViewById(R.id.ll_qudao);
@@ -73,10 +73,10 @@ public class InventoryActivity extends BaseActivity implements View.OnClickListe
             @Override
             public void OnClick(int childPosition) {
                 if (null != panKulistData && panKulistData.size() > 0) {
-                    if (false == panKulistData.get(childPosition).isChecked()) {
-                        panKulistData.get(childPosition).setChecked(true);
-                    } else {
-                        panKulistData.get(childPosition).setChecked(false);
+                    if ( "false".equals(panKulistData.get(childPosition).getIsSelect())) {
+                        panKulistData.get(childPosition).setIsSelect("true");
+                    } else if ( "true".equals(panKulistData.get(childPosition).getIsSelect())){
+                        panKulistData.get(childPosition).setIsSelect("false");
                     }
                     fs_cxkcxx_list.setContentDataForNoPackage(panKulistData);
                 }
@@ -112,7 +112,7 @@ public class InventoryActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void getPankuHeaderData() {
-        panKuHeaderList.add(new FourSidesSlidListTitileModel(getResources().getString(R.string.str_gx)
+        panKuHeaderList.add(new FourSidesSlidListTitileModel(1,getResources().getString(R.string.str_gx)
                 , "", getResources().getString(R.string.str_zzzt)
                 , getResources().getString(R.string.str_ydh), getResources().getString(R.string.str_zdtm)
                 , getResources().getString(R.string.str_js), getResources().getString(R.string.str_shizhong)

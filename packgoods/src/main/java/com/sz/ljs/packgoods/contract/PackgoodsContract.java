@@ -3,6 +3,8 @@ package com.sz.ljs.packgoods.contract;
 import com.sz.ljs.common.model.BaseResultModel;
 import com.sz.ljs.common.utils.MD5Util;
 import com.sz.ljs.common.model.GsonDepltListModel;
+import com.sz.ljs.packgoods.model.GsonAddBussinessPackageModel;
+import com.sz.ljs.packgoods.model.GsonServiceChannelModel;
 
 import java.util.Map;
 
@@ -29,4 +31,34 @@ public interface PackgoodsContract {
     @POST("user/BagPutBusiness")
     @FormUrlEncoded
     Flowable<BaseResultModel> bagPutBusiness(@Header("token") String token, @FieldMap Map<String, String> param);
+
+
+    public static final String STR_BAG_CODE ="strBagCode";
+    public static final String STR_LENGTH ="strlength";
+    public static final String STR_WIDTH ="strwidth";
+    public static final String STR_HEIGHT ="strheight";
+    public static final String TEXT_WEIGHT ="txtWeight";
+    public static final String TEXTBAG_GROSSWEIGHT ="txtbag_grossweight";
+    @POST("user/BagWeighing")
+    @FormUrlEncoded
+    Flowable<BaseResultModel> bagWeighing(@Header("token") String token, @FieldMap Map<String, String> param);
+
+    @POST("user/GetServiceChannel")
+    @FormUrlEncoded
+    Flowable<GsonServiceChannelModel> getServiceChannel(@Header("token") String token, @FieldMap Map<String, String> param);
+
+    public static final String USERID ="userId";
+    public static final String STR_EXPRESS_CODE ="strExpressCode";
+    public static final String BS_LIST ="bs_list";
+    @POST("user/AddBussinessPackage")
+    @FormUrlEncoded
+    Flowable<GsonAddBussinessPackageModel> addBussinessPackage(@Header("token") String token, @FieldMap Map<String, String> param);
+
+
+    public static final String BAG_LABEL_CODE ="bag_labelcode";
+    @POST("user/Unpacking")
+    @FormUrlEncoded
+    Flowable<BaseResultModel> unpacking(@Header("token") String token, @FieldMap Map<String, String> param);
+
+
 }

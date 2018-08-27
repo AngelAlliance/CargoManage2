@@ -16,8 +16,9 @@ public class ExpressModel {
     private String balance_sign;   //欠费状态
     private String holding;  //扣件状态
     private String IsSelect;
+    private String order_status;//中转状态
 
-    public ExpressModel(String bs_id, String shipper_hawbcode, String child_number, String server_id, String server_channelid, String checkin_date, String shipper_pieces, String outvolume_grossweight, String outvolume_length, String outvolume_width, String outvolume_height, String balance_sign, String holding, String isSelect) {
+    public ExpressModel(String bs_id, String shipper_hawbcode, String child_number, String server_id, String server_channelid, String checkin_date, String shipper_pieces, String outvolume_grossweight, String outvolume_length, String outvolume_width, String outvolume_height, String balance_sign, String holding, String isSelect,String order_status) {
         this.bs_id = bs_id;
         this.shipper_hawbcode = shipper_hawbcode;
         this.child_number = child_number;
@@ -31,7 +32,8 @@ public class ExpressModel {
         this.outvolume_height = outvolume_height;
         this.balance_sign = balance_sign;
         this.holding = holding;
-        IsSelect = isSelect;
+        this.IsSelect = isSelect;
+        this.order_status=order_status;
     }
 
     public String getBs_id() {
@@ -144,5 +146,13 @@ public class ExpressModel {
 
     public void setIsSelect(String isSelect) {
         IsSelect = isSelect;
+    }
+
+    public String getOrder_status() {
+        return order_status;
+    }
+
+    public void setOrder_status(String order_status) {
+        this.order_status = order_status;
     }
 }
