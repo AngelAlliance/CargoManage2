@@ -32,16 +32,36 @@
         android:layout_marginEnd="15dp"
         android:layout_marginStart="15dp" />
 
-    <EditText
-        android:id="@+id/edt_"
-        android:gravity="center"
-        android:background="@null"
-        android:textSize="16sp"
-        android:visibility="gone"
-        android:maxLength="8"
-        android:textColor="@color/secondary_color_333333"
+    <LinearLayout
+        android:id="@+id/ll_edt_"
         android:layout_width="match_parent"
-        android:layout_height="30dp" />
+        android:layout_height="42dp"
+        android:orientation="horizontal"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:padding="5dp"
+        android:background="@drawable/login_edittext_bg"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textSize="@dimen/majority_text"
+            android:textColor="@color/secondary_color_333333"
+            android:text="@string/str_bbh"/>
+        <EditText
+            android:id="@+id/edt_"
+            android:gravity="center_vertical"
+            android:background="@null"
+            android:textSize="16sp"
+            android:visibility="visible"
+            android:layout_marginLeft="10dp"
+            android:hint="@string/str_qsr"
+            android:textColor="@color/secondary_color_333333"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
 
     <ImageView
         android:layout_width="match_parent"

@@ -13,6 +13,9 @@ public class BagPutBusinessReqModel {
     private String bag_id;//包id
     private String bag_labelcode;//包号码 PPNO-
 
+    public BagPutBusinessReqModel() {
+    }
+
     public BagPutBusinessReqModel(String bs_id, String hawbcode, String hawbcode_mode, String scan_date, String bag_id, String bag_labelcode) {
         this.bs_id = bs_id;
         this.hawbcode = hawbcode;
