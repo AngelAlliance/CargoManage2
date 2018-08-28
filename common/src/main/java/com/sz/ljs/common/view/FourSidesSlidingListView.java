@@ -46,6 +46,7 @@ public class FourSidesSlidingListView extends BaseCustomView {
     private List<ExpressModel> noPackageListData = new ArrayList<>();
     private ExpressAdapter expressAdapter;
     private int type; //1代表有包编号的，2代表没有报编号（未打包的）
+    private int isShowzz; //0代表有没有中转状态这一项，1表示根据具体数据进行判断（如果不是树状结构的数据不需要管这个）
 
     //TODO 带包数据的包勾选按钮回调
     public interface SidesSlidGroupCheckListener {
@@ -90,6 +91,7 @@ public class FourSidesSlidingListView extends BaseCustomView {
         try {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.FourSidesSlidingListView, 0, 0);
             type = ta.getInt(R.styleable.FourSidesSlidingListView_type, 1);
+            isShowzz = ta.getInt(R.styleable.FourSidesSlidingListView_isShowzz, 0);
         } catch (Exception e) {
             e.fillInStackTrace();
         }
@@ -115,7 +117,7 @@ public class FourSidesSlidingListView extends BaseCustomView {
             headerAdapter = new FourSidesSlidListTitleAdapter(mContext, headerList);
             lv_header.setAdapter(headerAdapter);
             setListViewHeight(lv_header);
-            dataAdapter = new NoscrollExpandableListAdapter(mContext, listData);
+            dataAdapter = new NoscrollExpandableListAdapter(mContext, listData,isShowzz);
             lv_data.setAdapter(dataAdapter);
             setListViewHeight(lv_data);
         } else if (2 == type) {

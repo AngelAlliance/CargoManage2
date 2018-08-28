@@ -45,6 +45,7 @@ public class PackgoodsPresenter {
         } else {
             token = "";
         }
+        param.put(PackgoodsContract.USERID, ""+UserModel.getInstance().getSt_id());
         param.put(PackgoodsContract.OG_ID, og_id);
         param.put(PackgoodsContract.SERVRE_ID, service_id);
         param.put(PackgoodsContract.SERVRE_CHANNELID, server_channelid);
@@ -63,6 +64,7 @@ public class PackgoodsPresenter {
             token = "";
         }
         param.put(PackgoodsContract.LIST_PARAMSTRING, new Gson().toJson(listParamString));
+        param.put(PackgoodsContract.USERID, ""+UserModel.getInstance().getSt_id());
         param.put(PackgoodsContract.SUMMARY, PackgoodsContract.summary);
         return mContract.bagPutBusiness(token, param);
     }
@@ -77,6 +79,7 @@ public class PackgoodsPresenter {
         } else {
             token = "";
         }
+        param.put(PackgoodsContract.USERID, ""+UserModel.getInstance().getSt_id());
         param.put(PackgoodsContract.SUMMARY, PackgoodsContract.summary);
         param.put(PackgoodsContract.STR_BAG_CODE, strBagCode);
         param.put(PackgoodsContract.OG_ID, og_id);
@@ -97,6 +100,7 @@ public class PackgoodsPresenter {
         } else {
             token = "";
         }
+        param.put(PackgoodsContract.USERID, ""+UserModel.getInstance().getSt_id());
         param.put(PackgoodsContract.SUMMARY, PackgoodsContract.summary);
         return mContract.getServiceChannel(token, param);
     }
@@ -131,6 +135,7 @@ public class PackgoodsPresenter {
             token = "";
         }
         param.put(PackgoodsContract.SUMMARY, PackgoodsContract.summary);
+        param.put(PackgoodsContract.USERID, ""+UserModel.getInstance().getSt_id());
         param.put(PackgoodsContract.BAG_LABEL_CODE, bag_labelcode);
         param.put(PackgoodsContract.OG_ID, og_id);
         return mContract.unpacking(token, param);

@@ -40,5 +40,6 @@
     </style>
     <declare-styleable name="FourSidesSlidingListView">
         <attr name="type" format="integer" />
+        <attr name="isShowzz" format="integer" />
     </declare-styleable>
 </resources>

@@ -128,4 +128,6 @@
     <string name="confirm">确认</string>
     <string name="str_qsrssnr">请输入搜索内容</string>
     <string name="str_alter">提示</string>
+    <string name="str_dzczl">电子秤重量</string>
+    <string name="str_bzl">包重量</string>
 </resources>

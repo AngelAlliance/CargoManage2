@@ -72,7 +72,7 @@ public class AlertDialog {
         img_line = (ImageView) view.findViewById(R.id.img_line);
         img_line.setVisibility(View.GONE);
         edt_ = (EditText) view.findViewById(R.id.edt_);
-        ll_edt_ = (LinearLayout) view.findViewById(R.id.ll_edt_);
+        ll_edt_ = (LinearLayout) view.findViewById(R.id.ll_edt);
         if (edtVisible) {
             ll_edt_.setVisibility(View.VISIBLE);
             edt_.setVisibility(View.VISIBLE);

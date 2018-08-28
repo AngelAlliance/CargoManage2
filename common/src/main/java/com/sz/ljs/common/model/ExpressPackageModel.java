@@ -14,9 +14,13 @@ public class ExpressPackageModel {
     private String length;//包的长
     private String width;//包的宽
     private String height;//包的高
+    private String bag_id;//包id
     private List<ExpressModel> cn_list;
 
-    public ExpressPackageModel(String bag_pieces, String number_pieces, String bag_weight, String weighing, String bag_lable_code, String isSelect, String length, String width, String height, List<ExpressModel> cn_list) {
+    public ExpressPackageModel() {
+    }
+
+    public ExpressPackageModel(String bag_pieces, String number_pieces, String bag_weight, String weighing, String bag_lable_code, String isSelect, String length, String width, String height, List<ExpressModel> cn_list, String bag_id) {
         this.bag_pieces = bag_pieces;
         this.number_pieces = number_pieces;
         this.bag_weight = bag_weight;
@@ -27,6 +31,7 @@ public class ExpressPackageModel {
         this.width = width;
         this.height = height;
         this.cn_list = cn_list;
+        this.bag_id = bag_id;
     }
 
     public String getBag_pieces() {
@@ -107,5 +112,13 @@ public class ExpressPackageModel {
 
     public void setCn_list(List<ExpressModel> cn_list) {
         this.cn_list = cn_list;
+    }
+
+    public String getBag_id() {
+        return bag_id;
+    }
+
+    public void setBag_id(String bag_id) {
+        this.bag_id = bag_id;
     }
 }

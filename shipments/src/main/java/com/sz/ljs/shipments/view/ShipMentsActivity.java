@@ -1,4 +1,4 @@
-package com.example.shipments.view;
+package com.sz.ljs.shipments.view;
 
 import android.os.Bundle;
 import android.text.TextUtils;

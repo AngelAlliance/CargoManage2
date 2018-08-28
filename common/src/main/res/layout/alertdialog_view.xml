@@ -33,7 +33,7 @@
         android:layout_marginStart="15dp" />
 
     <LinearLayout
-        android:id="@+id/ll_edt_"
+        android:id="@+id/ll_edt"
         android:layout_width="match_parent"
         android:layout_height="42dp"
         android:orientation="horizontal"

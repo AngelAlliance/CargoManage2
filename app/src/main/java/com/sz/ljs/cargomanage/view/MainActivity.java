@@ -1,6 +1,5 @@
 package com.sz.ljs.cargomanage.view;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -9,23 +8,20 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.example.shipments.view.ShipMentsActivity;
+import com.sz.ljs.shipments.view.ShipMentsActivity;
 import com.ljs.examinegoods.view.ExamineGoodsActivity;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.cargomanage.R;
 import com.sz.ljs.cargomanage.adapter.HomeMenuAdapter;
 import com.sz.ljs.cargomanage.model.HomeMenuModel;
-import com.sz.ljs.inventory.view.InventoryActivity;
 import com.sz.ljs.cargomanage.model.ScanNumberLengModel;
 import com.sz.ljs.cargomanage.presenter.LoginPresenter;
 import com.sz.ljs.common.constant.GenApi;
 import com.sz.ljs.common.utils.Utils;
-import com.sz.ljs.common.view.SelectionPopForBottomView;
 import com.sz.ljs.packgoods.view.PackGoodsActivity;
 import com.sz.ljs.patchlabel.view.PatchlabelActivity;
 import com.sz.ljs.setting.view.SettingActivity;
-import com.sz.ljs.warehousing.model.CountryModel;
 import com.sz.ljs.warehousing.view.WareHousingActivity;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 

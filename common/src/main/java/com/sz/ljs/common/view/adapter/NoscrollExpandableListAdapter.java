@@ -27,6 +27,7 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
     private Context mContext;
     private List<ExpressPackageModel> listData = new ArrayList<ExpressPackageModel>();
     private LayoutInflater inflater;
+    private int type=0; //0代表不需要显示中转状态，1表示根据判断来显示
 
     public interface GroupCheckedImgOnclick {
         void onClick(int groupPosition);
@@ -47,9 +48,10 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
         childCheckedImgOnclick = listener;
     }
 
-    public NoscrollExpandableListAdapter(Context context, List<ExpressPackageModel> list) {
+    public NoscrollExpandableListAdapter(Context context, List<ExpressPackageModel> list,int type) {
         mContext = context;
         listData = list;
+        this.type = type;
         inflater = LayoutInflater.from(context);
     }
 
@@ -175,7 +177,7 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
             hodler.iv_isOpen = (ImageView) convertView.findViewById(R.id.iv_isOpen);
             hodler.iv_ischecked = (ImageView) convertView.findViewById(R.id.iv_ischecked);
             hodler.tv_kongbai = (TextView) convertView.findViewById(R.id.tv_kongbai);
-            hodler.tv_kongbai.setVisibility(View.VISIBLE);
+            hodler.tv_kongbai.setVisibility(View.GONE);
             hodler.tv_gx = (TextView) convertView.findViewById(R.id.tv_gx);
             hodler.tv_gx.setVisibility(View.GONE);
             hodler.tv_packageNum = (TextView) convertView.findViewById(R.id.tv_packageNum);
@@ -203,20 +205,18 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
             }
             hodler.tv_packageNum.setText("");
-//            if (TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getPackageNumber())) {
-//                //TODO 没有包编号，证明这些数据全是没有打包的子单,这个时候就不需要显示包编号一栏
-//            } else {
-//                //TODO 有包编号，这里也不显示
-//                hodler.tv_packageNum.setVisibility(View.VISIBLE);
-//                hodler.tv_packageNum.setText("");
-//            }
 
-            if (TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getOrder_status())) {
+            if(1==type){
+                if (TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getOrder_status())) {
+                    //TODO 没有中转状态这一项，则直接隐藏掉
+                    hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
+                } else {
+                    hodler.tv_zhongzhuanzhuangtai.setVisibility(View.VISIBLE);
+                    hodler.tv_zhongzhuanzhuangtai.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOrder_status());
+                }
+            }else {
                 //TODO 没有中转状态这一项，则直接隐藏掉
                 hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
-            } else {
-                hodler.tv_zhongzhuanzhuangtai.setVisibility(View.VISIBLE);
-                hodler.tv_zhongzhuanzhuangtai.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOrder_status());
             }
             hodler.tv_yundanhao.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getShipper_hawbcode());
             hodler.tv_zidantiaoma.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getChild_number());
