@@ -748,9 +748,14 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 selectCurrentDayBatch(result.getData().getCustomer_id(), result.getData().getCountry_code());
             }
             if (!TextUtils.isEmpty(result.getData().getCountry_code())) {
+                countryModel = new CountryModel.DataEntity();
+                countryModel.setCountry_code(result.getData().getCountry_code());
                 et_mudiguojia.setText(result.getData().getCountry_code());
             }
             if (!TextUtils.isEmpty(result.getData().getProduct_cnname())) {
+                productModel=new ProductModel.DataEntity();
+                productModel.setProduct_code(result.getData().getProduct_code());
+                productModel.setProduct_cnname(result.getData().getProduct_cnname());
                 et_xiaoshouchanpin.setText(result.getData().getProduct_cnname());
             }
 
@@ -885,9 +890,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                                         .setCallBackListener(new ListDialog.CallBackListener() {
                                             @Override
                                             public void Result(int position, String name) {
-                                                if (null == countryModel) {
                                                     countryModel = new CountryModel.DataEntity();
-                                                }
                                                 for (CountryModel.DataEntity mode:countryList){
                                                     if(name.equals(mode.getCountry_cnname())){
                                                         countryModel = mode;

@@ -45,19 +45,19 @@ public class TransportBatchBusinessParamModel {
          * ReturnName :
          */
 
-        private String receive_date;
-        private String receiver_id;
-        private String receive_check_weight;
-        private String business_gross_weight;
-        private String checkout_gross_weight;
-        private String hawb_bs_id;
-        private String hawb_code;
-        private String hawb_type;
-        private String tra_id;
-        private String tb_id;
-        private String TableName;
-        private String PrimaryKeys;
-        private String ReturnName;
+        private String receive_date; //可为空
+        private String receiver_id;  //可为空
+        private String receive_check_weight;  //可为空
+        private String business_gross_weight; //重量
+        private String checkout_gross_weight;  //出货重量
+        private String hawb_bs_id; //包id
+        private String hawb_code;  //包号码
+        private String hawb_type;  //包类型
+        private String tra_id;  //可为空
+        private String tb_id;  //可为空
+        private String TableName;  //可为空
+        private String PrimaryKeys;  //可为空
+        private String ReturnName; //可为空
 
         public String getReceive_date() {
             return receive_date;
@@ -170,8 +170,8 @@ public class TransportBatchBusinessParamModel {
          * child_number : 300611253
          */
 
-        private String bs_id;
-        private String child_number;
+        private String bs_id;  //业务id
+        private String child_number; //运单得子号码
 
         public String getBs_id() {
             return bs_id;

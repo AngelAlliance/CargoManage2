@@ -130,4 +130,5 @@
     <string name="str_alter">提示</string>
     <string name="str_dzczl">电子秤重量</string>
     <string name="str_bzl">包重量</string>
+    <string name="str_zps">总票数:</string>
 </resources>

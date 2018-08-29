@@ -8,6 +8,7 @@ import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.shipments.contract.ShipmentsContract;
 import com.sz.ljs.shipments.model.GsonOrgServerModel;
 import com.sz.ljs.shipments.model.GsonSaveTransportBatchAndBusinessModel;
+import com.sz.ljs.shipments.model.GsonServiceChannelModel;
 import com.sz.ljs.shipments.model.TransportBatchBusinessParamModel;
 
 import java.util.HashMap;
@@ -47,6 +48,21 @@ public class ShipmentsPresenter {
         return mContract.getDepltList(token, param);
     }
 
+
+
+    //TODO 生效渠道
+    public Flowable<GsonServiceChannelModel> getServiceChannel() {
+        Map<String, String> param = new HashMap<>();
+        String token = "";
+        if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
+            token = UserModel.getInstance().getTokenModel().getToken();
+        } else {
+            token = "";
+        }
+        param.put(ShipmentsContract.USERID, ""+UserModel.getInstance().getSt_id());
+        param.put(ShipmentsContract.SUMMARY, ShipmentsContract.summary);
+        return mContract.getServiceChannel(token, param);
+    }
 
     //TODO 查看收货服务商跟机构
     public Flowable<GsonOrgServerModel> getOrgServer() {

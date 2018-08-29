@@ -16,7 +16,6 @@ import com.sz.ljs.common.base.BaseCustomView;
 import com.sz.ljs.common.model.ExpressModel;
 import com.sz.ljs.common.model.ExpressPackageModel;
 import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
-import com.sz.ljs.common.model.GsonDepltListModel;
 import com.sz.ljs.common.view.adapter.ExpressAdapter;
 import com.sz.ljs.common.view.adapter.FourSidesSlidListTitleAdapter;
 import com.sz.ljs.common.view.adapter.NoscrollExpandableListAdapter;

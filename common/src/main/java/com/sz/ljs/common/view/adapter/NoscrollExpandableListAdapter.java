@@ -142,9 +142,17 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
             } else  if ("true" == listData.get(groupPosition).getIsSelect()){
                 hodler.ll_zge.setBackgroundResource(R.color.secondary_color_ff0000);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
+            }else {
+                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
+                hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
             }
             hodler.tv_packageNum.setText("" + listData.get(groupPosition).getBag_lable_code());
-            hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
+            if(1==type){
+                hodler.tv_zhongzhuanzhuangtai.setVisibility(View.VISIBLE);
+            }else {
+                //TODO 没有中转状态这一项，则直接隐藏掉
+                hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
+            }
             hodler.tv_yundanhao.setText("");
             hodler.tv_zidantiaoma.setText("");
             hodler.tv_jianshu.setText("" + listData.get(groupPosition).getBag_pieces());
@@ -203,15 +211,17 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
             } else if ("true" == listData.get(groupPosition).getCn_list().get(childPosition).getIsSelect()){
                 hodler.ll_zge.setBackgroundResource(R.color.secondary_color_ff0000);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
+            }else {
+                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
+                hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
             }
             hodler.tv_packageNum.setText("");
 
             if(1==type){
+                hodler.tv_zhongzhuanzhuangtai.setVisibility(View.VISIBLE);
                 if (TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getOrder_status())) {
-                    //TODO 没有中转状态这一项，则直接隐藏掉
-                    hodler.tv_zhongzhuanzhuangtai.setVisibility(View.GONE);
+
                 } else {
-                    hodler.tv_zhongzhuanzhuangtai.setVisibility(View.VISIBLE);
                     hodler.tv_zhongzhuanzhuangtai.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOrder_status());
                 }
             }else {

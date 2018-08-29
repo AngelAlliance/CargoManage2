@@ -98,7 +98,9 @@ public class ExpressAdapter extends BaseAdapter {
             } else  if ("true" == listData.get(position).getIsSelect()){
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
                 hodler.ll_zge.setBackgroundResource(R.color.secondary_color_ff0000);
-
+            }else {
+                hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
+                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
             }
 //            if (TextUtils.isEmpty(listData.get(position).getPackageNumber())) {
 //                //TODO 没有包编号，证明这些数据全是没有打包的子单,这个时候就不需要显示包编号一栏

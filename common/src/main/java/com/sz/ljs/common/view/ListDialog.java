@@ -114,7 +114,9 @@ public class ListDialog extends AlertDialog implements View.OnClickListener {
                         if (null != listData && listData.size() > 0 && null != lists && lists.size() > 0) {
                             listData.clear();
                             for (ListialogModel model:lists){
-                                if(model.getName().contains(s)||model.getId().contains(s)||model.getEn_name().contains(s)){
+                                if(model.getName().contains(s.toString().toUpperCase())
+                                        ||model.getId().contains(s.toString().toUpperCase())
+                                        ||model.getEn_name().contains(s.toString().toUpperCase())){
                                     listData.add(model);
                                 }
                             }

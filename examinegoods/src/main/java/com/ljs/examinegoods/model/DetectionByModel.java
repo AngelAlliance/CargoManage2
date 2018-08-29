@@ -55,6 +55,8 @@ public class DetectionByModel {
         private String detection_en_name;  //检查项英文
         private String defult_value;    //默认项 Y：是 N:否
         private String value;           //检测结果项 Y：是 N:否D：不做限制
+        private boolean isChaYi=false;
+        private String select_value;//手动选择项(根据这个来显示选中哪个，默认和默认项一模一样)
 
         public String getItem_cn_name() {
             return item_cn_name;
@@ -102,6 +104,22 @@ public class DetectionByModel {
 
         public void setValue(String value) {
             this.value = value;
+        }
+
+        public boolean isChaYi() {
+            return isChaYi;
+        }
+
+        public void setChaYi(boolean chaYi) {
+            isChaYi = chaYi;
+        }
+
+        public String getSelect_value() {
+            return select_value;
+        }
+
+        public void setSelect_value(String select_value) {
+            this.select_value = select_value;
         }
     }
 }

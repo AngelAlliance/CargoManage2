@@ -4,5 +4,6 @@
         android:allowBackup="true"
         android:supportsRtl="true">
         <activity android:name="com.sz.ljs.shipments.view.ShipMentsActivity"></activity>
+        <activity android:name="com.sz.ljs.shipments.view.ProductionMasterActivity"></activity>
     </application>
 </manifest>

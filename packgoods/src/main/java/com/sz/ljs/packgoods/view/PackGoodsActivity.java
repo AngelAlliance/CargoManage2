@@ -447,7 +447,11 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     entety.setBs_id(model.getBs_id());
                     entety.setShipper_hawbcode(model.getShipper_hawbcode());
                     entety.setServe_hawbcode(model.getShipper_hawbcode());
-                    entety.setChild_number(model.getChild_number());
+                    if(TextUtils.isEmpty(model.getChild_number())){
+                        entety.setChild_number(model.getShipper_hawbcode());
+                    }else {
+                        entety.setChild_number(model.getChild_number());
+                    }
                     entety.setServer_channelid("" + serviceChanneModel.getServer_channelid());
                     entety.setFormal_code(serviceChanneModel.getFormal_code());
                     entety.setServer_channel_cnname(serviceChanneModel.getServer_channel_cnname());

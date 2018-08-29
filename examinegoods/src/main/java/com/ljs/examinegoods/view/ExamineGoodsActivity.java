@@ -15,11 +15,14 @@ import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -32,6 +35,7 @@ import com.iflytek.cloud.SpeechEvent;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.ljs.examinegoods.R;
+import com.ljs.examinegoods.adapter.InspectionItemAdapter;
 import com.ljs.examinegoods.adapter.PhotoGridAdapter;
 import com.ljs.examinegoods.contract.ExamineGoodsContract;
 import com.ljs.examinegoods.model.DetectionByModel;
@@ -52,6 +56,7 @@ import com.sz.ljs.common.utils.BluetoothManager;
 import com.sz.ljs.common.utils.Utils;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ListDialog;
+import com.sz.ljs.common.view.NoscrollListView;
 import com.sz.ljs.common.view.PhotosUtils;
 import com.sz.ljs.common.view.ScanView;
 import com.sz.ljs.common.view.SelectionPopForBottomView;
@@ -72,39 +77,40 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class ExamineGoodsActivity extends BaseActivity implements View.OnClickListener {
-    public static final String TAG="ExamineGoodsActivity";
+    public static final String TAG = "ExamineGoodsActivity";
     private EditText et_yundanhao, et_kehucankaodanhao, et_wenti, et_jianshu;
     private ImageView iv_scan, iv_yiyanhuo, iv_scan2;
-    private TextView tv_goods_type, tv_goods_shifoudaidian, tv_goods_shifoudaici, tv_goods_shifoudaipai, tv_goods_jianshu, tv_goods_suihuofapiao, tv_goods_fapiaoziliao, tv_goods_baoguanziliao, tv_goods_dandubaoguan, tv_goods_huowusunhuai, tv_goods_baozhuangposun, tv_goods_weijinpin, tv_goods_yisuipin;
-    private RadioGroup rg_shifoudaidian, rg_shifoudaici, rg_shifoudaipai, rg_jianshu, rg_suihuofapiao, rg_fapiaoziliao, rg_baoguanziliao, rg_dandubaoguan, rg_huowusunhuai, rg_baozhuangposun, rg_weijinpin, rg_yisuipin;
-    private RadioButton yes_shifoudaidian, no_shifoudaidian, yes_shifoudaici, no_shifoudaici, yes_shifoudaipai, no_shifoudaipai, yes_jianshu, no_jianshu, yes_suihuofapiao, no_suihuofapiao, yes_fapiaoziliao, no_fapiaoziliao, yes_baoguanziliao, no_baoguanziliao, yes_dandubaoguan, no_dandubaoguan, yes_huowusunhuai, no_huowusunhuai, yes_baozhuangposun, no_baozhuangposun, yes_weijinpin, no_weijinpin, yes_yisuipin, no_yisuipin;
+    private TextView tv_goods_type, tv_goods_jianshu;
+    private RadioGroup rg_jianshu;
     private GridView gv_photo;
-    private LinearLayout ll_photo, ll_shifoudaidian, ll_shifoudaici, ll_shifoudaipai, ll_jianshu, ll_suihuofapiao, ll_fapiaoziliao, ll_baoguanziliao, ll_dandubaoguan, ll_huowusunhuai, ll_baozhuangposun, ll_weijinpin, ll_yisuipin;
+    private LinearLayout ll_photo, ll_jianshu;
     private Button bt_yes;
-    private boolean isYanHuo = false,isWenTiJian=false;
+    private boolean isYanHuo = false, isWenTiJian = false, isWenTiJian2 = false;
     private List<Bitmap> photoList = new ArrayList<>();
     private PhotoGridAdapter adapter;
     private ExamineGoodsPresenter mPresenter;
     private List<ListialogModel> showList = new ArrayList<>();
     private List<ItemTypeModel.DataBean> typeList = new ArrayList<>();
-    private List<DetectionByModel.DataBean> detectionList = new ArrayList<>();
     private WaitingDialog waitingDialog;
-    private String isDaiDian, isDaiCi, isDaiPai, isJianShu, isSuiHuoFaPiao, isFaPiaoZiLiao, isBaoGuanZiLiao, isDanDuBaoGuan, isHuoWuSunHuai, isWaiBaoZhuangPoSun, isWeiJinPin, isYiSuiPin;
-    private boolean isHongKuang = false, isHongKuang1 = false, isHongKuang2 = false, isHongKuang3 = false, isHongKuang4 = false, isHongKuang5 = false, isHongKuang6 = false, isHongKuang7 = false, isHongKuang8 = false, isHongKuang9 = false, isHongKuang10 = false, isHongKuang11 = false;
     private OrderModel orderModel;
     private List<ImageType> Imagelist = new ArrayList<>();
     private ListDialog dialog;
     private BluetoothManager bluetoothManager;
     private AlertDialog alertDialog;
-    private AndBleScanner mScanner;
-    private List<ScanInfo> bleList=new ArrayList<ScanInfo>();
+    private NoscrollListView listview;
+    private InspectionItemAdapter inspectionAdapter;
+    private List<DetectionByModel.DataBean> detectionList = new ArrayList<>();
     private Handler handl;
+    //蓝牙搜索
+    private AndBleScanner mScanner;
+    private List<ScanInfo> bleList = new ArrayList<ScanInfo>();
     // 语音合成对象
     private SpeechSynthesizer mTts;
     // 引擎类型
     private String mEngineType = SpeechConstant.TYPE_CLOUD;
     // 默认发音人
     private String voicer = "vixy";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,79 +127,24 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 .build();
         waitingDialog = new WaitingDialog(this);
         mPresenter = new ExamineGoodsPresenter();
+        listview = (NoscrollListView) findViewById(R.id.lv_listView);
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         et_kehucankaodanhao = (EditText) findViewById(R.id.et_kehucankaodanhao);
+        rg_jianshu = (RadioGroup) findViewById(R.id.rg_jianshu);
+        ll_jianshu = (LinearLayout) findViewById(R.id.ll_jianshu);
+        tv_goods_jianshu = (TextView) findViewById(R.id.tv_goods_jianshu);
         et_wenti = (EditText) findViewById(R.id.et_wenti);
         et_jianshu = (EditText) findViewById(R.id.et_jianshu);
         iv_scan = (ImageView) findViewById(R.id.iv_scan);
         iv_scan2 = (ImageView) findViewById(R.id.iv_scan2);
         iv_yiyanhuo = (ImageView) findViewById(R.id.iv_yiyanhuo);
         tv_goods_type = (TextView) findViewById(R.id.tv_goods_type);
-        tv_goods_shifoudaidian = (TextView) findViewById(R.id.tv_goods_shifoudaidian);
-        tv_goods_shifoudaici = (TextView) findViewById(R.id.tv_goods_shifoudaici);
-        tv_goods_shifoudaipai = (TextView) findViewById(R.id.tv_goods_shifoudaipai);
-        tv_goods_jianshu = (TextView) findViewById(R.id.tv_goods_jianshu);
-        tv_goods_suihuofapiao = (TextView) findViewById(R.id.tv_goods_suihuofapiao);
-        tv_goods_fapiaoziliao = (TextView) findViewById(R.id.tv_goods_fapiaoziliao);
-        tv_goods_baoguanziliao = (TextView) findViewById(R.id.tv_goods_baoguanziliao);
-        tv_goods_dandubaoguan = (TextView) findViewById(R.id.tv_goods_dandubaoguan);
-        tv_goods_huowusunhuai = (TextView) findViewById(R.id.tv_goods_huowusunhuai);
-        tv_goods_baozhuangposun = (TextView) findViewById(R.id.tv_goods_baozhuangposun);
-        tv_goods_huowusunhuai = (TextView) findViewById(R.id.tv_goods_huowusunhuai);
-        tv_goods_baozhuangposun = (TextView) findViewById(R.id.tv_goods_baozhuangposun);
-        tv_goods_weijinpin = (TextView) findViewById(R.id.tv_goods_weijinpin);
-        tv_goods_yisuipin = (TextView) findViewById(R.id.tv_goods_yisuipin);
-        rg_shifoudaidian = (RadioGroup) findViewById(R.id.rg_shifoudaidian);
-        rg_shifoudaici = (RadioGroup) findViewById(R.id.rg_shifoudaici);
-        rg_shifoudaipai = (RadioGroup) findViewById(R.id.rg_shifoudaipai);
-        rg_jianshu = (RadioGroup) findViewById(R.id.rg_jianshu);
-        rg_suihuofapiao = (RadioGroup) findViewById(R.id.rg_suihuofapiao);
-        rg_fapiaoziliao = (RadioGroup) findViewById(R.id.rg_fapiaoziliao);
-        rg_baoguanziliao = (RadioGroup) findViewById(R.id.rg_baoguanziliao);
-        rg_dandubaoguan = (RadioGroup) findViewById(R.id.rg_dandubaoguan);
-        rg_huowusunhuai = (RadioGroup) findViewById(R.id.rg_huowusunhuai);
-        rg_baozhuangposun = (RadioGroup) findViewById(R.id.rg_baozhuangposun);
-        rg_weijinpin = (RadioGroup) findViewById(R.id.rg_weijinpin);
-        rg_yisuipin = (RadioGroup) findViewById(R.id.rg_yisuipin);
-        yes_shifoudaidian = (RadioButton) findViewById(R.id.yes_shifoudaidian);
-        no_shifoudaidian = (RadioButton) findViewById(R.id.no_shifoudaidian);
-        yes_shifoudaici = (RadioButton) findViewById(R.id.yes_shifoudaici);
-        no_shifoudaici = (RadioButton) findViewById(R.id.no_shifoudaici);
-        yes_shifoudaipai = (RadioButton) findViewById(R.id.yes_shifoudaipai);
-        no_shifoudaipai = (RadioButton) findViewById(R.id.no_shifoudaipai);
-        yes_jianshu = (RadioButton) findViewById(R.id.yes_jianshu);
-        no_jianshu = (RadioButton) findViewById(R.id.no_jianshu);
-        yes_suihuofapiao = (RadioButton) findViewById(R.id.yes_suihuofapiao);
-        no_suihuofapiao = (RadioButton) findViewById(R.id.no_suihuofapiao);
-        yes_fapiaoziliao = (RadioButton) findViewById(R.id.yes_fapiaoziliao);
-        no_fapiaoziliao = (RadioButton) findViewById(R.id.no_fapiaoziliao);
-        yes_baoguanziliao = (RadioButton) findViewById(R.id.yes_baoguanziliao);
-        no_baoguanziliao = (RadioButton) findViewById(R.id.no_baoguanziliao);
-        yes_dandubaoguan = (RadioButton) findViewById(R.id.yes_dandubaoguan);
-        no_dandubaoguan = (RadioButton) findViewById(R.id.no_dandubaoguan);
-        yes_huowusunhuai = (RadioButton) findViewById(R.id.yes_huowusunhuai);
-        no_huowusunhuai = (RadioButton) findViewById(R.id.no_huowusunhuai);
-        yes_baozhuangposun = (RadioButton) findViewById(R.id.yes_baozhuangposun);
-        no_baozhuangposun = (RadioButton) findViewById(R.id.no_baozhuangposun);
-        yes_weijinpin = (RadioButton) findViewById(R.id.yes_weijinpin);
-        no_weijinpin = (RadioButton) findViewById(R.id.no_weijinpin);
-        yes_yisuipin = (RadioButton) findViewById(R.id.yes_yisuipin);
-        no_yisuipin = (RadioButton) findViewById(R.id.no_yisuipin);
         gv_photo = (GridView) findViewById(R.id.gv_photo);
         ll_photo = (LinearLayout) findViewById(R.id.ll_photo);
         bt_yes = (Button) findViewById(R.id.bt_yes);
-        ll_shifoudaidian = (LinearLayout) findViewById(R.id.ll_shifoudaidian);
-        ll_shifoudaici = (LinearLayout) findViewById(R.id.ll_shifoudaici);
-        ll_shifoudaipai = (LinearLayout) findViewById(R.id.ll_shifoudaipai);
-        ll_jianshu = (LinearLayout) findViewById(R.id.ll_jianshu);
-        ll_suihuofapiao = (LinearLayout) findViewById(R.id.ll_suihuofapiao);
-        ll_fapiaoziliao = (LinearLayout) findViewById(R.id.ll_fapiaoziliao);
-        ll_baoguanziliao = (LinearLayout) findViewById(R.id.ll_baoguanziliao);
-        ll_dandubaoguan = (LinearLayout) findViewById(R.id.ll_dandubaoguan);
-        ll_huowusunhuai = (LinearLayout) findViewById(R.id.ll_huowusunhuai);
-        ll_baozhuangposun = (LinearLayout) findViewById(R.id.ll_baozhuangposun);
-        ll_weijinpin = (LinearLayout) findViewById(R.id.ll_weijinpin);
-        ll_yisuipin = (LinearLayout) findViewById(R.id.ll_yisuipin);
+        inspectionAdapter = new InspectionItemAdapter(this, detectionList);
+        listview.setAdapter(inspectionAdapter);
+        setListViewHeight(listview);
     }
 
 
@@ -205,7 +156,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             @Override
             public void onInit(int i) {
                 if (i != ErrorCode.SUCCESS) {
-                    Utils.showToast(getBaseActivity(),"初始化失败,错误码："+i);
+                    Utils.showToast(getBaseActivity(), "初始化失败,错误码：" + i);
                 } else {
                     // 初始化成功，之后可以调用startSpeaking方法
                     // 注：有的开发者在onCreate方法中创建完合成对象之后马上就调用startSpeaking进行合成，
@@ -217,7 +168,6 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         // 设置参数
         setParam();
     }
-
 
 
     private void setListener() {
@@ -240,208 +190,37 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
             }
         });
-        rg_shifoudaidian.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-
-                if (checkedId == R.id.yes_shifoudaidian) {
-                    isHongKuang = inspect(getResources().getString(R.string.str_sfdd), "Y");
-                    isDaiDian = "Y";
-                } else if (checkedId == R.id.no_shifoudaidian) {
-                    isHongKuang = inspect(getResources().getString(R.string.str_sfdd), "N");
-                    isDaiDian = "N";
-                }
-                if (true == isHongKuang) {
-                    ll_shifoudaidian.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_shifoudaidian.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
-        rg_shifoudaici.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_shifoudaici) {
-                    isHongKuang1 = inspect(getResources().getString(R.string.str_sfdc), "Y");
-                    isDaiCi = "Y";
-                } else if (checkedId == R.id.no_shifoudaici) {
-                    isHongKuang1 = inspect(getResources().getString(R.string.str_sfdc), "N");
-                    isDaiCi = "N";
-                }
-                if (true == isHongKuang1) {
-                    ll_shifoudaici.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_shifoudaici.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
-        rg_shifoudaipai.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_shifoudaipai) {
-                    isHongKuang2 = inspect(getResources().getString(R.string.str_sfdp), "Y");
-                    isDaiPai = "Y";
-                } else if (checkedId == R.id.no_shifoudaipai) {
-                    isHongKuang2 = inspect(getResources().getString(R.string.str_sfdp), "N");
-                    isDaiPai = "N";
-                }
-                if (true == isHongKuang2) {
-                    ll_shifoudaipai.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_shifoudaipai.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
         rg_jianshu.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_jianshu) {
-                    isHongKuang3 = inspect(getResources().getString(R.string.str_js), "Y");
-                    isJianShu = "Y";
-                } else if (checkedId == R.id.no_jianshu) {
-                    isHongKuang3 = inspect(getResources().getString(R.string.str_js), "N");
-                    isJianShu = "N";
-                }
-                if (true == isHongKuang3) {
+                if (checkedId == R.id.no_jianshu) {
+                    //TODO 勾选了否，则表示件数与运单返回件数不符,为问题件
+                    isWenTiJian = true;
                     ll_jianshu.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
+                } else if (checkedId == R.id.yes_jianshu) {
+                    isWenTiJian = false;
                     ll_jianshu.setBackgroundResource(R.drawable.login_edittext_bg);
                 }
             }
         });
-        rg_suihuofapiao.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        inspectionAdapter.setCallBack(new InspectionItemAdapter.SelsectRadioButtonCallBack() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_suihuofapiao) {
-                    isHongKuang4 = inspect(getResources().getString(R.string.str_sfyshfp), "Y");
-                    isSuiHuoFaPiao = "Y";
-                } else if (checkedId == R.id.no_suihuofapiao) {
-                    isHongKuang4 = inspect(getResources().getString(R.string.str_sfyshfp), "N");
-                    isSuiHuoFaPiao = "N";
-                }
-                if (true == isHongKuang4) {
-                    ll_suihuofapiao.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_suihuofapiao.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
-        rg_fapiaoziliao.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_fapiaoziliao) {
-                    isHongKuang5 = inspect(getResources().getString(R.string.str_fpzlsfzq), "Y");
-                    isFaPiaoZiLiao = "Y";
-                } else if (checkedId == R.id.no_fapiaoziliao) {
-                    isHongKuang5 = inspect(getResources().getString(R.string.str_fpzlsfzq), "N");
-                    isFaPiaoZiLiao = "N";
-                }
-                if (true == isHongKuang5) {
-                    ll_fapiaoziliao.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_fapiaoziliao.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
-        rg_baoguanziliao.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_baoguanziliao) {
-                    isHongKuang6 = inspect(getResources().getString(R.string.str_ywbgzl), "Y");
-                    isBaoGuanZiLiao = "Y";
-                } else if (checkedId == R.id.no_baoguanziliao) {
-                    isHongKuang6 = inspect(getResources().getString(R.string.str_ywbgzl), "N");
-                    isBaoGuanZiLiao = "N";
-                }
-                if (true == isHongKuang6) {
-                    ll_baoguanziliao.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_baoguanziliao.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
-        rg_dandubaoguan.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_dandubaoguan) {
-                    isHongKuang7 = inspect(getResources().getString(R.string.str_sfddbg), "Y");
-                    isDanDuBaoGuan = "Y";
-                } else if (checkedId == R.id.no_dandubaoguan) {
-                    isHongKuang7 = inspect(getResources().getString(R.string.str_sfddbg), "N");
-                    isDanDuBaoGuan = "N";
-                }
-                if (true == isHongKuang7) {
-                    ll_dandubaoguan.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_dandubaoguan.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
-        rg_huowusunhuai.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_huowusunhuai) {
-                    isHongKuang8 = inspect(getResources().getString(R.string.str_hwsfsh), "Y");
-                    isHuoWuSunHuai = "Y";
-                } else if (checkedId == R.id.no_huowusunhuai) {
-                    isHongKuang8 = inspect(getResources().getString(R.string.str_hwsfsh), "N");
-                    isHuoWuSunHuai = "N";
-                }
-                if (true == isHongKuang8) {
-                    ll_huowusunhuai.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_huowusunhuai.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
-        rg_baozhuangposun.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_baozhuangposun) {
-                    isHongKuang9 = inspect(getResources().getString(R.string.str_wbzsfps), "Y");
-                    isWaiBaoZhuangPoSun = "Y";
-                } else if (checkedId == R.id.no_baozhuangposun) {
-                    isHongKuang9 = inspect(getResources().getString(R.string.str_wbzsfps), "N");
-                    isWaiBaoZhuangPoSun = "N";
-                }
-                if (true == isHongKuang9) {
-                    ll_baozhuangposun.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_baozhuangposun.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
-        rg_weijinpin.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_weijinpin) {
-                    isHongKuang10 = inspect(getResources().getString(R.string.str_sfwwjp), "Y");
-                    isWeiJinPin = "Y";
-                } else if (checkedId == R.id.no_weijinpin) {
-                    isHongKuang10 = inspect(getResources().getString(R.string.str_sfwwjp), "N");
-                    isWeiJinPin = "N";
-                }
-                if (true == isHongKuang10) {
-                    ll_weijinpin.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_weijinpin.setBackgroundResource(R.drawable.login_edittext_bg);
-                }
-            }
-        });
-        rg_yisuipin.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.yes_yisuipin) {
-                    isHongKuang11 = inspect(getResources().getString(R.string.str_sfwysp), "Y");
-                    isYiSuiPin = "Y";
-                } else if (checkedId == R.id.no_yisuipin) {
-                    isHongKuang11 = inspect(getResources().getString(R.string.str_sfwysp), "N");
-                    isYiSuiPin = "N";
-                }
-                if (true == isHongKuang11) {
-                    ll_yisuipin.setBackgroundResource(R.drawable.login_edittext2_bg);
-                } else {
-                    ll_yisuipin.setBackgroundResource(R.drawable.login_edittext_bg);
+            public void callBack(int position, String select) {
+                if (null != detectionList && detectionList.size() > 0) {
+//                    Log.i("接收回来的","position="+position);
+                    String value = detectionList.get(position).getValue();
+                    detectionList.get(position).setSelect_value(select);
+                    if ("D".equals(detectionList.get(position).getValue())) {
+                        //TODO 不做检查
+                        detectionList.get(position).setChaYi(false);
+                    } else {
+                        if (value.equals(select)) {
+                            detectionList.get(position).setChaYi(false);
+                        } else {
+                            detectionList.get(position).setChaYi(true);
+                        }
+                    }
+                    inspectionAdapter.notifyDataSetChanged();
                 }
             }
         });
@@ -468,7 +247,23 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         int id = v.getId();
         if (id == R.id.ll_photo) {
             if (photoList.size() >= 3) {
-                Utils.showToast(getBaseActivity(), R.string.str_zpzds);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                .builder()
+                                .setTitle(getResources().getString(R.string.str_alter))
+                                .setMsg(getResources().getString(R.string.str_zpzds))
+                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        alertDialog.dissmiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+                });
+//                Utils.showToast(getBaseActivity(), R.string.str_zpzds);
                 return;
             }
             //TODO 拍照
@@ -486,13 +281,6 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             });
         } else if (id == R.id.bt_yes) {
             //TODO 确认
-            if (isHongKuang || isHongKuang1 || isHongKuang2 || isHongKuang3 || isHongKuang4 || isHongKuang5 || isHongKuang6
-                    || isHongKuang7 || isHongKuang8 || isHongKuang9 || isHongKuang10 || isHongKuang11) {
-                //TODO 表示为问题件，不给点击已验货按钮
-                isWenTiJian = true;
-            }else {
-                isWenTiJian=false;
-            }
             saveDetecTionOrder();
         } else if (id == R.id.iv_scan) {
             //TODO 运单号扫描
@@ -502,7 +290,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                     if (!TextUtils.isEmpty(result)) {
                         et_yundanhao.setText(result);
                         int code = mTts.startSpeaking(result, mTtsListener);
-                        Log.i("语音播报","code="+code);
+                        Log.i("语音播报", "code=" + code);
                     }
                 }
             });
@@ -517,8 +305,16 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 }
             });
         } else if (id == R.id.iv_yiyanhuo) {
-            if (isHongKuang || isHongKuang1 || isHongKuang2 || isHongKuang3 || isHongKuang4 || isHongKuang5 || isHongKuang6
-                    || isHongKuang7 || isHongKuang8 || isHongKuang9 || isHongKuang10 || isHongKuang11) {
+            isWenTiJian=false;
+            if (null != detectionList && detectionList.size() > 0) {
+                for (DetectionByModel.DataBean model : detectionList) {
+                    if (true == model.isChaYi()) {
+                        isWenTiJian = true;
+                        break;
+                    }
+                }
+            }
+            if (true == isWenTiJian) {
                 //TODO 表示为问题件，不给点击已验货按钮
                 return;
             }
@@ -531,10 +327,6 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 iv_yiyanhuo.setImageResource(R.mipmap.fb_b);
             }
         }
-//        else if (id == R.id.tv_goods_type) {
-//            //TODO 货物类型
-//            getItemType();
-//        }
     }
 
     //TODO 图片上传
@@ -546,53 +338,169 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<UploadFileResultModel>() {
                     @Override
-                    public void accept(UploadFileResultModel result) throws Exception {
-                        if (0 == result.getCode()) {
+                    public void accept(final UploadFileResultModel result) throws Exception {
+                        if (1 == result.getCode()) {
                             showWaiting(false);
-                            Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
-                            showWaiting(false);
-                            Imagelist.add(new ImageType(result.getData(),"A"));
+                            Imagelist.add(new ImageType(result.getData(), "A"));
                             photoList.add(bitmap);
                             adapter.notifyDataSetChanged();
+                        } else {
+                            showWaiting(false);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                            .builder()
+                                            .setTitle(getResources().getString(R.string.str_alter))
+                                            .setMsg(result.getMsg())
+                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    alertDialog.dissmiss();
+                                                }
+                                            });
+                                    alertDialog.show();
+                                }
+                            });
                         }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
+//                        showWaiting(false);
                         //获取失败，提示
-                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                        showWaiting(false);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                        .builder()
+                                        .setTitle(getResources().getString(R.string.str_alter))
+                                        .setMsg(getResources().getString(R.string.str_qqsb))
+                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                alertDialog.dissmiss();
+                                            }
+                                        });
+                                alertDialog.show();
+                            }
+                        });
                     }
                 });
     }
 
     //TODO 提交问题件或者保存验货单
     private void saveDetecTionOrder() {
+        //TODO 检查是否是问题件
+        isWenTiJian=false;
+        if (null != detectionList && detectionList.size() > 0) {
+            for (DetectionByModel.DataBean model : detectionList) {
+                if (true == model.isChaYi()) {
+                    isWenTiJian = true;
+                    break;
+                }
+            }
+        }
         if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
-            Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_ydhbnwk));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                            .builder()
+                            .setTitle(getResources().getString(R.string.str_alter))
+                            .setMsg(getResources().getString(R.string.str_ydhbnwk))
+                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    alertDialog.dissmiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+            });
             return;
         }
 //        if (TextUtils.isEmpty(et_kehucankaodanhao.getText().toString().trim())) {
 //            Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_khckdhbnwk));
 //            return;
 //        }
-        if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
-            Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_jsbnwk));
-            return;
-        }
         if (true == isWenTiJian) {
             if (TextUtils.isEmpty(et_wenti.getText().toString().trim())) {
-                Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_wtmsbnwk));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                .builder()
+                                .setTitle(getResources().getString(R.string.str_alter))
+                                .setMsg(getResources().getString(R.string.str_wtmsbnwk))
+                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        alertDialog.dissmiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+                });
                 return;
             }
-            if(null==Imagelist&&Imagelist.size()<=0){
-                Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_zpbnwk));
+            if (null == Imagelist || Imagelist.size() <= 0) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                .builder()
+                                .setTitle(getResources().getString(R.string.str_alter))
+                                .setMsg(getResources().getString(R.string.str_zpbnwk))
+                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        alertDialog.dissmiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+                });
                 return;
             }
-        }else {
-            if(false==isYanHuo){
-                Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_qgxyyh));
+        } else {
+            if (false == isYanHuo) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                .builder()
+                                .setTitle(getResources().getString(R.string.str_alter))
+                                .setMsg(getResources().getString(R.string.str_qgxyyh))
+                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        alertDialog.dissmiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+                });
+                return;
+            }
+            if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                .builder()
+                                .setTitle(getResources().getString(R.string.str_alter))
+                                .setMsg(getResources().getString(R.string.str_jsbnwk))
+                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        alertDialog.dissmiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+                });
                 return;
             }
         }
@@ -610,14 +518,13 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         } else {
             //TODO 不是问题件，不需要上传问题描述与图片集合，需要上传检验结果
             requestModel.setRequest_type("N");
-//            + "," + getResources().getString(R.string.str_js) + ":" + isJianShu
-            String detection_note = getResources().getString(R.string.str_sfdd) + ":" + isDaiDian + "," + getResources().getString(R.string.str_sfdc) + ":" + isDaiCi
-                    + "," + getResources().getString(R.string.str_sfdp) + ":" + isDaiPai
-                    + "," + getResources().getString(R.string.str_sfyshfp) + ":" + isSuiHuoFaPiao + "," + getResources().getString(R.string.str_fpzlsfzq) + ":" + isFaPiaoZiLiao
-                    + "," + getResources().getString(R.string.str_ywbgzl) + ":" + isBaoGuanZiLiao + "," + getResources().getString(R.string.str_sfddbg) + ":" + isDanDuBaoGuan
-                    + "," + getResources().getString(R.string.str_hwsfsh) + ":" + isHuoWuSunHuai + "," + getResources().getString(R.string.str_wbzsfps) + ":" + isWaiBaoZhuangPoSun
-                    + "," + getResources().getString(R.string.str_sfwwjp) + ":" + isWeiJinPin + "," + getResources().getString(R.string.str_sfwysp) + ":" + isYiSuiPin
-                    + "," + getResources().getString(R.string.str_zjs) + et_jianshu.getText().toString().trim();
+            String detection_note = "";
+            if (null != detectionList && detectionList.size() > 0) {
+                for (DetectionByModel.DataBean model : detectionList) {
+                    detection_note = detection_note + model.getDetection_cn_name() + ":" + model.getSelect_value() + ",";
+                }
+            }
+            detection_note = detection_note + getResources().getString(R.string.str_zjs) + et_jianshu.getText().toString().trim();
             requestModel.setDetection_note(detection_note);
         }
         if (null != orderModel && null != orderModel.getData() && !TextUtils.isEmpty(orderModel.getData().getOrder_id())) {
@@ -634,14 +541,44 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 .subscribe(new Consumer<SaveDetecTionOrderResultModel>() {
 
                     @Override
-                    public void accept(SaveDetecTionOrderResultModel result) throws Exception {
-                        if (0 == result.getCode()) {
+                    public void accept(final SaveDetecTionOrderResultModel result) throws Exception {
+                        if (1 == result.getCode()) {
                             showWaiting(false);
-                            Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                            .builder()
+                                            .setTitle(getResources().getString(R.string.str_alter))
+                                            .setMsg(result.getMsg())
+                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    alertDialog.dissmiss();
+                                                }
+                                            });
+                                    alertDialog.show();
+                                }
+                            });
+                            clean();
+                        } else {
                             showWaiting(false);
-                            Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
-                            finish();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                            .builder()
+                                            .setTitle(getResources().getString(R.string.str_alter))
+                                            .setMsg(result.getMsg())
+                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    alertDialog.dissmiss();
+                                                }
+                                            });
+                                    alertDialog.show();
+                                }
+                            });
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -649,9 +586,44 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                     public void accept(Throwable throwable) throws Exception {
                         showWaiting(false);
                         //获取失败，提示
-                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                        .builder()
+                                        .setTitle(getResources().getString(R.string.str_alter))
+                                        .setMsg(getResources().getString(R.string.str_qqsb))
+                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                alertDialog.dissmiss();
+                                            }
+                                        });
+                                alertDialog.show();
+                            }
+                        });
                     }
                 });
+    }
+
+    //TODO 清空界面数据
+    private void clean() {
+        et_yundanhao.setText("");
+        et_kehucankaodanhao.setText("");
+        et_wenti.setText("");
+        et_jianshu.setText("");
+        tv_goods_type.setText("");
+        tv_goods_jianshu.setText("");
+        ll_jianshu.setBackgroundResource(R.drawable.login_edittext_bg);
+        isYanHuo = false;
+        isWenTiJian = false;
+        showList.clear();
+        typeList.clear();
+        orderModel = null;
+        Imagelist.clear();
+        detectionList.clear();
+        adapter.notifyDataSetChanged();
+        inspectionAdapter.notifyDataSetChanged();
     }
 
     //TODO 查询所有得货物类型
@@ -674,9 +646,9 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                                 typeList.addAll(result.getData());
                                 showList.clear();
                                 for (ItemTypeModel.DataBean bean : result.getData()) {
-                                    showList.add(new ListialogModel("",bean.getItem_cn_name(),bean.getItem_en_name(),false));
+                                    showList.add(new ListialogModel("", bean.getItem_cn_name(), bean.getItem_en_name(), false));
                                 }
-                                dialog=new ListDialog(ExamineGoodsActivity.this)
+                                dialog = new ListDialog(ExamineGoodsActivity.this)
                                         .creatDialog()
                                         .setTitle("请选择货物类型")
                                         .setListData(showList)
@@ -710,17 +682,32 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<DetectionByModel>() {
                     @Override
-                    public void accept(DetectionByModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            showWaiting(false);
-                            Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
+                    public void accept(final DetectionByModel result) throws Exception {
+                        if (1 == result.getCode()) {
                             showWaiting(false);
                             if (null != result.getData() && result.getData().size() > 0) {
-                                detectionList.clear();
-                                detectionList.addAll(result.getData());
-                                setItemDefaultValues();
+                                handelDetectionResult(result);
                             }
+                        } else {
+                            showWaiting(false);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                            .builder()
+                                            .setTitle(getResources().getString(R.string.str_alter))
+                                            .setMsg(result.getMsg())
+                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    detectionList.clear();
+                                                    inspectionAdapter.notifyDataSetChanged();
+                                                    alertDialog.dissmiss();
+                                                }
+                                            });
+                                    alertDialog.show();
+                                }
+                            });
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -728,9 +715,41 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                     public void accept(Throwable throwable) throws Exception {
                         showWaiting(false);
                         //获取失败，提示
-                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                        .builder()
+                                        .setTitle(getResources().getString(R.string.str_alter))
+                                        .setMsg(getResources().getString(R.string.str_qqsb))
+                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                alertDialog.dissmiss();
+                                            }
+                                        });
+                                alertDialog.show();
+                            }
+                        });
                     }
                 });
+    }
+
+    private void handelDetectionResult(DetectionByModel result) {
+        if (null != result.getData() && result.getData().size() > 0) {
+            for (DetectionByModel.DataBean model : result.getData()) {
+                model.setSelect_value(model.getDefult_value());
+                if ("D".equals(model.getValue()) || model.getDefult_value().equals(model.getValue())) {
+                    //TODO 如果相同，则表示没有差异
+                    model.setChaYi(false);
+                } else {
+                    model.setChaYi(true);
+                }
+                detectionList.add(model);
+            }
+            inspectionAdapter.notifyDataSetChanged();
+        }
+
     }
 
     //TODO 根据运单号请求运单数据
@@ -742,18 +761,49 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<OrderModel>() {
                     @Override
-                    public void accept(OrderModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
+                    public void accept(final OrderModel result) throws Exception {
+                        if (1 == result.getCode()) {
                             handelOrderResult(result);
+                        } else {
+                            showWaiting(false);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                            .builder()
+                                            .setTitle(getResources().getString(R.string.str_alter))
+                                            .setMsg(result.getMsg())
+                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    alertDialog.dissmiss();
+                                                }
+                                            });
+                                    alertDialog.show();
+                                }
+                            });
                         }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         //获取失败，提示
-                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                        .builder()
+                                        .setTitle(getResources().getString(R.string.str_alter))
+                                        .setMsg(getResources().getString(R.string.str_qqsb))
+                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                alertDialog.dissmiss();
+                                            }
+                                        });
+                                alertDialog.show();
+                            }
+                        });
                     }
                 });
     }
@@ -776,139 +826,30 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         }
     }
 
-    //TODO 设置检查项默认值
-    private void setItemDefaultValues() {
-        if (null != detectionList && detectionList.size() > 0) {
-            for (DetectionByModel.DataBean bean : detectionList) {
-                if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_sfdd))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_shifoudaidian.setChecked(true);
-                        isDaiDian = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_shifoudaidian.setChecked(true);
-                        isDaiDian = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_sfdc))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_shifoudaici.setChecked(true);
-                        isDaiCi = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_shifoudaici.setChecked(true);
-                        isDaiCi = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_sfdp))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_shifoudaipai.setChecked(true);
-                        isDaiPai = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_shifoudaipai.setChecked(true);
-                        isDaiPai = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_js))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_jianshu.setChecked(true);
-                        isJianShu = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_jianshu.setChecked(true);
-                        isJianShu = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_sfyshfp))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_suihuofapiao.setChecked(true);
-                        isSuiHuoFaPiao = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_suihuofapiao.setChecked(true);
-                        isSuiHuoFaPiao = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_fpzlsfzq))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_fapiaoziliao.setChecked(true);
-                        isFaPiaoZiLiao = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_fapiaoziliao.setChecked(true);
-                        isFaPiaoZiLiao = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_ywbgzl))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_baoguanziliao.setChecked(true);
-                        isBaoGuanZiLiao = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_baoguanziliao.setChecked(true);
-                        isBaoGuanZiLiao = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_sfddbg))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_dandubaoguan.setChecked(true);
-                        isDanDuBaoGuan = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_dandubaoguan.setChecked(true);
-                        isDanDuBaoGuan = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_hwsfsh))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_huowusunhuai.setChecked(true);
-                        isHuoWuSunHuai = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_huowusunhuai.setChecked(true);
-                        isHuoWuSunHuai = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_wbzsfps))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_baozhuangposun.setChecked(true);
-                        isWaiBaoZhuangPoSun = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_baozhuangposun.setChecked(true);
-                        isWaiBaoZhuangPoSun = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_sfwwjp))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_weijinpin.setChecked(true);
-                        isWeiJinPin = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_weijinpin.setChecked(true);
-                        isWeiJinPin = "N";
-                    }
-                } else if (bean.getDetection_cn_name().equals(getResources().getString(R.string.str_sfwysp))) {
-                    if ("Y".equals(bean.getDefult_value())) {
-                        yes_yisuipin.setChecked(true);
-                        isYiSuiPin = "Y";
-                    } else if ("N".equals(bean.getDefult_value())) {
-                        no_yisuipin.setChecked(true);
-                        isYiSuiPin = "N";
-                    }
-                }
-            }
+    //为listview动态设置高度（有多少条目就显示多少条目）
+    public void setListViewHeight(ListView listView) {
+        //获取listView的adapter
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            return;
         }
-    }
-
-    //TODO 通过对应的检测项名称以及所点击的来检测是否需要显示红框
-    private boolean inspect(String inspectName, String inspectType) {
-        boolean isChaYi = false;
-        if (null != detectionList && detectionList.size() > 0) {
-            for (int i = 0; i < detectionList.size(); i++) {
-                if (inspectName.equals(detectionList.get(i).getDetection_cn_name())) {
-                    //如果有这一项检查
-                    if ("D".equals(detectionList.get(i).getValue())) {
-                        //表示不做限制的，这时候随便点哪项都没事
-                        isChaYi = false;
-                        break;
-                    } else if (inspectType.equals(detectionList.get(i).getValue())) {
-                        isChaYi = false;
-                        break;
-                    } else {
-                        isChaYi = true;
-                        break;
-                    }
-                }
-            }
+        int totalHeight = 0;
+        //listAdapter.getCount()返回数据项的数目
+        for (int i = 0, len = listAdapter.getCount(); i < len; i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
         }
-        return isChaYi;
+        // listView.getDividerHeight()获取子项间分隔符占用的高度
+        // params.height最后得到整个ListView完整显示需要的高度
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
     }
-
 
     //TODO 打印
-    private void Printing(){
-        bluetoothManager=new BluetoothManager(ExamineGoodsActivity.this)
+    private void Printing() {
+        bluetoothManager = new BluetoothManager(ExamineGoodsActivity.this)
                 .setStateChangCallBack(new BluetoothManager.IBluetoothStateChangCallBack() {
                     @Override
                     public void onStateChang(int state) {
@@ -947,7 +888,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     }
 
     //TODO 蓝牙搜索
-    private void Scan(){
+    private void Scan() {
         mScanner.searchBle()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -955,11 +896,11 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
                     @Override
                     public void accept(ScanInfo scanInfo) throws Exception {
-                        String tmp = "Addr=" +scanInfo.getScanDevice().getAddress()
+                        String tmp = "Addr=" + scanInfo.getScanDevice().getAddress()
                                 + " Rssi=" + scanInfo.getRssi()
                                 + " UUID=" + scanInfo.getAdvData().getAdvData()
                                 + " LocalName=" + scanInfo.getAdvData().getLocalName();
-                        Log.i("设备信息","tmp="+tmp);
+                        Log.i("设备信息", "tmp=" + tmp);
                         for (final ScanInfo mdevice : bleList) { // 将设备储存进扫描列表
                             if (mdevice.getScanDevice().getAddress().equals(scanInfo.getScanDevice().getAddress())) {
                                 handl.post(new Runnable() {
@@ -1004,6 +945,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private void stopScan() {
         mScanner.stopScan();
     }
+
     private void showWaiting(boolean isShow) {
         if (null != waitingDialog) {
             waitingDialog.showDialog(isShow);
@@ -1012,13 +954,14 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
     /**
      * 参数设置
+     *
      * @return
      */
-    private void setParam(){
+    private void setParam() {
         // 清空参数
         mTts.setParameter(SpeechConstant.PARAMS, null);
         // 根据合成引擎设置相应参数
-        if(mEngineType.equals(SpeechConstant.TYPE_CLOUD)) {
+        if (mEngineType.equals(SpeechConstant.TYPE_CLOUD)) {
             mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
             //onevent回调接口实时返回音频流数据
             //mTts.setParameter(SpeechConstant.TTS_DATA_NOTIFY, "1");
@@ -1030,7 +973,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             mTts.setParameter(SpeechConstant.PITCH, "50");
             //设置合成音量
             mTts.setParameter(SpeechConstant.VOLUME, "100");
-        }else {
+        } else {
             mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_LOCAL);
             // 设置本地合成发音人 voicer为空，默认通过语记界面指定发音人。
             mTts.setParameter(SpeechConstant.VOICE_NAME, "");
@@ -1047,7 +990,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
         // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
         mTts.setParameter(SpeechConstant.AUDIO_FORMAT, "pcm");
-        mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory()+"/msc/tts.pcm");
+        mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/msc/tts.pcm");
     }
 
     /**
@@ -1080,10 +1023,10 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         public void onSpeakProgress(int percent, int beginPos, int endPos) {
             // 播放进度
 
-            if(!"henry".equals(voicer)||!"xiaoyan".equals(voicer)||
-                    !"xiaoyu".equals(voicer)||!"catherine".equals(voicer))
+            if (!"henry".equals(voicer) || !"xiaoyan".equals(voicer) ||
+                    !"xiaoyu".equals(voicer) || !"catherine".equals(voicer))
                 endPos++;
-            Log.e(TAG,"beginPos = "+beginPos +"  endPos = "+endPos);
+            Log.e(TAG, "beginPos = " + beginPos + "  endPos = " + endPos);
         }
 
         @Override
@@ -1099,14 +1042,15 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
             // 以下代码用于获取与云端的会话id，当业务出错时将会话id提供给技术支持人员，可用于查询会话日志，定位出错原因
             // 若使用本地能力，会话id为null
-            Log.e(TAG,"TTS Demo onEvent >>>"+eventType);
+            Log.e(TAG, "TTS Demo onEvent >>>" + eventType);
             if (SpeechEvent.EVENT_SESSION_ID == eventType) {
                 String sid = obj.getString(SpeechEvent.KEY_EVENT_SESSION_ID);
                 Log.d(TAG, "session id =" + sid);
             }
         }
     };
+
     private void showTip(final String str) {
-        Utils.showToast(getBaseActivity(),str);
+        Utils.showToast(getBaseActivity(), str);
     }
 }

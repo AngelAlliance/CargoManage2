@@ -4,6 +4,7 @@ import com.sz.ljs.common.model.GsonDepltListModel;
 import com.sz.ljs.common.utils.MD5Util;
 import com.sz.ljs.shipments.model.GsonOrgServerModel;
 import com.sz.ljs.shipments.model.GsonSaveTransportBatchAndBusinessModel;
+import com.sz.ljs.shipments.model.GsonServiceChannelModel;
 
 import java.util.Map;
 
@@ -33,4 +34,11 @@ public interface ShipmentsContract {
     @POST("user/SaveTransportBatchAndBusiness")
     @FormUrlEncoded
     Flowable<GsonSaveTransportBatchAndBusinessModel> saveTransportBatchAndBusiness(@Header("token") String token, @FieldMap Map<String, String> param);
+
+
+    @POST("user/GetServiceChannel")
+    @FormUrlEncoded
+    Flowable<GsonServiceChannelModel> getServiceChannel(@Header("token") String token, @FieldMap Map<String, String> param);
+
+
 }
