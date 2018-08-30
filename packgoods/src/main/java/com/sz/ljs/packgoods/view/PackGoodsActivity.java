@@ -1100,7 +1100,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         ysmMenuList.add(new MenuModel(2, getResources().getString(R.string.str_sx), R.mipmap.ic_shuaxin));
         ysmMenuList.add(new MenuModel(3, getResources().getString(R.string.str_tc), R.mipmap.ic_tichu));
         ysmMenuList.add(new MenuModel(4, getResources().getString(R.string.str_cb), R.mipmap.ic_chaibao));
-        ysmMenuList.add(new MenuModel(5, getResources().getString(R.string.str_cz), R.mipmap.ic_tichu));
+        ysmMenuList.add(new MenuModel(5, getResources().getString(R.string.str_cz), R.mipmap.icon_chengzhong));
     }
 
     //TODO 设置打包界面待出运界面数据标题栏

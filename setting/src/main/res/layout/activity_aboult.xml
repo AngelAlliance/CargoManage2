@@ -23,12 +23,15 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/iv_log"
-                android:layout_width="80dp"
-                android:layout_height="80dp" />
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:src="@mipmap/icon_log"/>
 
             <TextView
                 android:id="@+id/tv_versionCode"

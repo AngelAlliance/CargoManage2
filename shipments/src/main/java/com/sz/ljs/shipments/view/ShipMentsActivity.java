@@ -422,7 +422,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
     //TODO 设置待出运菜单
     private void setDaiChuYunMenu() {
         dcyMenuList.add(new MenuModel(1, getResources().getString(R.string.str_cx), R.mipmap.ic_chexiao));
-        dcyMenuList.add(new MenuModel(2, getResources().getString(R.string.str_sczd), R.mipmap.ic_tichu));
+        dcyMenuList.add(new MenuModel(2, getResources().getString(R.string.str_sczd), R.mipmap.icon_shengchengzhudan));
         dcyMenuList.add(new MenuModel(3, getResources().getString(R.string.str_sx), R.mipmap.ic_shuaxin));
     }
 

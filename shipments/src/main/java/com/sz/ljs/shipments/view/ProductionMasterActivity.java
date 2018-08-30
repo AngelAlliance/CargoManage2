@@ -2,6 +2,7 @@ package com.sz.ljs.shipments.view;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,14 +21,19 @@ import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ListDialog;
 import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.shipments.model.GsonOrgServerModel;
+import com.sz.ljs.shipments.model.GsonSaveTransportBatchAndBusinessModel;
 import com.sz.ljs.shipments.model.ShipMentsModel;
 import com.sz.ljs.shipments.model.TransportBatchBusinessParamModel;
 import com.sz.ljs.shipments.presenter.ShipmentsPresenter;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+import cn.qqtheme.framework.picker.DateTimePicker;
+import cn.qqtheme.framework.picker.WheelPicker;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
@@ -123,10 +129,10 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
             selectShouHuoFuWuShang();
         } else if (id == R.id.ll_fahuoshijian) {
             //TODO 发货时间
-
+            handlerLeaveDate();
         } else if (id == R.id.btn_queren) {
             //TODO 确认
-
+            saveTransportBatchAndBusiness();
         } else if (id == R.id.btn_guanbi) {
             //TODO 关闭
             finish();
@@ -196,9 +202,175 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
 
     //TODO 生成主单
     private void saveTransportBatchAndBusiness(){
+        showWaiting(true);
+        if(TextUtils.isEmpty(tv_xiayizhan.getText().toString())){
+            showWaiting(false);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                            .builder()
+                            .setTitle(getResources().getString(R.string.str_alter))
+                            .setMsg("请选择下一站地址")
+                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    alertDialog.dissmiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+            });
+            return;
+        }
+        if(TextUtils.isEmpty(tv_shouhuofuwushao.getText().toString())){
+            showWaiting(false);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                            .builder()
+                            .setTitle(getResources().getString(R.string.str_alter))
+                            .setMsg("请选择收货服务商")
+                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    alertDialog.dissmiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+            });
+            return;
+        }
+        if(TextUtils.isEmpty(tv_fahuoshijian.getText().toString())){
+            showWaiting(false);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                            .builder()
+                            .setTitle(getResources().getString(R.string.str_alter))
+                            .setMsg("请选择发货时间")
+                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    alertDialog.dissmiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+            });
+            return;
+        }
+        if(TextUtils.isEmpty(et_yunshubianhao.getText().toString())){
+            showWaiting(false);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                            .builder()
+                            .setTitle(getResources().getString(R.string.str_alter))
+                            .setMsg("请输入运输编号")
+                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    alertDialog.dissmiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+            });
+            return;
+        }
         List<TransportBatchBusinessParamModel> list=new ArrayList<>();
+        if(null!=selectListData&&selectListData.size()>0){
+            for (ExpressPackageModel model:selectListData){
+                TransportBatchBusinessParamModel entity=new TransportBatchBusinessParamModel();
+                TransportBatchBusinessParamModel.BusinessTRBean businessTRBean=new TransportBatchBusinessParamModel.BusinessTRBean();
+                businessTRBean.setReceive_date("");
+                businessTRBean.setReceiver_id("");
+                businessTRBean.setReceive_check_weight("");
+                businessTRBean.setBusiness_gross_weight(model.getBag_weight());
+                businessTRBean.setCheckout_gross_weight(model.getWeighing());
+                businessTRBean.setHawb_bs_id(model.getBag_id());
+                businessTRBean.setHawb_code(model.getBag_lable_code());
+                businessTRBean.setHawb_type("");//暂时不知道填什么
+                businessTRBean.setTra_id("");
+                businessTRBean.setTb_id("");
+                businessTRBean.setTableName("");
+                businessTRBean.setPrimaryKeys("");
+                businessTRBean.setReturnName("");
+                entity.setBusinessTR(businessTRBean);
+                if(null!=model.getCn_list()&&model.getCn_list().size()>0){
+                    List<TransportBatchBusinessParamModel.ListBusinessBean> list1=new ArrayList<>();
+                    //TODO 包底下含有子单
+                    for(ExpressModel expressModel : model.getCn_list()){
+                        TransportBatchBusinessParamModel.ListBusinessBean listBusinessBean=new TransportBatchBusinessParamModel.ListBusinessBean();
+                        listBusinessBean.setBs_id(expressModel.getBs_id());
+                        listBusinessBean.setChild_number(expressModel.getChild_number());
+                        list1.add(listBusinessBean);
+                    }
+                    entity.setList_business(list1);
+                }
+                list.add(entity);
+            }
+        }
+        mPresnter.saveTransportBatchAndBusiness(tv_fahuoshijian.getText().toString(),""+orgListBean.getOg_id()
+                ,""+serverListBean.getServer_id(),serverListBean.getServer_code(),list)
+                .compose(this.<GsonSaveTransportBatchAndBusinessModel>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<GsonSaveTransportBatchAndBusinessModel>() {
+                    @Override
+                    public void accept(GsonSaveTransportBatchAndBusinessModel result) throws Exception {
+                        if (1 == result.getCode()) {
+                            showWaiting(false);
+                            alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                                    .builder()
+                                    .setTitle(getResources().getString(R.string.str_alter))
+                                    .setMsg(result.getMsg())
+                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            alertDialog.dissmiss();
+                                        }
+                                    });
+                            alertDialog.show();
+                        } else {
+                            showWaiting(false);
+                            alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                                    .builder()
+                                    .setTitle(getResources().getString(R.string.str_alter))
+                                    .setMsg(result.getMsg())
+                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            alertDialog.dissmiss();
+                                        }
+                                    });
+                            alertDialog.show();
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        showWaiting(false);
+                        //获取失败，提示
+                        alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                                .builder()
+                                .setTitle(getResources().getString(R.string.str_alter))
+                                .setMsg(getResources().getString(R.string.str_qqsb))
+                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        alertDialog.dissmiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+                });
 
-        TransportBatchBusinessParamModel model=new TransportBatchBusinessParamModel();
     }
     //TODO 查看收货服务商跟机构
     private void getOrgServer(){
@@ -261,6 +433,64 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
                 serverList.addAll(result.getData().getServer_list());
             }
         }
+    }
+
+    //TODO 设置出货时间
+    private void handlerLeaveDate(){
+        final DateTimePicker dateTimePicker = new DateTimePicker(this,
+                DateTimePicker.YEAR_MONTH_DAY,DateTimePicker.HOUR_24);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+
+        dateTimePicker.setDateRangeStart(calendar.get(Calendar.YEAR),1,1);
+        dateTimePicker.setDateRangeEnd(calendar.get(Calendar.YEAR) +1,12,31);
+        calendar.setTime(new Date());
+        dateTimePicker.setSelectedItem(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH)+1,
+                calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+
+        dateTimePicker.setHeaderView(getPackerHeadView(dateTimePicker, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar selcal = Calendar.getInstance();
+                int year = Integer.parseInt(dateTimePicker.getSelectedYear());
+                int month = Integer.parseInt(dateTimePicker.getSelectedMonth());
+                int day = Integer.parseInt(dateTimePicker.getSelectedDay());
+                int hour = Integer.parseInt(dateTimePicker.getSelectedHour());
+                int minute = Integer.parseInt(dateTimePicker.getSelectedMinute());
+                selcal.set(year,month -1,day,hour,minute);
+                String years=dateTimePicker.getSelectedYear();
+                String months=dateTimePicker.getSelectedMonth();
+                String days=dateTimePicker.getSelectedDay();
+                String hours=dateTimePicker.getSelectedHour();
+                String minutes=dateTimePicker.getSelectedMinute();
+                String strTime=getString(R.string.str_leave_date_string);
+                strTime=String.format(strTime,years,months,days,hours,minutes);
+//                String strTime = getString(R.string.str_leave_date_string,years,months,days,hours,minutes);
+                tv_fahuoshijian.setText(strTime);
+            }
+        }));
+        dateTimePicker.setResetWhileWheel(false);
+        dateTimePicker.show();
+    }
+
+    private View getPackerHeadView(final WheelPicker picker, final View.OnClickListener complete_listener){
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.layout_leave_type_picker_head, null);
+        view.findViewById(R.id.text_view_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                picker.dismiss();
+            }
+        });
+        view.findViewById(R.id.text_view_complete).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(null != complete_listener){
+                    complete_listener.onClick(v);
+                }
+                picker.dismiss();
+            }
+        });
+        return view;
     }
 
     private void showWaiting(boolean isShow){

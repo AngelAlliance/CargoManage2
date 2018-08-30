@@ -34,6 +34,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     compile(name: 'WBarcodeScan-1.0.3', ext: 'aar')
     compile 'com.google.zxing:core:3.3.0'
+    compile('cn.qqtheme.framework:WheelPicker:1.5.5') {
+        exclude group: 'com.android.support'
+    }
     compile files('libs/bluetooth.jar')
     compile files('libs/ethernet.jar')
     compile(name: 'AndBLE-1.1.2', ext: 'aar')

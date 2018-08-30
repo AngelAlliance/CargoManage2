@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp"
+    android:background="@color/leave_picker_head_bg_color"
+    android:layout_width="match_parent"
+    android:layout_height="46dp">
+
+    <TextView
+        android:id="@+id/text_view_cancel"
+        android:text="@string/str_cancel"
+        android:gravity="center_vertical"
+        android:textColor="@color/main_color_098dbe"
+        android:textSize="@dimen/majority_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"/>
+
+    <TextView
+        android:id="@+id/text_view_complete"
+        android:text="@string/str_yes"
+        android:gravity="center_vertical"
+        android:textColor="@color/main_color_098dbe"
+        android:textSize="@dimen/majority_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
