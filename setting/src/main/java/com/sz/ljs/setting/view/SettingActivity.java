@@ -9,8 +9,13 @@ import android.widget.TextView;
 
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.base.BaseApplication;
+import com.sz.ljs.base.event.EventID;
+import com.sz.ljs.base.event.EventMSG;
 import com.sz.ljs.common.utils.Utils;
+import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.setting.R;
+
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Created by liujs on 2018/8/20.
@@ -77,10 +82,25 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
 
         } else if (id == R.id.bt_loginOut) {
             //TODO 退出登录
+            handlerLogOff();
         }
     }
 
     private String getShowVersion(){
         return getString(R.string.str_dqbb) +":v" + Utils.getVersionName(SettingActivity.this);
+    }
+
+    //TODO 注销用户
+    private void handlerLogOff(){
+        new AlertDialog(SettingActivity.this).builder()
+                .setTitle(getString(R.string.str_login_out))
+                .setMsg(getString(R.string.str_Logout_tips))
+                .setNegativeButtonVisibility()
+                .setPositiveButton("", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        EventBus.getDefault().post(new EventMSG(EventID.USER_LOG_OFF));
+                    }
+                }).show();
     }
 }

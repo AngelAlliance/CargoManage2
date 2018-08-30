@@ -132,4 +132,5 @@
     <string name="str_bzl">包重量</string>
     <string name="str_zps">总票数:</string>
     <string name="str_leave_date_string">%1$s-%2$s-%3$s %4$s:%5$s</string>
+    <string name="str_Logout_tips">确定要退出当前账号?</string>
 </resources>

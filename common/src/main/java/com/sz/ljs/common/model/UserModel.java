@@ -18,6 +18,25 @@ public class UserModel {
         return Instance;
     }
 
+    public void handlerSignOut() {
+        authentication_code = null;
+        tms_id = 0;
+        st_id_ctreate = 0;
+        sp_id = 0;
+        ur_loginpassword = "";
+        st_ename = "";
+        st_name = "";
+        competence_og_id = 0;
+        og_id = 0;
+        vs_code = "";
+        st_code = "";
+        st_id = 0;
+        ding_user_id = "";
+        og_shortcode = "";
+        og_cityenname = "";
+        tokenModel = null;
+        permission.clear();
+    }
 
     /**
      * authentication_code : null
@@ -173,6 +192,7 @@ public class UserModel {
     public void setOg_cityenname(String og_cityenname) {
         this.og_cityenname = og_cityenname;
     }
+
     public TokenModelEntity getTokenModel() {
         return tokenModel;
     }

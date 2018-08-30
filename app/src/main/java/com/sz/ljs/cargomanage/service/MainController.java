@@ -6,7 +6,9 @@ import android.content.Context;
 import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.base.event.EventID;
 import com.sz.ljs.base.event.EventMSG;
+import com.sz.ljs.cargomanage.view.LoginActivity;
 import com.sz.ljs.cargomanage.view.MainActivity;
+import com.sz.ljs.common.model.UserModel;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -61,8 +63,12 @@ public class MainController {
 
     //注销用户和清理数据
     private void logOffCleanUp(boolean logOff) {
+        //通知关闭所有界面
+        EventBus.getDefault().post(new EventMSG(EventID.FINISH_ACTIVITY));
         if (logOff) {
             //释放与用户相关业务数据
+            UserModel.getInstance().handlerSignOut();
+            BaseApplication.startActivity(LoginActivity.class);
         }
     }
 

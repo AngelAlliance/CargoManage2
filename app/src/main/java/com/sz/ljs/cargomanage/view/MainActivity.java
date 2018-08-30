@@ -84,21 +84,22 @@ public class MainActivity extends BaseActivity {
                 BaseApplication.startActivity(WareHousingActivity.class);
             }
             break;
-            case 2:{
+            case 2: {
                 //TODO 打包
                 BaseApplication.startActivity(PackGoodsActivity.class);
             }
             break;
-            case 3:{
+            case 3: {
                 //TODO 出库
                 BaseApplication.startActivity(ShipMentsActivity.class);
             }
             break;
-            case 6:{
+            case 6: {
                 //TODO 补打标签
                 BaseApplication.startActivity(PatchlabelActivity.class);
             }
-            case 7:{
+            break;
+            case 7: {
                 //TODO 设置
                 BaseApplication.startActivity(SettingActivity.class);
             }
@@ -136,9 +137,9 @@ public class MainActivity extends BaseActivity {
                         if (0 == result.getCode()) {
                             Utils.showToast(MainActivity.this, result.getMsg());
                         } else if (1 == result.getCode()) {
-                            if(!TextUtils.isEmpty(result.getData())){
-                                Log.i("请求运单号位数","length="+result.getData());
-                                GenApi.ScanNumberLeng=Integer.parseInt(result.getData());
+                            if (!TextUtils.isEmpty(result.getData())) {
+                                Log.i("请求运单号位数", "length=" + result.getData());
+                                GenApi.ScanNumberLeng = Integer.parseInt(result.getData());
                             }
                         }
                     }
