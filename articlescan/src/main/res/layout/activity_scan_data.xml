@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.sz.ljs.common.view.TitleView
+        android:id="@+id/tv_titles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleText="@string/str_ysmsj" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingTop="10dp">
+        <!--按钮布局-->
+        <GridView
+            android:id="@+id/gv_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:horizontalSpacing="4dp"
+            android:numColumns="3"
+            android:scrollbars="none"
+            android:verticalSpacing="10dp"
+            android:visibility="visible" />
+
+        <com.sz.ljs.common.view.FourSidesSlidingListView
+            android:id="@+id/fs_yisaomiao_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="visible"
+            app:isShowzz="1" />
+    </LinearLayout>
+
+</LinearLayout>

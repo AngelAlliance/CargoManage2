@@ -21,29 +21,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    repositories {
-        flatDir {
-            dirs 'libs','../base/libs'
+    repositories{
+        flatDir{
+            dirs 'libs','../common/libs','../base/libs'
         }
     }
+
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     implementation 'com.android.support:appcompat-v7:26.1.0'
     testImplementation 'junit:junit:4.12'
-    compile(name: 'WBarcodeScan-1.0.3', ext: 'aar')
-    compile 'com.google.zxing:core:3.3.0'
-    compile('cn.qqtheme.framework:WheelPicker:1.5.5') {
-        exclude group: 'com.android.support'
-    }
-    compile files('libs/bluetooth.jar')
-    compile files('libs/ethernet.jar')
-    compile(name: 'AndBLE-1.1.2', ext: 'aar')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.4.0-RC1'
-    compile 'com.orhanobut:logger:1.15'
     implementation project(':base')
+    implementation project(':common')
     implementation project(':theme')
 }

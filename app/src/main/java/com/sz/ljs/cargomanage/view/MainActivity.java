@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.sz.ljs.articlescan.view.ArticleScanActivity;
+import com.sz.ljs.inventory.view.InventoryActivity;
 import com.sz.ljs.shipments.view.ShipMentsActivity;
 import com.ljs.examinegoods.view.ExamineGoodsActivity;
 import com.sz.ljs.base.BaseActivity;
@@ -84,22 +86,31 @@ public class MainActivity extends BaseActivity {
                 BaseApplication.startActivity(WareHousingActivity.class);
             }
             break;
-            case 2: {
+            case 2:{
                 //TODO 打包
                 BaseApplication.startActivity(PackGoodsActivity.class);
             }
             break;
-            case 3: {
+            case 3:{
                 //TODO 出库
                 BaseApplication.startActivity(ShipMentsActivity.class);
             }
             break;
-            case 6: {
+            case 4:{
+                //TODO 盘库
+                BaseApplication.startActivity(InventoryActivity.class);
+            }
+            break;
+            case 5:{
+                //TODO 到件扫描
+                BaseApplication.startActivity(ArticleScanActivity.class);
+            }
+            break;
+            case 6:{
                 //TODO 补打标签
                 BaseApplication.startActivity(PatchlabelActivity.class);
             }
-            break;
-            case 7: {
+            case 7:{
                 //TODO 设置
                 BaseApplication.startActivity(SettingActivity.class);
             }
@@ -113,13 +124,13 @@ public class MainActivity extends BaseActivity {
         switch (type) {
             case 0: {
                 homeMenuList.add(new HomeMenuModel(0, getResources().getString(R.string.str_yh), R.mipmap.icon_yanhuo));
-                homeMenuList.add(new HomeMenuModel(1, getResources().getString(R.string.str_rk), R.mipmap.icon_ruku));
+                homeMenuList.add(new HomeMenuModel(1, getResources().getString(R.string.str_rk), R.mipmap.common_lading_live1));
                 homeMenuList.add(new HomeMenuModel(2, getResources().getString(R.string.str_db), R.mipmap.icon_packgoods));
                 homeMenuList.add(new HomeMenuModel(3, getResources().getString(R.string.str_ck), R.mipmap.icon_chuku));
                 homeMenuList.add(new HomeMenuModel(4, getResources().getString(R.string.str_pk), R.mipmap.icon_panku));
                 homeMenuList.add(new HomeMenuModel(5, getResources().getString(R.string.str_djsm), R.mipmap.icon_daojiansaomiao));
                 homeMenuList.add(new HomeMenuModel(6, getResources().getString(R.string.str_bdbq), R.mipmap.icon_budabiaoqian));
-                homeMenuList.add(new HomeMenuModel(7, getResources().getString(R.string.str_sz), R.mipmap.icon_setting));
+                homeMenuList.add(new HomeMenuModel(7, getResources().getString(R.string.str_sz), R.mipmap.common_lading_live1));
             }
             break;
         }
@@ -137,9 +148,9 @@ public class MainActivity extends BaseActivity {
                         if (0 == result.getCode()) {
                             Utils.showToast(MainActivity.this, result.getMsg());
                         } else if (1 == result.getCode()) {
-                            if (!TextUtils.isEmpty(result.getData())) {
-                                Log.i("请求运单号位数", "length=" + result.getData());
-                                GenApi.ScanNumberLeng = Integer.parseInt(result.getData());
+                            if(!TextUtils.isEmpty(result.getData())){
+                                Log.i("请求运单号位数","length="+result.getData());
+                                GenApi.ScanNumberLeng=Integer.parseInt(result.getData());
                             }
                         }
                     }

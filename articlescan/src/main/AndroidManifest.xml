@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.sz.ljs.articlescan" >
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true">
+        <activity android:name=".view.ArticleScanActivity" />
+        <activity android:name=".view.ScanDataActivity" />
+    </application>
+</manifest>

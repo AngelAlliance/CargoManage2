@@ -44,4 +44,5 @@ dependencies {
     implementation project(':setting')
     implementation project(':warehousing')
     implementation project(':inventory')
+    implementation project(':articlescan')
 }
