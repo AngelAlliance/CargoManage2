@@ -1,5 +1,6 @@
 package com.sz.ljs.cargomanage.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.sz.ljs.articlescan.view.ArticleScanActivity;
+import com.sz.ljs.base.service.ScanService;
 import com.sz.ljs.inventory.view.InventoryActivity;
 import com.sz.ljs.shipments.view.ShipMentsActivity;
 import com.ljs.examinegoods.view.ExamineGoodsActivity;
@@ -60,6 +62,10 @@ public class MainActivity extends BaseActivity {
 
     private void initData() {
         getScanNumberLeng();
+        //TODO 启动扫描服务
+        Intent newIntent = new Intent(MainActivity.this, ScanService.class);
+        newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startService(newIntent);
     }
 
     private void setListener() {

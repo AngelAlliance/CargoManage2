@@ -181,6 +181,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() >= GenApi.ScanNumberLeng) {
                     //TODO 当运单号大于8位的时候就开始请求数据
+                    int code = mTts.startSpeaking(s.toString(), mTtsListener);
+                        Log.i("语音播报", "code=" + code);
                     getOrderByNumber();
                 }
             }

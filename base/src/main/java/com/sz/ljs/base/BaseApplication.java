@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.os.StrictMode;
+import android.posapi.PosApi;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,6 +42,22 @@ public class BaseApplication extends Application {
     //腾讯bugly Appid
     public final String BUGLY_APP_ID = "112ab15512";//8ec6cc34-f6b4-4dc2-9e12-25f82cf6e666
     public final String XUNFEI_ID="5b7a7165";
+    static BaseApplication instance = null;
+    //PosSDK mSDK = null;
+    static PosApi mPosApi = null;
+    private static String mCurDev1 = "";
+    public BaseApplication(){
+        super.onCreate();
+        instance = this;
+    }
+
+    public static  BaseApplication getInstance(){
+        if(instance==null){
+            instance =new BaseApplication();
+        }
+        return instance;
+    }
+
 
     @Override
     public void onCreate() {
@@ -53,8 +70,35 @@ public class BaseApplication extends Application {
         SpeechUtility a=	SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID+"=5b7a7165");
         Log.i("初始化讯飞","a="+a);
         Logger.addLogAdapter(new AndroidLogAdapter());
+        //PosApi类初始化，该类为项目核心类，请注意务必实例化，否则将会出现无法打印和扫描等现象
+        mPosApi = PosApi.getInstance(this);
+        //根据型号进行初始化mPosApi类
+        if (Build.MODEL.contains("LTE")||android.os.Build.DISPLAY.contains("3508")||
+                android.os.Build.DISPLAY.contains("403")||
+                android.os.Build.DISPLAY.contains("35S09")) {
+            mPosApi.initPosDev("ima35s09");
+            setCurDevice("ima35s09");
+        } else if(Build.MODEL.contains("5501")){
+            mPosApi.initPosDev("ima35s12");
+            setCurDevice("ima35s12");
+        }else{
+            mPosApi.initPosDev(PosApi.PRODUCT_MODEL_IMA80M01);
+            setCurDevice(PosApi.PRODUCT_MODEL_IMA80M01);
+        }
     }
-    //启动主服务
+
+    public String getCurDevice() {
+        return mCurDev1;
+    }
+    public static  void setCurDevice(String mCurDev) {
+        mCurDev1 = mCurDev;
+    }
+    //TODO 其他地方引用mPosApi变量
+    public PosApi getPosApi(){
+        return mPosApi;
+    }
+
+    //TODO 启动主服务
     private void startMainService(){
         Intent service = new Intent("COM.LJS.SMARTCARD.MAIN_SERVICES");
         service.setPackage(getPackageName());

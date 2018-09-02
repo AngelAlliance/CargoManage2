@@ -1,16 +1,9 @@
 package com.sz.ljs.inventory.contract;
 
-import com.sz.ljs.common.model.OrderModel;
-import com.sz.ljs.common.utils.MD5Util;
-import com.sz.ljs.inventory.model.ResultBean;
+import com.sz.ljs.base.interfacecallback.IBaseView;
+import com.sz.ljs.inventory.model.BsListModel;
 
-import java.util.Map;
-
-import io.reactivex.Flowable;
-import retrofit2.http.FieldMap;
-import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.Header;
-import retrofit2.http.POST;
+import java.util.List;
 
 /**
  * Author: Mr. Duan
@@ -19,12 +12,17 @@ import retrofit2.http.POST;
  */
 
 public interface InventoryContract {
-    public static final String summary = MD5Util.get32MD5Str("zhbg_ips2018_cn");
+    public static final int REQUEST_FAIL_ID = -1;//网络失败，网络请求失败
+    public static final int REQUEST_SUCCESS_ID = 1;//网络请求成功
+    public static final int ADD_EXPRESSS_TRACK_SUCCESS = 2;//批量提交盘库成功
 
-    public static final String NUMBER = "number";   //运单号码
-    public static final String SUMMARY = "summary";  //zhbg_ips2018_cn得MD532位小写加密
+    interface View extends IBaseView {
 
-    @POST("user/FindExpressByID")
-    @FormUrlEncoded
-    Flowable<ResultBean> getFindExpressByID(@Header("token") String token, @FieldMap Map<String, String> param);
+    }
+
+    interface Presenter {
+        public void getFindExpressByID(String number);
+
+        public void addExpressTrack(List<BsListModel> list);
+    }
 }

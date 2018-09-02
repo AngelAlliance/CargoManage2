@@ -136,4 +136,19 @@
     <string name="str_ysmsj">已扫描数据</string>
     <string name="str_leave_date_string">%1$s-%2$s-%3$s %4$s:%5$s</string>
     <string name="str_Logout_tips">确定要退出当前账号?</string>
+    <string name="state_normal">正常</string>
+    <string name="state_no_card">无卡</string>
+    <string name="state_card_error">卡错误</string>
+    <string name="state_fault">故障</string>
+    <string name="state_no_paper">缺纸</string>
+    <string name="print_complete">打印完成</string>
+    <string name="print_success">打印结果:打印成功</string>
+    <string name="print_no_paper">打印结果:打印机缺纸</string>
+    <string name="print_failed">打印结果:打印机失败</string>
+    <string name="print_voltate_low">打印结果:电池电压过低</string>
+    <string name="print_voltate_high">打印结果:电源电压过高</string>
+    <string name="no_paper">缺纸</string>
+    <string name="label">检测到黑标</string>
+    <string name="str_qsrydydydh">请输入需要补打标签的运单号或者子单号</string>
+    <string name="cannot_create_bar">当前数据不能生成一维码</string>
 </resources>

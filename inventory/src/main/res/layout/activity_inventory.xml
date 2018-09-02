@@ -14,8 +14,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/ll_tongji"
         android:layout_below="@+id/tv_titles"
-        android:layout_marginBottom="@dimen/large_fillet_button_height"
+        android:layout_marginBottom="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:orientation="vertical">
@@ -25,8 +26,8 @@
             android:layout_height="@dimen/title_bar_heighr"
             android:layout_marginTop="10dp"
             android:background="@drawable/login_edittext_bg"
-            android:visibility="gone"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -129,39 +130,126 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:paddingTop="10dp">
-            <!--按钮布局-->
-            <GridView
-                android:id="@+id/gv_cxkcxx_menu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:horizontalSpacing="10dp"
-                android:numColumns="3"
-                android:scrollbars="none"
-                android:verticalSpacing="10dp" />
 
             <com.sz.ljs.common.view.FourSidesSlidingListView
                 android:id="@+id/fs_cxkcxx_list"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                app:type="2"
-                />
+                app:type="2" />
         </LinearLayout>
 
     </LinearLayout>
 
+    <!--统计-->
+    <LinearLayout
+        android:id="@+id/ll_tongji"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rl_gxkczt"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/large_fillet_button_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_zsz"
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+
+                <TextView
+                    android:id="@+id/tv_zongshizhong"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text=""
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/large_fillet_button_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_zps"
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+
+                <TextView
+                    android:id="@+id/tv_piaoshu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text=""
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_zjs"
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+
+                <TextView
+                    android:id="@+id/tv_zongjianshu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text=""
+                    android:textColor="@color/secondary_color_333333"
+                    android:textSize="@dimen/majority_text" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
     <!--更新库存按钮-->
     <RelativeLayout
         android:id="@+id/rl_gxkczt"
         android:layout_width="match_parent"
         android:layout_height="@dimen/title_bar_heighr"
-        android:layout_marginTop="35dp"
-        android:background="@drawable/loging_button_bg"
-        android:gravity="center_vertical"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp">
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/loging_button_bg"
+        android:gravity="center_vertical">
 
         <TextView
             android:layout_width="wrap_content"

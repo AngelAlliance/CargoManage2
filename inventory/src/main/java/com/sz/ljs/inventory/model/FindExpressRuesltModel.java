@@ -10,7 +10,7 @@ import java.util.List;
  * Description:查询运单编号返回数据体
  */
 
-public class ResultBean {
+public class FindExpressRuesltModel {
 
  /**
   * Code : 1
@@ -64,7 +64,7 @@ public class ResultBean {
 
  @Override
  public String toString() {
-  return "ResultBean{" +
+  return "FindExpressRuesltModel{" +
           "Code=" + Code +
           ", Msg='" + Msg + '\'' +
           ", Data=" + Data.getExpressEntity().toString() +
