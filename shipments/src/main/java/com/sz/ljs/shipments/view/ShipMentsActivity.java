@@ -2,7 +2,9 @@ package com.sz.ljs.shipments.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import com.example.shipments.R;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.common.adapter.MenuAdapter;
+import com.sz.ljs.common.constant.GenApi;
 import com.sz.ljs.common.model.ExpressPackageModel;
 import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
 import com.sz.ljs.common.model.GsonDepltListModel;
@@ -44,7 +47,8 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class ShipMentsActivity extends BaseActivity implements View.OnClickListener {
-    private EditText et_qudao, et_yundanhao;
+    private EditText  et_yundanhao;
+    private TextView et_qudao;
     private LinearLayout ll_qudao;
     private ImageView iv_qudao, iv_scan;
     private GridView gv_menu;
@@ -77,7 +81,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
         setDaiChuYunMenu();
         mPresnter=new ShipmentsPresenter();
         waitingDialog=new WaitingDialog(this);
-        et_qudao = (EditText) findViewById(R.id.et_qudao);
+        et_qudao = (TextView) findViewById(R.id.et_qudao);
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         ll_qudao = (LinearLayout) findViewById(R.id.ll_qudao);
         iv_qudao = (ImageView) findViewById(R.id.iv_qudao);
@@ -89,6 +93,24 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
     private void setListener() {
         ll_qudao.setOnClickListener(this);
         iv_scan.setOnClickListener(this);
+        et_yundanhao.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!TextUtils.isEmpty(s) && s.length() >= GenApi.ScanNumberLeng) {
+                    handlerScanResult(s.toString());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         gv_menu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -263,6 +285,49 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+    //TODO 处理扫描的单号（扫描就选中）
+    private void handlerScanResult(String result) {
+        //TODO 已扫描
+        if (null != listData && listData.size() > 0) {
+            if (result.contains("PPNO")) {
+                //TODO 证明扫描的是包编号
+                for (int i = 0; i < listData.size(); i++) {
+                    if (result.equals(listData.get(i).getBag_lable_code())
+                            && "false".equals(listData.get(i).getIsSelect())) {
+                        listData.get(i).setIsSelect("true");
+                        selectList.add( listData.get(i));
+                        packGoodsCode=result;
+                        break;
+                    } else if (result.equals(listData.get(i).getBag_lable_code())
+                            && "true".equals(listData.get(i).getIsSelect())) {
+
+                        break;
+                    }
+                }
+                fs_listView.setContentData(listData);
+            } else {
+                //TODO 扫描的是子单号
+                for (int i = 0; i < listData.size(); i++) {
+                    if (null != listData.get(i).getCn_list() && listData.get(i).getCn_list().size() > 0) {
+                        for (int j = 0; j < listData.get(i).getCn_list().size(); j++) {
+                            if (result.equals(listData.get(i).getCn_list().get(j).getShipper_hawbcode())
+                                    && "false".equals(listData.get(i).getCn_list().get(j).getIsSelect())) {
+                                listData.get(i).getCn_list().get(j).setIsSelect("true");
+                                listData.get(i).getCn_list().get(j).setOrder_status("选中");
+                                packGoodsexpressCode=result;
+                                break;
+                            } else if (result.equals(listData.get(i).getCn_list().get(j).getShipper_hawbcode())
+                                    && "true".equals(listData.get(i).getCn_list().get(j).getIsSelect())) {
+
+                                break;
+                            }
+                        }
+                    }
+                }
+                fs_listView.setContentData(listData);
+            }
+        }
+    }
     //TODO 获取打包界面初始化数据
     private void getDepltList() {
         showWaiting(true);

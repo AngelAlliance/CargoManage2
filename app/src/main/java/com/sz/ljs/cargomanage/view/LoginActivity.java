@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -219,8 +220,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 list.add(permissionEntity);
             }
             UserModel.getInstance().setPermission(list);
+            UserModel.getInstance().setLocalSaveUserNo(et_workNum.getText().toString().trim());
+            UserModel.getInstance().setLocalSavePassword(et_password.getText().toString().trim());
             ApiTimestampToken.setToken(dataEntity.getTokenModel().getToken());
             ApiTimestampToken.setUserID(dataEntity.getUserModel().getSt_id());
+//            Log.i("登录成功后","userNo="+UserModel.getInstance().getLocalSaveUserNo()+" ;password="+UserModel.getInstance().getLocalSavePassword());
             goHome();
         }
     }

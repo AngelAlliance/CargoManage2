@@ -62,10 +62,10 @@ public class MainActivity extends BaseActivity {
 
     private void initData() {
         getScanNumberLeng();
-        //TODO 启动扫描服务
-        Intent newIntent = new Intent(MainActivity.this, ScanService.class);
-        newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startService(newIntent);
+//        //TODO 启动扫描服务
+//        Intent newIntent = new Intent(MainActivity.this, ScanService.class);
+//        newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startService(newIntent);
     }
 
     private void setListener() {
@@ -130,13 +130,13 @@ public class MainActivity extends BaseActivity {
         switch (type) {
             case 0: {
                 homeMenuList.add(new HomeMenuModel(0, getResources().getString(R.string.str_yh), R.mipmap.icon_yanhuo));
-                homeMenuList.add(new HomeMenuModel(1, getResources().getString(R.string.str_rk), R.mipmap.common_lading_live1));
+                homeMenuList.add(new HomeMenuModel(1, getResources().getString(R.string.str_rk), R.mipmap.icon_ruku));
                 homeMenuList.add(new HomeMenuModel(2, getResources().getString(R.string.str_db), R.mipmap.icon_packgoods));
                 homeMenuList.add(new HomeMenuModel(3, getResources().getString(R.string.str_ck), R.mipmap.icon_chuku));
                 homeMenuList.add(new HomeMenuModel(4, getResources().getString(R.string.str_pk), R.mipmap.icon_panku));
                 homeMenuList.add(new HomeMenuModel(5, getResources().getString(R.string.str_djsm), R.mipmap.icon_daojiansaomiao));
                 homeMenuList.add(new HomeMenuModel(6, getResources().getString(R.string.str_bdbq), R.mipmap.icon_budabiaoqian));
-                homeMenuList.add(new HomeMenuModel(7, getResources().getString(R.string.str_sz), R.mipmap.common_lading_live1));
+                homeMenuList.add(new HomeMenuModel(7, getResources().getString(R.string.str_sz), R.mipmap.icon_setting));
             }
             break;
         }

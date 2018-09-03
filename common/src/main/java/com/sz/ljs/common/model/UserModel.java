@@ -35,6 +35,8 @@ public class UserModel {
         og_shortcode = "";
         og_cityenname = "";
         tokenModel = null;
+        LocalSaveUserNo = null; //保存在本地用于自动登录的用户名
+        LocalSavePassword = null; //保存在本地用用户知道登录的密码
         permission.clear();
     }
 
@@ -72,6 +74,8 @@ public class UserModel {
     private String og_cityenname;
     private TokenModelEntity tokenModel;
     private List<PermissionEntity> permission;
+    private String LocalSaveUserNo; //保存在本地用于自动登录的用户名
+    private String LocalSavePassword; //保存在本地用用户知道登录的密码
 
     public Object getAuthentication_code() {
         return authentication_code;
@@ -207,6 +211,22 @@ public class UserModel {
 
     public void setPermission(List<PermissionEntity> permission) {
         this.permission = permission;
+    }
+
+    public String getLocalSaveUserNo() {
+        return LocalSaveUserNo;
+    }
+
+    public void setLocalSaveUserNo(String localSaveUserNo) {
+        LocalSaveUserNo = localSaveUserNo;
+    }
+
+    public String getLocalSavePassword() {
+        return LocalSavePassword;
+    }
+
+    public void setLocalSavePassword(String localSavePassword) {
+        LocalSavePassword = localSavePassword;
     }
 
     public static class TokenModelEntity {

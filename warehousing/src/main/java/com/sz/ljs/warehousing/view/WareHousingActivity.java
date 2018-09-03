@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -56,11 +57,11 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
 
     private ImageView iv_yubaokehu, iv_scan, iv_mudiguojia, iv_xiaoshouchanpin;
     private EditText et_yundanhao, et_kehucankaodanhao, et_shizhong, et_chang, et_kuan, et_gao, et_jianshu, et_khdaimabiaoji;
-    private TextView et_mudiguojia, et_xiaoshouchanpin, et_kehudaima, tv_jianshu, et_daohuozongdan,et_daohuozongdan1;
+    private TextView et_mudiguojia, et_xiaoshouchanpin, et_kehudaima, tv_jianshu, et_daohuozongdan, et_daohuozongdan1;
     private LinearLayout ll_mudiguojia, ll_xiaoshouchanpin, ll_duojian, ll_jianshu, ll_changkuangao;
     private Button btn_qianru, btn_fujiafuwu;
     private String countryCode;//国家简码
-    private boolean isYuBaoKeHu = false; //是否预报客户
+    private boolean isYuBaoKeHu = true; //是否预报客户
     private int customerId; //客户id
     private WarehouPresenter mPresenter;
     private WaitingDialog mWaitingDialog;
@@ -80,6 +81,8 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //让布局向上移来显示软键盘
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.acivity_warehousing);
         initView();
         setListener();
@@ -253,21 +256,15 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         } else if (id == R.id.ll_xiaoshouchanpin) {
             //TODO 销售产品
             if (TextUtils.isEmpty(et_mudiguojia.getText().toString())) {
-                alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                        .setTitle(getResources().getString(R.string.str_alter))
-                        .setMsg("请先选择目的国家")
-                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                            }
-                        });
-                alertDialog.show();
+                showTipeDialog("请先选择目的国家");
                 return;
             }
             getProduct();
         } else if (id == R.id.ll_duojian) {
             //TODO 多件
+            if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
+                return;
+            }
             Intent intent = new Intent(WareHousingActivity.this, AddSubunitActivity.class);
             if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
                 intent.putExtra("pice", 0);
@@ -294,17 +291,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         && !TextUtils.isEmpty(et_kuan.getText().toString().trim()) && !TextUtils.isEmpty(et_gao.getText().toString().trim())) {
                     calculationVolumeWeight(et_shizhong.getText().toString().trim(), et_chang.getText().toString().trim(), et_kuan.getText().toString().trim(), et_gao.getText().toString().trim());
                 } else {
-                    alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                            .setTitle(getResources().getString(R.string.str_alter))
-                            .setMsg("长宽高不能为空")
-                            .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-
-                                }
-                            });
-                    alertDialog.show();
-//                    Utils.showToast(getBaseActivity(),"");
+                    showTipeDialog("长宽高不能为空");
                 }
             } else {
                 chenckIn();
@@ -312,9 +299,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         } else if (id == R.id.btn_fujiafuwu) {
             //TODO 附加服务
             Intent intent = new Intent(WareHousingActivity.this, AddServiceActivity.class);
-            if (null!=orderModel&&null != orderModel.getData() && null != orderModel.getData().getExtraservice() && orderModel.getData().getExtraservice().size() > 0) {
+            if (null != serviceList && serviceList.size() > 0) {
                 //TODO 订单中带有服务的，
-                intent.putExtra("pice", orderModel.getData().getExtraservice().size());
+                intent.putExtra("pice", serviceList.size());
             } else {
                 intent.putExtra("pice", 1);
             }
@@ -332,8 +319,8 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         } else if (id == R.id.et_kehudaima) {
             //TODO 客户代码
 //            if (false == isYuBaoKeHu) {
-                //TODO 如果不是预报客户，点击跳转到客户检索界面
-                startActivityForResult(new Intent(WareHousingActivity.this, CustomerRetrievalActivity.class), 1002);
+            //TODO 如果不是预报客户，点击跳转到客户检索界面
+            startActivityForResult(new Intent(WareHousingActivity.this, CustomerRetrievalActivity.class), 1002);
 //            }
         }
     }
@@ -349,20 +336,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 .subscribe(new Consumer<CalculationVolumeWeightModel>() {
                     @Override
                     public void accept(CalculationVolumeWeightModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                        }
-                                    });
-                            alertDialog.show();
-//                            Utils.showToast(WareHousingActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
+                        if (1 == result.getCode()) {
                             showWaiting(false);
                             SubnitModel model = new SubnitModel();
                             if (null != result.getData() && null != result.getData().getLstCargoVolume()) {
@@ -370,6 +344,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                             }
                             subnitList.add(model);
                             chenckIn();
+                        } else {
+                            showWaiting(false);
+                            showTipeDialog(result.getMsg());
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -377,166 +354,54 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     public void accept(Throwable throwable) throws Exception {
                         showWaiting(false);
                         //获取失败，提示
-                        alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                    }
-                                });
-                        alertDialog.show();
-//                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                        showTipeDialog(getResources().getString(R.string.str_qqsb));
                     }
                 });
     }
 
-    ;
-
     //TODO 入库
     private void chenckIn() {
         if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
-            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                    .setTitle(getResources().getString(R.string.str_alter))
-                    .setMsg("运单号不能为空")
-                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                        }
-                    });
-            alertDialog.show();
-//            Utils.showToast(getBaseActivity(),"运单号不能为空");
+            showTipeDialog("运单号不能为空");
             return;
         }
         if (TextUtils.isEmpty(et_kehudaima.getText().toString().trim())) {
-            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                    .setTitle(getResources().getString(R.string.str_alter))
-                    .setMsg("客户代码不能为空")
-                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                        }
-                    });
-            alertDialog.show();
-//            Utils.showToast(getBaseActivity(),"客户代码不能为空");
+            showTipeDialog("客户代码不能为空");
             return;
         }
-        if (TextUtils.isEmpty(et_kehucankaodanhao.getText().toString().trim())) {
-            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                    .setTitle(getResources().getString(R.string.str_alter))
-                    .setMsg("客户参考单号不能为空")
-                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                        }
-                    });
-            alertDialog.show();
-//            Utils.showToast(getBaseActivity(),"客户参考单号不能为空");
-            return;
-        }
+//        if (TextUtils.isEmpty(et_kehucankaodanhao.getText().toString().trim())) {
+//            showTipeDialog("客户参考单号不能为空");
+//            return;
+//        }
         if (TextUtils.isEmpty(et_mudiguojia.getText().toString().trim())) {
-            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                    .setTitle(getResources().getString(R.string.str_alter))
-                    .setMsg("目的国家不能为空")
-                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                        }
-                    });
-            alertDialog.show();
-//            Utils.showToast(getBaseActivity(),"目的国家不能为空");
+            showTipeDialog("目的国家不能为空");
             return;
         }
         if (TextUtils.isEmpty(et_xiaoshouchanpin.getText().toString().trim())) {
-            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                    .setTitle(getResources().getString(R.string.str_alter))
-                    .setMsg("销售产品不能为空")
-                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                        }
-                    });
-            alertDialog.show();
-//            Utils.showToast(getBaseActivity(),"销售产品不能为空");
+            showTipeDialog("销售产品不能为空");
             return;
         }
         if (TextUtils.isEmpty(et_shizhong.getText().toString().trim())) {
-            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                    .setTitle(getResources().getString(R.string.str_alter))
-                    .setMsg("实重不能为空")
-                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                        }
-                    });
-            alertDialog.show();
-//            Utils.showToast(getBaseActivity(),"实重不能为空");
+            showTipeDialog("实重不能为空");
             return;
         }
         if (1 == pice) {
             //TODO 只有一件
             if (TextUtils.isEmpty(et_chang.getText().toString().trim())) {
-                alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                        .setTitle(getResources().getString(R.string.str_alter))
-                        .setMsg("长度不能为空")
-                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                            }
-                        });
-                alertDialog.show();
-//                Utils.showToast(getBaseActivity(),"长度不能为空");
+                showTipeDialog("长度不能为空");
                 return;
             }
             if (TextUtils.isEmpty(et_kuan.getText().toString().trim())) {
-                alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                        .setTitle(getResources().getString(R.string.str_alter))
-                        .setMsg("宽度不能为空")
-                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                            }
-                        });
-                alertDialog.show();
-//                Utils.showToast(getBaseActivity(),"宽度不能为空");
+                showTipeDialog("宽度不能为空");
                 return;
             }
             if (TextUtils.isEmpty(et_gao.getText().toString().trim())) {
-                alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                        .setTitle(getResources().getString(R.string.str_alter))
-                        .setMsg("高度不能为空")
-                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                            }
-                        });
-                alertDialog.show();
-//                Utils.showToast(getBaseActivity(),"高度不能为空");
+                showTipeDialog("高度不能为空");
                 return;
             }
         } else {
             if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
-                alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                        .setTitle(getResources().getString(R.string.str_alter))
-                        .setMsg("件数不能为空")
-                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                            }
-                        });
-                alertDialog.show();
-//                Utils.showToast(getBaseActivity(),"件数不能为空");
+                showTipeDialog("件数不能为空");
                 return;
             }
         }
@@ -608,36 +473,25 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 .subscribe(new Consumer<ChenckInModel>() {
                     @Override
                     public void accept(ChenckInModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                        }
-                                    });
-                            alertDialog.show();
-//                            Utils.showToast(WareHousingActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
+                        if (1 == result.getCode()) {
                             showWaiting(false);
                             alertDialog = new AlertDialog(WareHousingActivity.this).builder()
                                     .setTitle("入库成功")
-                                    .setMsg("运单号："+et_yundanhao.getText().toString().trim()+"\n"+"渠道名称:"+result.getData().getServer_code())
+                                    .setMsg("运单号：" + et_yundanhao.getText().toString().trim() + "\n" + "渠道名称:" + result.getData().getServer_code())
                                     .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
                                             WareHouSingModel.getInstance().release(); //情况入库缓存
                                             clean(true);
-                                            isWenTiDan=false;
-                                            isYuBaoKeHu=false;
-                                            iv_yubaokehu.setImageResource(R.mipmap.fb_b);
+                                            isWenTiDan = false;
+                                            isYuBaoKeHu = true;
+                                            iv_yubaokehu.setImageResource(R.mipmap.fb_g);
                                         }
                                     });
                             alertDialog.show();
-//                            Utils.showToast(WareHousingActivity.this, result.getMsg());
+                        } else {
+                            showWaiting(false);
+                            showTipeDialog(result.getMsg());
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -645,17 +499,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     public void accept(Throwable throwable) throws Exception {
                         showWaiting(false);
                         //获取失败，提示
-                        alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                    }
-                                });
-                        alertDialog.show();
-//                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                        showTipeDialog(getResources().getString(R.string.str_qqsb));
                     }
                 });
     }
@@ -670,19 +514,11 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 .subscribe(new Consumer<OrderModel>() {
                     @Override
                     public void accept(OrderModel result) throws Exception {
-                        if (0 == result.getCode()) {
+                        if (1 == result.getCode()) {
                             showWaiting(false);
-                            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                        }
-                                    });
-                            alertDialog.show();
-//                            Utils.showToast(WareHousingActivity.this, result.getMsg());
+                            handelOrderResult(result);
+                        } else {
+                            showWaiting(false);
                             if ("没有数据".equals(result.getMsg())) {
                                 //TODO 没有返回订单详情的时候
                                 isWenTiDan = true;
@@ -697,9 +533,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                                 btn_fujiafuwu.setClickable(false);
                                 btn_qianru.setClickable(false);
                             }
-                        } else if (1 == result.getCode()) {
-                            showWaiting(false);
-                            handelOrderResult(result);
+                            showTipeDialog(result.getMsg());
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -707,17 +541,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     public void accept(Throwable throwable) throws Exception {
                         showWaiting(false);
                         //获取失败，提示
-                        alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                    }
-                                });
-                        alertDialog.show();
-//                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                        showTipeDialog(getResources().getString(R.string.str_qqsb));
                     }
                 });
     }
@@ -753,7 +577,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 et_mudiguojia.setText(result.getData().getCountry_code());
             }
             if (!TextUtils.isEmpty(result.getData().getProduct_cnname())) {
-                productModel=new ProductModel.DataEntity();
+                productModel = new ProductModel.DataEntity();
                 productModel.setProduct_code(result.getData().getProduct_code());
                 productModel.setProduct_cnname(result.getData().getProduct_cnname());
                 et_xiaoshouchanpin.setText(result.getData().getProduct_cnname());
@@ -761,6 +585,14 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
 
             if (null != orderModel.getData() && null != orderModel.getData().getExtraservice() && orderModel.getData().getExtraservice().size() > 0) {
                 WareHouSingModel.getInstance().setExtrasList(orderModel.getData().getExtraservice());
+                serviceList.clear();
+                for (int i = 0; i < orderModel.getData().getExtraservice().size(); i++) {
+                    ServiceModel models = new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
+                            , "", Double.valueOf(orderModel.getData().getExtraservice().get(i).getExtra_servicevalue())
+                            , orderModel.getData().getExtraservice().get(i).getExtra_servicecode(),orderModel.getData().getExtraservice().get(i).getExtra_service_cnname(), "");
+                    serviceList.add(models);
+                }
+                WareHouSingModel.getInstance().setServiceModelList(serviceList);
             }
             if (1 == Integer.parseInt(result.getData().getOrder_pieces())) {
                 tv_jianshu.setText("1");
@@ -805,20 +637,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 .subscribe(new Consumer<SelectCurrentDayBatchModel>() {
                     @Override
                     public void accept(SelectCurrentDayBatchModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                        }
-                                    });
-                            alertDialog.show();
-//                            Utils.showToast(WareHousingActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
+                        if (1 == result.getCode()) {
                             showWaiting(false);
                             if (null != result.getData()) {
                                 if (null == selectCurrentDayBatchEntity) {
@@ -828,6 +647,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                                 et_daohuozongdan.setText("总单号：" + result.getData().getArrivalbatch_labelcode());
                                 et_daohuozongdan1.setText("到货时间：" + result.getData().getArrival_date());
                             }
+                        } else {
+                            showWaiting(false);
+                            showTipeDialog(result.getMsg());
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -835,17 +657,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     public void accept(Throwable throwable) throws Exception {
                         showWaiting(false);
                         //获取失败，提示
-                        alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                    }
-                                });
-                        alertDialog.show();
-//                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                        showTipeDialog(getResources().getString(R.string.str_qqsb));
                     }
                 });
     }
@@ -860,20 +672,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 .subscribe(new Consumer<CountryModel>() {
                     @Override
                     public void accept(CountryModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                        }
-                                    });
-                            alertDialog.show();
-//                            Utils.showToast(WareHousingActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
+                        if (1 == result.getCode()) {
                             showWaiting(false);
                             if (null != result.getData() && result.getData().size() > 0) {
                                 countryList.clear();
@@ -890,9 +689,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                                         .setCallBackListener(new ListDialog.CallBackListener() {
                                             @Override
                                             public void Result(int position, String name) {
-                                                    countryModel = new CountryModel.DataEntity();
-                                                for (CountryModel.DataEntity mode:countryList){
-                                                    if(name.equals(mode.getCountry_cnname())){
+                                                countryModel = new CountryModel.DataEntity();
+                                                for (CountryModel.DataEntity mode : countryList) {
+                                                    if (name.equals(mode.getCountry_cnname())) {
                                                         countryModel = mode;
                                                         et_mudiguojia.setText(mode.getCountry_code() + "-" + mode.getCountry_cnname());
                                                         break;
@@ -903,6 +702,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                                         });
                                 dialog.show();
                             }
+                        } else {
+                            showWaiting(false);
+                            showTipeDialog(result.getMsg());
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -910,17 +712,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     public void accept(Throwable throwable) throws Exception {
                         showWaiting(false);
                         //获取失败，提示
-                        alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                    }
-                                });
-                        alertDialog.show();
-//                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
+                        showTipeDialog(getResources().getString(R.string.str_qqsb));
                     }
                 });
     }
@@ -935,10 +727,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 .subscribe(new Consumer<ProductModel>() {
                     @Override
                     public void accept(ProductModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            showWaiting(false);
-                            Utils.showToast(WareHousingActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
+                        if (1 == result.getCode()) {
                             showWaiting(false);
                             if (null != result.getData() && result.getData().size() > 0) {
                                 productList.clear();
@@ -959,10 +748,10 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                                                 if (null == productModel) {
                                                     productModel = new ProductModel.DataEntity();
                                                 }
-                                                for (ProductModel.DataEntity model:productList){
-                                                    if(name.equals(model.getProduct_cnname())){
+                                                for (ProductModel.DataEntity model : productList) {
+                                                    if (name.equals(model.getProduct_cnname())) {
                                                         et_xiaoshouchanpin.setText(model.getProduct_cnname());
-                                                        productModel =model;
+                                                        productModel = model;
                                                     }
                                                 }
                                                 dialog.dismiss();
@@ -970,6 +759,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                                         });
                                 dialog.show();
                             }
+                        } else {
+                            showWaiting(false);
+                            showTipeDialog(result.getMsg());
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -977,16 +769,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     public void accept(Throwable throwable) throws Exception {
                         showWaiting(false);
                         //获取失败，提示
-                        alertDialog = new AlertDialog(WareHousingActivity.this).builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                    }
-                                });
-                        alertDialog.show();
+                        showTipeDialog(getResources().getString(R.string.str_qqsb));
 //                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
                     }
                 });
@@ -1061,5 +844,24 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         if (null != mWaitingDialog) {
             mWaitingDialog.showDialog(isShow);
         }
+    }
+
+    private void showTipeDialog(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog = new AlertDialog(WareHousingActivity.this).builder()
+                        .setTitle(getResources().getString(R.string.str_alter))
+                        .setMsg(msg)
+                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dissmiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
+
     }
 }

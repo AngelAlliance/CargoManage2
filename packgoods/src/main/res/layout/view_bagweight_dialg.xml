@@ -6,7 +6,7 @@
 
     <RelativeLayout
         android:layout_width="300dp"
-        android:layout_height="400dp"
+        android:layout_height="420dp"
         android:layout_centerInParent="true"
         android:background="@android:color/transparent"
         android:orientation="vertical">
@@ -37,7 +37,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_below="@+id/rl_title"
-            android:layout_above="@+id/ll_anniu"
+            android:layout_above="@+id/tv_tishi"
             android:background="@color/secondary_color_ffffff"
             >
             <!--包编号-->
@@ -282,11 +282,24 @@
 
 
 
+        <TextView
+            android:id="@+id/tv_tishi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_above="@+id/ll_anniu"
+            android:textSize="@dimen/majority_text"
+            android:textColor="@color/secondary_color_999999"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:background="@color/secondary_color_ffffff"
+            android:text="温馨提示：长宽高为必填，如需拆包用0代替"/>
         <LinearLayout
             android:id="@+id/ll_anniu"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:layout_alignParentBottom="true"
+            android:gravity="top"
             android:orientation="horizontal">
 
             <Button
@@ -296,10 +309,14 @@
                 android:layout_alignParentBottom="true"
                 android:layout_weight="1"
                 android:background="@drawable/bagweight_dialog_left_btn_bg"
-                android:orientation="horizontal"
                 android:text="取消"
                 android:textColor="@color/secondary_color_ffffff"
                 android:textSize="@dimen/majority_text" />
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:background="@color/secondary_color_ffffff"/>
 
             <Button
                 android:id="@+id/bt_queding"
@@ -308,7 +325,6 @@
                 android:layout_alignParentBottom="true"
                 android:layout_weight="1"
                 android:background="@drawable/bagweight_dialog_right_btn_bg"
-                android:orientation="horizontal"
                 android:text="确定"
                 android:textColor="@color/secondary_color_ffffff"
                 android:textSize="@dimen/majority_text" />

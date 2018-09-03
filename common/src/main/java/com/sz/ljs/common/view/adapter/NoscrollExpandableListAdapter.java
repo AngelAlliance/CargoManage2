@@ -140,7 +140,7 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
                 hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
             } else  if ("true" == listData.get(groupPosition).getIsSelect()){
-                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_ff0000);
+                hodler.ll_zge.setBackgroundResource(R.drawable.login_edittext2_bg);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
             }else {
                 hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
@@ -156,10 +156,21 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
             hodler.tv_yundanhao.setText("");
             hodler.tv_zidantiaoma.setText("");
             hodler.tv_jianshu.setText("" + listData.get(groupPosition).getBag_pieces());
-            hodler.tv_shizhong.setText(listData.get(groupPosition).getBag_weight() + "KG");
-            hodler.tv_changkuaigao.setText(listData.get(groupPosition).getLength() + "*"
-                    + listData.get(groupPosition).getWidth() + "*"
-                    + listData.get(groupPosition).getHeight());
+            if(TextUtils.isEmpty(listData.get(groupPosition).getWeighing())){
+                hodler.tv_shizhong.setText("");
+            }else{
+                hodler.tv_shizhong.setText(listData.get(groupPosition).getWeighing() + "KG");
+            }
+           if(!TextUtils.isEmpty(listData.get(groupPosition).getLength())
+                   &&!TextUtils.isEmpty(listData.get(groupPosition).getWidth())
+                   &&!TextUtils.isEmpty(listData.get(groupPosition).getHeight())){
+               hodler.tv_changkuaigao.setText(listData.get(groupPosition).getLength() + "*"
+                       + listData.get(groupPosition).getWidth() + "*"
+                       + listData.get(groupPosition).getHeight());
+           }else{
+               hodler.tv_changkuaigao.setText("");
+           }
+
         }
         hodler.ll_ischecked.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,7 +220,7 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
                 hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
             } else if ("true" == listData.get(groupPosition).getCn_list().get(childPosition).getIsSelect()){
-                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_ff0000);
+                hodler.ll_zge.setBackgroundResource(R.drawable.login_edittext2_bg);
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
             }else {
                 hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
@@ -231,10 +242,20 @@ public class NoscrollExpandableListAdapter extends BaseExpandableListAdapter {
             hodler.tv_yundanhao.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getShipper_hawbcode());
             hodler.tv_zidantiaoma.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getChild_number());
             hodler.tv_jianshu.setText("" + listData.get(groupPosition).getCn_list().get(childPosition).getShipper_pieces());
-            hodler.tv_shizhong.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_grossweight() + "KG");
-            hodler.tv_changkuaigao.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_length() + "*"
-                    + listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_width() + "*"
-                    + listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_length());
+            if(TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_grossweight())){
+                hodler.tv_shizhong.setText("");
+            }else{
+                hodler.tv_shizhong.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_grossweight() + "KG");
+            }
+            if(!TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_length())
+                    &&!TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_width())
+                    &&!TextUtils.isEmpty(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_length())){
+                hodler.tv_changkuaigao.setText(listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_length() + "*"
+                        + listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_width() + "*"
+                        + listData.get(groupPosition).getCn_list().get(childPosition).getOutvolume_length());
+            }else{
+                hodler.tv_changkuaigao.setText("");
+            }
         }
         hodler.ll_ischecked.setOnClickListener(new View.OnClickListener() {
             @Override

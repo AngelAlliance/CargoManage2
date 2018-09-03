@@ -12,9 +12,10 @@ public class ServiceModel {
     private String extra_paytype;//默认未空不需要管
     private Double extra_servicevalue; //费用金额
     private String extra_servicecode;//费用代码
+    private String extra_servicecname;//费用中文名字
     private String bs_id;//业务id
 
-    public ServiceModel(int position,String extra_servicecurrency, String extra_createrid, String extra_createdate, String extra_servicenote, String extra_paytype, Double extra_servicevalue, String extra_servicecode, String bs_id) {
+    public ServiceModel(int position,String extra_servicecurrency, String extra_createrid, String extra_createdate, String extra_servicenote, String extra_paytype, Double extra_servicevalue, String extra_servicecode,String extra_servicecname, String bs_id) {
         this.position = position;
         this.extra_servicecurrency = extra_servicecurrency;
         this.extra_createrid = extra_createrid;
@@ -23,6 +24,7 @@ public class ServiceModel {
         this.extra_paytype = extra_paytype;
         this.extra_servicevalue = extra_servicevalue;
         this.extra_servicecode = extra_servicecode;
+        this.extra_servicecname = extra_servicecname;
         this.bs_id = bs_id;
     }
     public int getPosition() {
@@ -98,8 +100,11 @@ public class ServiceModel {
         this.bs_id = bs_id;
     }
 
+    public String getExtra_servicecname() {
+        return extra_servicecname;
+    }
 
-
-
-
+    public void setExtra_servicecname(String extra_servicecname) {
+        this.extra_servicecname = extra_servicecname;
+    }
 }

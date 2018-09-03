@@ -16,6 +16,7 @@ import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -115,6 +116,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //让布局向上移来显示软键盘
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_examine_goods);
         initView();
         initData();
@@ -166,7 +169,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         });
 
         // 设置参数
-        setParam();
+//        setParam();
     }
 
 
@@ -181,8 +184,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() >= GenApi.ScanNumberLeng) {
                     //TODO 当运单号大于8位的时候就开始请求数据
-                    int code = mTts.startSpeaking(s.toString(), mTtsListener);
-                        Log.i("语音播报", "code=" + code);
+//                    int code = mTts.startSpeaking(s.toString(), mTtsListener);
+//                        Log.i("语音播报", "code=" + code);
                     getOrderByNumber();
                 }
             }
@@ -291,8 +294,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 public void onResult(String result) {
                     if (!TextUtils.isEmpty(result)) {
                         et_yundanhao.setText(result);
-                        int code = mTts.startSpeaking(result, mTtsListener);
-                        Log.i("语音播报", "code=" + code);
+//                        int code = mTts.startSpeaking(result, mTtsListener);
+//                        Log.i("语音播报", "code=" + code);
                     }
                 }
             });

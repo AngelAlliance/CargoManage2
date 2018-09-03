@@ -97,7 +97,7 @@ public class ExpressAdapter extends BaseAdapter {
                 hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
             } else  if ("true" == listData.get(position).getIsSelect()){
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_g);
-                hodler.ll_zge.setBackgroundResource(R.color.secondary_color_ff0000);
+                hodler.ll_zge.setBackgroundResource(R.drawable.login_edittext2_bg);
             }else {
                 hodler.iv_ischecked.setImageResource(R.mipmap.fb_b);
                 hodler.ll_zge.setBackgroundResource(R.color.secondary_color_transparent);
@@ -121,12 +121,21 @@ public class ExpressAdapter extends BaseAdapter {
             hodler.tv_yundanhao.setText("" + listData.get(position).getShipper_hawbcode());
             hodler.tv_zidantiaoma.setText("" + listData.get(position).getChild_number());
             hodler.tv_jianshu.setText("" + listData.get(position).getShipper_pieces());
-            hodler.tv_shizhong.setText(listData.get(position).getOutvolume_grossweight() + "KG");
-            hodler.tv_changkuaigao.setText(listData.get(position).getOutvolume_length() + "*"
-                    + listData.get(position).getOutvolume_width() + "*"
-                    + listData.get(position).getOutvolume_length());
-           
 
+            if(TextUtils.isEmpty(listData.get(position).getOutvolume_grossweight())){
+                hodler.tv_shizhong.setText("");
+            }else{
+                hodler.tv_shizhong.setText(listData.get(position).getOutvolume_grossweight() + "KG");
+            }
+            if(!TextUtils.isEmpty(listData.get(position).getOutvolume_length())
+                    &&!TextUtils.isEmpty(listData.get(position).getOutvolume_width())
+                    &&!TextUtils.isEmpty(listData.get(position).getOutvolume_length())){
+                hodler.tv_changkuaigao.setText(listData.get(position).getOutvolume_length() + "*"
+                        + listData.get(position).getOutvolume_width() + "*"
+                        + listData.get(position).getOutvolume_length());
+            }else{
+                hodler.tv_changkuaigao.setText("");
+            }
         }
         hodler.ll_ischecked.setOnClickListener(new View.OnClickListener() {
             @Override

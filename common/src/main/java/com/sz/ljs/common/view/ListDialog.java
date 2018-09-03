@@ -88,11 +88,14 @@ public class ListDialog extends AlertDialog implements View.OnClickListener {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 index = position;
                 if (null != listData && listData.size() > 0) {
-                    for (int i = 0; i < listData.size(); i++) {
-                        listData.get(i).setChecked(false);
+                    if (null != listener) {
+                        listener.Result(index, listData.get(index).getName());
                     }
-                    listData.get(position).setChecked(true);
-                    adapter.notifyDataSetChanged();
+//                    for (int i = 0; i < listData.size(); i++) {
+//                        listData.get(i).setChecked(false);
+//                    }
+//                    listData.get(position).setChecked(true);
+//                    adapter.notifyDataSetChanged();
                 }
             }
         });
@@ -113,10 +116,10 @@ public class ListDialog extends AlertDialog implements View.OnClickListener {
                         //TODO 开始检索
                         if (null != listData && listData.size() > 0 && null != lists && lists.size() > 0) {
                             listData.clear();
-                            for (ListialogModel model:lists){
-                                if(model.getName().contains(s.toString().toUpperCase())
-                                        ||model.getId().contains(s.toString().toUpperCase())
-                                        ||model.getEn_name().contains(s.toString().toUpperCase())){
+                            for (ListialogModel model : lists) {
+                                if (model.getName().contains(s.toString().toUpperCase())
+                                        || model.getId().contains(s.toString().toUpperCase())
+                                        || model.getEn_name().contains(s.toString().toUpperCase())) {
                                     listData.add(model);
                                 }
                             }
@@ -189,7 +192,8 @@ public class ListDialog extends AlertDialog implements View.OnClickListener {
             dismiss();
         } else if (id == R.id.bt_queren) {
             //TODO 确认
-            CallBack();
+//            CallBack();
+            dismiss();
         } else if (id == R.id.iv_clean) {
             //TODO 清空搜索输入框内容
             et_seach.setText("");

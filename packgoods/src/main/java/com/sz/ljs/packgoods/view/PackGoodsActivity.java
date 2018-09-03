@@ -1,7 +1,9 @@
 package com.sz.ljs.packgoods.view;
 
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sz.ljs.base.BaseActivity;
+import com.sz.ljs.common.constant.GenApi;
 import com.sz.ljs.common.model.BaseResultModel;
 import com.sz.ljs.common.model.ExpressModel;
 import com.sz.ljs.common.model.ExpressPackageModel;
@@ -116,7 +119,24 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         iv_scan.setOnClickListener(this);
         btn_daichuhuo.setOnClickListener(this);
         btn_yisaomiaobao.setOnClickListener(this);
+        et_yundanhao.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!TextUtils.isEmpty(s) && s.length() >= GenApi.ScanNumberLeng) {
+                    handlerScanResult(s.toString());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         //TODO 设置待出运点击勾选按钮监听
         fs_daichuyun_list.setSidesSlidNoGroupCheckListener(new FourSidesSlidingListView.SidesSlidNoGroupCheckListener() {
             @Override
@@ -423,6 +443,68 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+    //TODO 处理扫描的单号（扫描就选中）
+    private void handlerScanResult(String result) {
+        if (getResources().getString(R.string.str_tmbh).equals(tv_yundanhao.getText().toString().trim())) {
+            //TODO 待出运
+            if (null != danChuYunlistData && danChuYunlistData.size() > 0) {
+                for (int i = 0; i < danChuYunlistData.size(); i++) {
+                    if (result.equals(danChuYunlistData.get(i).getShipper_hawbcode())
+                            && "false".equals(danChuYunlistData.get(i).getIsSelect())) {
+                        danChuYunlistData.get(i).setIsSelect("true");
+                        danChuYunlistData.get(i).setOrder_status("选中");
+                        break;
+                    } else if (result.equals(danChuYunlistData.get(i).getShipper_hawbcode())
+                            && "true".equals(danChuYunlistData.get(i).getIsSelect())) {
+
+                        break;
+                    }
+                }
+                fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
+            }
+        } else if (getResources().getString(R.string.str_ydh).equals(tv_yundanhao.getText().toString().trim())) {
+            //TODO 已扫描
+            if (null != yiSaoMiaolistData && yiSaoMiaolistData.size() > 0) {
+                if (result.contains("PPNO")) {
+                    //TODO 证明扫描的是包编号
+                    for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
+                        if (result.equals(yiSaoMiaolistData.get(i).getBag_lable_code())
+                                && "false".equals(yiSaoMiaolistData.get(i).getIsSelect())) {
+                            yiSaoMiaolistData.get(i).setIsSelect("true");
+                            packGoodsCode = result;
+                            break;
+                        } else if (result.equals(yiSaoMiaolistData.get(i).getBag_lable_code())
+                                && "true".equals(yiSaoMiaolistData.get(i).getIsSelect())) {
+
+                            break;
+                        }
+                    }
+                    fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
+                } else {
+                    //TODO 扫描的是子单号
+                    for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
+                        if (null != yiSaoMiaolistData.get(i).getCn_list() && yiSaoMiaolistData.get(i).getCn_list().size() > 0) {
+                            for (int j = 0; j < yiSaoMiaolistData.get(i).getCn_list().size(); j++) {
+                                if (result.equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getShipper_hawbcode())
+                                        && "false".equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect())) {
+                                    packGoodsexpressCode = result;
+                                    yiSaoMiaolistData.get(i).getCn_list().get(j).setIsSelect("true");
+                                    yiSaoMiaolistData.get(i).getCn_list().get(j).setOrder_status("选中");
+                                    break;
+                                } else if (result.equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getShipper_hawbcode())
+                                        && "true".equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect())) {
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
+                }
+            }
+        }
+    }
+
     //TODO 开始执行打包方法
     private void packageGoods() {
         if (!TextUtils.isEmpty(strExpressCode)) {
@@ -447,9 +529,9 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     entety.setBs_id(model.getBs_id());
                     entety.setShipper_hawbcode(model.getShipper_hawbcode());
                     entety.setServe_hawbcode(model.getShipper_hawbcode());
-                    if(TextUtils.isEmpty(model.getChild_number())){
+                    if (TextUtils.isEmpty(model.getChild_number())) {
                         entety.setChild_number(model.getShipper_hawbcode());
-                    }else {
+                    } else {
                         entety.setChild_number(model.getChild_number());
                     }
                     entety.setServer_channelid("" + serviceChanneModel.getServer_channelid());
@@ -555,9 +637,9 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     private void chengZhong() {
         showWaiting(true);
         int num = 0;
-        if (null == model) {
-            model = new ExpressPackageModel();
-        }
+//        if (null == model) {
+//            model = new ExpressPackageModel();
+//        }
         for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
             if ("true".equals(yiSaoMiaolistData.get(i).getIsSelect())) {
                 model = yiSaoMiaolistData.get(i);
@@ -597,13 +679,16 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                                     , chang, kuan, gao, dzcWeight, model.getBag_weight());
                         }
                     })
-            .setCallBackQuXiao(new BagWeightDialog.CallBackQuXiao() {
-                @Override
-                public void Onclick() {
-                    showWaiting(false);
-                }
-            });
+                    .setCallBackQuXiao(new BagWeightDialog.CallBackQuXiao() {
+                        @Override
+                        public void Onclick() {
+                            showWaiting(false);
+                        }
+                    });
             bagWeightDialog.show();
+        }else {
+            showWaiting(false);
+            showTipeDialog("请选择要称重的包");
         }
     }
 
@@ -1128,4 +1213,23 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+    private void showTipeDialog(final String msg){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog = new AlertDialog(PackGoodsActivity.this)
+                        .builder()
+                        .setTitle(getResources().getString(R.string.str_alter))
+                        .setMsg(msg)
+                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dissmiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
+
+    }
 }
