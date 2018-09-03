@@ -32,9 +32,11 @@ import com.sz.ljs.packgoods.R;
 import com.sz.ljs.common.adapter.MenuAdapter;
 import com.sz.ljs.common.model.MenuModel;
 import com.sz.ljs.common.model.GsonDepltListModel;
+import com.sz.ljs.packgoods.contract.PackgoodsContract;
 import com.sz.ljs.packgoods.model.BagPutBusinessReqModel;
 import com.sz.ljs.packgoods.model.GsonAddBussinessPackageModel;
 import com.sz.ljs.packgoods.model.GsonServiceChannelModel;
+import com.sz.ljs.packgoods.model.PackGoodsModel;
 import com.sz.ljs.packgoods.model.PackGoodsRequestBsListMode;
 import com.sz.ljs.packgoods.presenter.PackgoodsPresenter;
 import com.trello.rxlifecycle2.android.ActivityEvent;
@@ -52,7 +54,7 @@ import io.reactivex.schedulers.Schedulers;
  * 打包界面
  */
 
-public class PackGoodsActivity extends BaseActivity implements View.OnClickListener {
+public class PackGoodsActivity extends BaseActivity implements View.OnClickListener,PackgoodsContract.View {
     private EditText et_yundanhao;
     private TextView tv_yundanhao, et_qudao;
     private LinearLayout ll_qudao, ll_daichuyun, ll_yisaomiao;
@@ -92,7 +94,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
 
     private void initView() {
         waitingDialog = new WaitingDialog(this);
-        mPresnter = new PackgoodsPresenter();
+        mPresnter = new PackgoodsPresenter(this);
         setDaiChuYunMenu();
         setYiSaoMiaoMenu();
         getDaiChuYunHeaderData();
@@ -258,8 +260,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                                     public void onClick(View v) {
                                         if (null != v.getTag()) {
                                             strExpressCode = (String) v.getTag();
-                                            packageGoods();
                                             alertDialog.dissmiss();
+                                            packageGoods();
                                         } else {
 
                                         }
@@ -450,7 +452,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
             if (null != danChuYunlistData && danChuYunlistData.size() > 0) {
                 for (int i = 0; i < danChuYunlistData.size(); i++) {
                     if (result.equals(danChuYunlistData.get(i).getShipper_hawbcode())
-                            && "false".equals(danChuYunlistData.get(i).getIsSelect())) {
+                            && ("false".equals(danChuYunlistData.get(i).getIsSelect())
+                            ||TextUtils.isEmpty(danChuYunlistData.get(i).getIsSelect()))) {
                         danChuYunlistData.get(i).setIsSelect("true");
                         danChuYunlistData.get(i).setOrder_status("选中");
                         break;
@@ -469,7 +472,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     //TODO 证明扫描的是包编号
                     for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
                         if (result.equals(yiSaoMiaolistData.get(i).getBag_lable_code())
-                                && "false".equals(yiSaoMiaolistData.get(i).getIsSelect())) {
+                                && ("false".equals(yiSaoMiaolistData.get(i).getIsSelect())
+                                ||TextUtils.isEmpty(yiSaoMiaolistData.get(i).getIsSelect()))) {
                             yiSaoMiaolistData.get(i).setIsSelect("true");
                             packGoodsCode = result;
                             break;
@@ -486,7 +490,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         if (null != yiSaoMiaolistData.get(i).getCn_list() && yiSaoMiaolistData.get(i).getCn_list().size() > 0) {
                             for (int j = 0; j < yiSaoMiaolistData.get(i).getCn_list().size(); j++) {
                                 if (result.equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getShipper_hawbcode())
-                                        && "false".equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect())) {
+                                        && ("false".equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect())
+                                        ||TextUtils.isEmpty(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect()))) {
                                     packGoodsexpressCode = result;
                                     yiSaoMiaolistData.get(i).getCn_list().get(j).setIsSelect("true");
                                     yiSaoMiaolistData.get(i).getCn_list().get(j).setOrder_status("选中");
@@ -505,23 +510,120 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    //TODO 开始执行打包方法
+    @Override
+    public void onResult(int Id, String result) {
+        switch (Id){
+            case PackgoodsContract.REQUEST_FAIL_ID:
+                showTipeDialog(result);
+                break;
+            case PackgoodsContract.REQUEST_SUCCESS_ID:
+                //TODO 获取初始化数据
+                //TODO 先把子单数据遍历出来
+                if (null != PackGoodsModel.getInstance().getBaleList() && PackGoodsModel.getInstance().getBaleList().size() > 0) {
+                    danChuYunlistData.clear();
+                    danChuYunlistData.addAll(PackGoodsModel.getInstance().getBaleList());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
+                        }
+                    });
+                }
+                if (null != PackGoodsModel.getInstance().getShppingCnList() && PackGoodsModel.getInstance().getShppingCnList().size() > 0) {
+                    yiSaoMiaolistData.clear();
+                    yiSaoMiaolistData.addAll(PackGoodsModel.getInstance().getShppingCnList());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
+                        }
+                    });
+                }
+                break;
+            case PackgoodsContract.BAG_PUTBUSINESS_SUCCESS:
+                //TODO 把运单从某个包提出
+                getDepltList();
+                break;
+            case PackgoodsContract.BAG_WEIGHING_SUCCESS:
+                //TODO 称量包的重量
+                getDepltList();
+                break;
+            case PackgoodsContract.GET_SERVICECHANNEL_SUCCESS:
+                //TODO 生效渠道
+                if (null != PackGoodsModel.getInstance().getServiceChannelList()
+                        && PackGoodsModel.getInstance().getServiceChannelList().size() > 0) {
+                    serviceChannelList.clear();
+                    serviceChannelList.addAll(PackGoodsModel.getInstance().getServiceChannelList());
+                    final List<ListialogModel> showList = new ArrayList<>();
+                    for (GsonServiceChannelModel.DataBean bean : PackGoodsModel.getInstance().getServiceChannelList()) {
+                        showList.add(new ListialogModel("" + bean.getServer_channelid(), bean.getServer_channel_cnname(), bean.getServer_channel_enname(), false));
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog = new ListDialog(PackGoodsActivity.this, R.style.AlertDialogStyle)
+                                    .creatDialog()
+                                    .setTitle("请选择服务渠道")
+                                    .setSeachEditTextShow(true)
+                                    .setListData(showList)
+                                    .setCallBackListener(new ListDialog.CallBackListener() {
+                                        @Override
+                                        public void Result(int position, String name) {
+                                            for (GsonServiceChannelModel.DataBean bean : serviceChannelList) {
+                                                if (name.equals(bean.getServer_channelid()) ||
+                                                        name.equals(bean.getServer_channel_cnname()) ||
+                                                        name.equals(bean.getServer_channel_enname())) {
+                                                    serviceChanneModel = new GsonServiceChannelModel.DataBean();
+                                                    serviceChanneModel = bean;
+                                                    et_qudao.setText(name);
+                                                    getDepltList();
+                                                    break;
+                                                }
+                                            }
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            dialog.show();
+                        }
+                    });
+                }else {
+                    showTipeDialog("暂无数据");
+                }
+                break;
+            case PackgoodsContract.ADD_BUSSINESSPACKAGE_SUCCESS:
+                //TODO 运单打包
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alertDialog = new AlertDialog(PackGoodsActivity.this)
+                                .builder()
+                                .setTitle(getResources().getString(R.string.str_alter))
+                                .setMsg("打包成功")
+                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        getDepltList();
+                                        alertDialog.dissmiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+                });
+
+                break;
+            case PackgoodsContract.UNPACKING_SUCCESS:
+                //TODO 拆包
+                getDepltList();
+                break;
+        }
+    }
+    //TODO 运单打包 strExpressCode:包的号码 例如：PPNO-9908    og_id:机构id 登陆时返回  server_channelid:服务渠道   list:运单集合
     private void packageGoods() {
         if (!TextUtils.isEmpty(strExpressCode)) {
             if (null == serviceChanneModel) {
-                final AlertDialog dialogs = new AlertDialog(PackGoodsActivity.this)
-                        .builder()
-                        .setTitle(getResources().getString(R.string.str_alter))
-                        .setMsg("服务渠道不能为空")
-                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                            }
-                        });
-                dialogs.show();
+                showTipeDialog("服务渠道不能为空");
                 return;
             }
-            showWaiting(true);
             List<PackGoodsRequestBsListMode> list = new ArrayList<>();
             for (ExpressModel model : danChuYunlistData) {
                 PackGoodsRequestBsListMode entety = new PackGoodsRequestBsListMode();
@@ -553,93 +655,14 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     list.add(entety);
                 }
             }
-            addBussinessPackage(strExpressCode, "" + UserModel.getInstance().getOg_id(), "" + serviceChanneModel.getServer_channelid(), list);
+            mPresnter.addBussinessPackage(strExpressCode, "" + UserModel.getInstance().getOg_id(), "" + serviceChanneModel.getServer_channelid(), list);
         }
     }
 
-    //TODO 运单打包 strExpressCode:包的号码 例如：PPNO-9908    og_id:机构id 登陆时返回  server_channelid:服务渠道   list:运单集合
-    private void addBussinessPackage(String strExpressCode, String og_id
-            , String server_channelid, List<PackGoodsRequestBsListMode> list) {
-        mPresnter.addBussinessPackage(strExpressCode, og_id, server_channelid, list)
-                .compose(this.<GsonAddBussinessPackageModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer<GsonAddBussinessPackageModel>() {
-                    @Override
-                    public void accept(final GsonAddBussinessPackageModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg("打包成功")
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    getDepltList();
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
 
-                        } else {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    getDepltList();
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                        .builder()
-                                        .setTitle(getResources().getString(R.string.str_alter))
-                                        .setMsg(getResources().getString(R.string.str_qqsb))
-                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                alertDialog.dissmiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
-                        });
-                    }
-                });
-    }
-
-    //TODO 开始执行称重
+    //TODO 称量包的重量  strBagCode:包号码   og_id:机构id  strlength:长  strwidth:宽  strheight:高  txtWeight:称重的重量  txtbag_grossweight:包重量
     private void chengZhong() {
-        showWaiting(true);
         int num = 0;
-//        if (null == model) {
-//            model = new ExpressPackageModel();
-//        }
         for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
             if ("true".equals(yiSaoMiaolistData.get(i).getIsSelect())) {
                 model = yiSaoMiaolistData.get(i);
@@ -647,21 +670,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 if (num > 1) {
                     //TODO 点击的只一个包数据，不给拆包，提示用户
                     showWaiting(false);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final AlertDialog dialogs = new AlertDialog(PackGoodsActivity.this)
-                                    .builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg("只能选择一个包裹")
-                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                        }
-                                    });
-                            dialogs.show();
-                        }
-                    });
+                    showTipeDialog("只能选择一个包裹");
                     return;
                 }
             }
@@ -675,108 +684,25 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     .setCallBackListener(new BagWeightDialog.CallBackListener() {
                         @Override
                         public void Result(String dzcWeight, String chang, String kuan, String gao) {
-                            bagWeighing(model.getBag_lable_code(), "" + UserModel.getInstance().getOg_id()
+                            mPresnter.bagWeighing(model.getBag_lable_code(), "" + UserModel.getInstance().getOg_id()
                                     , chang, kuan, gao, dzcWeight, model.getBag_weight());
                         }
                     })
                     .setCallBackQuXiao(new BagWeightDialog.CallBackQuXiao() {
                         @Override
                         public void Onclick() {
-                            showWaiting(false);
+                            bagWeightDialog.dismiss();
                         }
                     });
             bagWeightDialog.show();
         }else {
-            showWaiting(false);
             showTipeDialog("请选择要称重的包");
         }
     }
 
-    //TODO 称量包的重量  strBagCode:包号码   og_id:机构id  strlength:长  strwidth:宽  strheight:高  txtWeight:称重的重量  txtbag_grossweight:包重量
-    private void bagWeighing(String strBagCode, String og_id, String strlength, String strwidth
-            , String strheight, String txtWeight, String txtbag_grossweight) {
-//        showWaiting(true);
-        mPresnter.bagWeighing(strBagCode, og_id, strlength, strwidth, strheight, txtWeight, txtbag_grossweight)
-                .compose(this.<BaseResultModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer<BaseResultModel>() {
-                    @Override
-                    public void accept(final BaseResultModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    getDepltList();
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-
-                        } else {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                        .builder()
-                                        .setTitle(getResources().getString(R.string.str_alter))
-                                        .setMsg(getResources().getString(R.string.str_qqsb))
-                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                alertDialog.dissmiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
-                        });
-
-                    }
-                });
-
-    }
-
-    //TODO 开始执行拆包处理
+    //TODO 拆包  bag_labelcode:包号码  og_id:机构id
     private void chaiBao() {
-        showWaiting(true);
         int num = 0;
-        if (null == model) {
-            model = new ExpressPackageModel();
-        }
         for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
             if ("true".equals(yiSaoMiaolistData.get(i).getIsSelect())) {
                 model = yiSaoMiaolistData.get(i);
@@ -804,105 +730,15 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
             }
         }
         if (null != model) {
-            unpacking(model.getBag_lable_code(), "" + UserModel.getInstance().getOg_id());
+            mPresnter.unpacking(model.getBag_lable_code(), "" + UserModel.getInstance().getOg_id());
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    final AlertDialog dialogs = new AlertDialog(PackGoodsActivity.this)
-                            .builder()
-                            .setTitle(getResources().getString(R.string.str_alter))
-                            .setMsg("请选择要拆包的包裹")
-                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                }
-                            });
-                    dialogs.show();
-                }
-            });
+            showTipeDialog("请选择要拆包的包裹");
         }
     }
 
-    //TODO 拆包  bag_labelcode:包号码  og_id:机构id
-    private void unpacking(String bag_labelcode, String og_id) {
-        showWaiting(true);
-        mPresnter.unpacking(bag_labelcode, og_id)
-                .compose(this.<BaseResultModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer<BaseResultModel>() {
-                    @Override
-                    public void accept(final BaseResultModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    getDepltList();
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
 
-                        } else {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                        .builder()
-                                        .setTitle(getResources().getString(R.string.str_alter))
-                                        .setMsg(getResources().getString(R.string.str_qqsb))
-                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                alertDialog.dissmiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
-                        });
-
-                    }
-                });
-    }
-
-    //TODO 开始执行运单提取处理
+    //TODO 把运单从某个包提出 list:运单的集合
     private void putBusiness() {
-        showWaiting(true);
         List<BagPutBusinessReqModel> list = new ArrayList<>();
         for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
             if (null != yiSaoMiaolistData.get(i).getCn_list() && yiSaoMiaolistData.get(i).getCn_list().size() > 0) {
@@ -940,237 +776,26 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 }
             }
         }
-        bagPutBusiness(list);
+        mPresnter.bagPutBusiness(list);
     }
 
-    //TODO 把运单从某个包提出 list:运单的集合
-    private void bagPutBusiness(List<BagPutBusinessReqModel> list) {
-        mPresnter.bagPutBusiness(list)
-                .compose(this.<BaseResultModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer<BaseResultModel>() {
-                    @Override
-                    public void accept(final BaseResultModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    getDepltList();
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-
-                        } else {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                        .builder()
-                                        .setTitle(getResources().getString(R.string.str_alter))
-                                        .setMsg(getResources().getString(R.string.str_qqsb))
-                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                alertDialog.dissmiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
-                        });
-
-                    }
-                });
-    }
 
     //TODO 查询生效渠道
     private void getServiceChannel() {
-        showWaiting(true);
-        mPresnter.getServiceChannel()
-                .compose(this.<GsonServiceChannelModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer<GsonServiceChannelModel>() {
-                    @Override
-                    public void accept(GsonServiceChannelModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            if (null != result.getData() && result.getData().size() > 0) {
-                                serviceChannelList.clear();
-                                serviceChannelList.addAll(result.getData());
-                                final List<ListialogModel> showList = new ArrayList<>();
-                                for (GsonServiceChannelModel.DataBean bean : result.getData()) {
-                                    showList.add(new ListialogModel("" + bean.getServer_channelid(), bean.getServer_channel_cnname(), bean.getServer_channel_enname(), false));
-                                }
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dialog = new ListDialog(PackGoodsActivity.this, R.style.AlertDialogStyle)
-                                                .creatDialog()
-                                                .setTitle("请选择服务渠道")
-                                                .setSeachEditTextShow(true)
-                                                .setListData(showList)
-                                                .setCallBackListener(new ListDialog.CallBackListener() {
-                                                    @Override
-                                                    public void Result(int position, String name) {
-                                                        for (GsonServiceChannelModel.DataBean bean : serviceChannelList) {
-                                                            if (name.equals(bean.getServer_channelid()) ||
-                                                                    name.equals(bean.getServer_channel_cnname()) ||
-                                                                    name.equals(bean.getServer_channel_enname())) {
-                                                                serviceChanneModel = new GsonServiceChannelModel.DataBean();
-                                                                serviceChanneModel = bean;
-                                                                et_qudao.setText(name);
-                                                                getDepltList();
-                                                                break;
-                                                            }
-                                                        }
-                                                        dialog.dismiss();
-                                                    }
-                                                });
-                                        dialog.show();
-                                    }
-                                });
-
-                            }
-                        } else {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                    .builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dissmiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
+        mPresnter.getServiceChannel();
     }
 
     //TODO 获取打包界面初始化数据
     private void getDepltList() {
-        showWaiting(true);
         String server_id = "";
         String server_channelid = "";
         if (!TextUtils.isEmpty(et_qudao.getText().toString().trim()) && null != serviceChanneModel) {
             server_id = "" + serviceChanneModel.getServer_id();
             server_channelid = "" + serviceChanneModel.getServer_channelid();
         }
-        mPresnter.getDepltList("" + UserModel.getInstance().getOg_id(), server_id, server_channelid)
-                .compose(this.<GsonDepltListModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<GsonDepltListModel>() {
-                    @Override
-                    public void accept(GsonDepltListModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            if (null != result.getData()) {
-                                handDepltListResult(result);
-                            }
-                        } else {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                    .builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dissmiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        alertDialog = new AlertDialog(PackGoodsActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
+        mPresnter.getDepltList("" + UserModel.getInstance().getOg_id(), server_id, server_channelid);
     }
 
-    private void handDepltListResult(GsonDepltListModel result) {
-        //TODO 先把子单数据遍历出来
-        if (null != result.getData().getBaleList() && result.getData().getBaleList().size() > 0) {
-            danChuYunlistData.clear();
-            danChuYunlistData.addAll(result.getData().getBaleList());
-            fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
-        }
-
-        if (null != result.getData().getShppingCnList() && result.getData().getShppingCnList().size() > 0) {
-            yiSaoMiaolistData.clear();
-            yiSaoMiaolistData.addAll(result.getData().getShppingCnList());
-            fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
-        }
-        showWaiting(false);
-    }
 
     //TODO 设置待出运菜单
     private void setDaiChuYunMenu() {
@@ -1207,11 +832,13 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     }
 
 
-    private void showWaiting(boolean isShow) {
+    public void showWaiting(boolean isShow) {
         if (null != waitingDialog) {
             waitingDialog.showDialog(isShow);
         }
     }
+
+
 
     private void showTipeDialog(final String msg){
         runOnUiThread(new Runnable() {
@@ -1221,7 +848,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         .builder()
                         .setTitle(getResources().getString(R.string.str_alter))
                         .setMsg(msg)
-                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
+                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 alertDialog.dissmiss();

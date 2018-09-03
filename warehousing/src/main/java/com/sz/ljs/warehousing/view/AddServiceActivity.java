@@ -303,7 +303,6 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
                         //TODO 表示有此项，则只需要更改相应的参数即可
                         serviceList.get(j).setExtra_servicecode(tv_zfx_code.getText().toString().trim()); //修改杂费项代码
                         serviceList.get(j).setExtra_servicevalue(Double.valueOf(et_feiyong.getText().toString().trim()));
-                        return;
                     }
                 }
             }

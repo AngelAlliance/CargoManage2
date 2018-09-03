@@ -1,7 +1,9 @@
 package com.sz.ljs.shipments.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -19,7 +21,9 @@ import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.TimeUtils;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ListDialog;
+import com.sz.ljs.common.view.TitleView;
 import com.sz.ljs.common.view.WaitingDialog;
+import com.sz.ljs.shipments.contract.ShipmentsContract;
 import com.sz.ljs.shipments.model.GsonOrgServerModel;
 import com.sz.ljs.shipments.model.GsonSaveTransportBatchAndBusinessModel;
 import com.sz.ljs.shipments.model.ShipMentsModel;
@@ -39,11 +43,12 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 //TODO 生成主单界面
-public class ProductionMasterActivity extends BaseActivity implements View.OnClickListener {
+public class ProductionMasterActivity extends BaseActivity implements View.OnClickListener, ShipmentsContract.View {
 
     private TextView tv_fahuozhan, tv_xiayizhan, tv_shouhuofuwushao, tv_fahuoshijian, tv_zongshizhong, tv_piaoshu, tv_zongjianshu;
     private LinearLayout ll_xiayizhan, ll_shouhuofuwushao, ll_fahuoshijian;
     private EditText et_yunshubianhao;
+    private TitleView tv_titles;
     private Button btn_queren, btn_guanbi;
     private ShipmentsPresenter mPresnter;
     private WaitingDialog waitingDialog;
@@ -51,9 +56,9 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
     private ListDialog dialog;
     private List<ExpressPackageModel> selectListData = new ArrayList<>();
     private List<ExpressModel> expressListData = new ArrayList<>();
-    private List<GsonOrgServerModel.DataBean.OrgListBean> orgList=new ArrayList<>();
+    private List<GsonOrgServerModel.DataBean.OrgListBean> orgList = new ArrayList<>();
     private GsonOrgServerModel.DataBean.OrgListBean orgListBean;
-    private List<GsonOrgServerModel.DataBean.ServerListBean> serverList=new ArrayList<>();
+    private List<GsonOrgServerModel.DataBean.ServerListBean> serverList = new ArrayList<>();
     private GsonOrgServerModel.DataBean.ServerListBean serverListBean;
 
 
@@ -67,7 +72,7 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
     }
 
     private void initView() {
-        mPresnter = new ShipmentsPresenter();
+        mPresnter = new ShipmentsPresenter(this);
         waitingDialog = new WaitingDialog(this);
         tv_fahuozhan = (TextView) findViewById(R.id.tv_fahuozhan);
         tv_xiayizhan = (TextView) findViewById(R.id.tv_xiayizhan);
@@ -82,6 +87,7 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
         et_yunshubianhao = (EditText) findViewById(R.id.et_yunshubianhao);
         btn_queren = (Button) findViewById(R.id.btn_queren);
         btn_guanbi = (Button) findViewById(R.id.btn_guanbi);
+        tv_titles = (TitleView) findViewById(R.id.tv_titles);
     }
 
     private void setListener() {
@@ -90,10 +96,17 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
         ll_fahuoshijian.setOnClickListener(this);
         btn_queren.setOnClickListener(this);
         btn_guanbi.setOnClickListener(this);
+        tv_titles.setBackOnclistener(new TitleView.IBackButtonCallBack() {
+            @Override
+            public boolean onClick(View v) {
+                goBack(0);
+                return false;
+            }
+        });
     }
 
     private void initData() {
-        if(!TextUtils.isEmpty(UserModel.getInstance().getOg_cityenname())){
+        if (!TextUtils.isEmpty(UserModel.getInstance().getOg_cityenname())) {
             tv_fahuozhan.setText(UserModel.getInstance().getOg_cityenname());
         }
         tv_fahuoshijian.setText(TimeUtils.getDateTime());
@@ -102,17 +115,17 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
             showWaiting(true);
             tv_piaoshu.setText("" + selectListData.size());
             expressListData.clear();
-            double weight=0;
+            double weight = 0;
             for (int i = 0; i < selectListData.size(); i++) {
-                if(!TextUtils.isEmpty(selectListData.get(i).getBag_weight())){
-                    weight=weight+Double.valueOf(selectListData.get(i).getBag_weight());
+                if (!TextUtils.isEmpty(selectListData.get(i).getBag_weight())) {
+                    weight = weight + Double.valueOf(selectListData.get(i).getBag_weight());
                 }
-                if(null!=selectListData.get(i).getCn_list()&&selectListData.get(i).getCn_list().size()>0){
+                if (null != selectListData.get(i).getCn_list() && selectListData.get(i).getCn_list().size() > 0) {
                     expressListData.addAll(selectListData.get(i).getCn_list());
                 }
             }
             tv_zongjianshu.setText("" + expressListData.size());
-            tv_zongshizhong.setText(weight+"KG");
+            tv_zongshizhong.setText(weight + "KG");
             getOrgServer();
         }
     }
@@ -140,11 +153,11 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
     }
 
     //TODO 选择下一站
-    private void selectXiaYiZhan(){
+    private void selectXiaYiZhan() {
         final List<ListialogModel> showList = new ArrayList<>();
-        if(null!=orgList&&orgList.size()>0){
+        if (null != orgList && orgList.size() > 0) {
             for (GsonOrgServerModel.DataBean.OrgListBean model : orgList) {
-                showList.add(new ListialogModel(""+model.getOg_id(), model.getOg_name(), model.getOg_ename(), false));
+                showList.add(new ListialogModel("" + model.getOg_id(), model.getOg_name(), model.getOg_ename(), false));
             }
             dialog = new ListDialog(ProductionMasterActivity.this, R.style.AlertDialogStyle)
                     .creatDialog()
@@ -155,10 +168,10 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
                         @Override
                         public void Result(int position, String name) {
                             orgListBean = new GsonOrgServerModel.DataBean.OrgListBean();
-                            for (GsonOrgServerModel.DataBean.OrgListBean model : orgList){
-                                if(name.equals(model.getOg_name())){
+                            for (GsonOrgServerModel.DataBean.OrgListBean model : orgList) {
+                                if (name.equals(model.getOg_name())) {
                                     orgListBean = model;
-                                    tv_xiayizhan.setText( model.getOg_name());
+                                    tv_xiayizhan.setText(model.getOg_name());
                                     break;
                                 }
                             }
@@ -169,12 +182,13 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
         }
 
     }
+
     //TODO 选择收货服务商
-    private void selectShouHuoFuWuShang(){
+    private void selectShouHuoFuWuShang() {
         final List<ListialogModel> showList = new ArrayList<>();
-        if(null!=serverList&&serverList.size()>0){
+        if (null != serverList && serverList.size() > 0) {
             for (GsonOrgServerModel.DataBean.ServerListBean model : serverList) {
-                showList.add(new ListialogModel(""+model.getServer_id(), model.getServer_shortname(), model.getServer_code(), false));
+                showList.add(new ListialogModel("" + model.getServer_id(), model.getServer_shortname(), model.getServer_code(), false));
             }
             dialog = new ListDialog(ProductionMasterActivity.this, R.style.AlertDialogStyle)
                     .creatDialog()
@@ -185,10 +199,10 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
                         @Override
                         public void Result(int position, String name) {
                             serverListBean = new GsonOrgServerModel.DataBean.ServerListBean();
-                            for (GsonOrgServerModel.DataBean.ServerListBean model : serverList){
-                                if(name.equals(model.getServer_shortname())){
+                            for (GsonOrgServerModel.DataBean.ServerListBean model : serverList) {
+                                if (name.equals(model.getServer_shortname())) {
                                     serverListBean = model;
-                                    tv_shouhuofuwushao.setText( model.getServer_shortname());
+                                    tv_shouhuofuwushao.setText(model.getServer_shortname());
                                     break;
                                 }
                             }
@@ -200,10 +214,87 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
 
     }
 
+    @Override
+    public void onResult(int Id, final String result) {
+        switch (Id) {
+            case ShipmentsContract.REQUEST_FAIL_ID:
+                showTipeDialog(result);
+                break;
+            case ShipmentsContract.GET_ORG_SERVER_SUCCESS:
+                //TODO 查看收货服务商跟机构
+                if (null != ShipMentsModel.getInstance().getOrg_list() && ShipMentsModel.getInstance().getOrg_list().size() > 0) {
+                    orgList.clear();
+                    orgList.addAll(ShipMentsModel.getInstance().getOrg_list());
+                    for (GsonOrgServerModel.DataBean.OrgListBean model : orgList) {
+                        if (UserModel.getInstance().getOg_cityenname().equals(model.getOg_ename())) {
+                            orgList.remove(model);
+                            break;
+                        }
+                    }
+                }
+
+                if (null != ShipMentsModel.getInstance().getServer_list()
+                        && ShipMentsModel.getInstance().getServer_list().size() > 0) {
+                    serverList.clear();
+                    serverList.addAll(ShipMentsModel.getInstance().getServer_list());
+                }
+                break;
+            case ShipmentsContract.SAVE_TRANSPORTBATCH_AND_BUSINESS_SUCCESS:
+                //TODO 出库生成主单
+                if (null != ShipMentsModel.getInstance().getBusinessDataBean()
+                        && null != ShipMentsModel.getInstance().getBusinessDataBean().getTransportBatchResult()) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                                    .builder()
+                                    .setTitle(getResources().getString(R.string.str_alter))
+                                    .setMsg(result + "\n" + getResources().getString(R.string.str_ysbh) + ":"
+                                            + ShipMentsModel.getInstance().getBusinessDataBean().getTransportBatchResult().getTra_batch_code())
+                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            alertDialog.dissmiss();
+                                            goBack(1);
+                                        }
+                                    });
+                            alertDialog.show();
+                        }
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                                    .builder()
+                                    .setTitle(getResources().getString(R.string.str_alter))
+                                    .setMsg(result)
+                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            alertDialog.dissmiss();
+                                            goBack(1);
+                                        }
+                                    });
+                            alertDialog.show();
+                        }
+                    });
+                }
+                break;
+        }
+    }
+
+    private void goBack(int type) {
+        Intent intent = new Intent();
+        intent.putExtra("type", type);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
     //TODO 生成主单
-    private void saveTransportBatchAndBusiness(){
+    private void saveTransportBatchAndBusiness() {
         showWaiting(true);
-        if(TextUtils.isEmpty(tv_xiayizhan.getText().toString())){
+        if (TextUtils.isEmpty(tv_xiayizhan.getText().toString())) {
             showWaiting(false);
             runOnUiThread(new Runnable() {
                 @Override
@@ -223,7 +314,7 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
             });
             return;
         }
-        if(TextUtils.isEmpty(tv_shouhuofuwushao.getText().toString())){
+        if (TextUtils.isEmpty(tv_shouhuofuwushao.getText().toString())) {
             showWaiting(false);
             runOnUiThread(new Runnable() {
                 @Override
@@ -243,7 +334,7 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
             });
             return;
         }
-        if(TextUtils.isEmpty(tv_fahuoshijian.getText().toString())){
+        if (TextUtils.isEmpty(tv_fahuoshijian.getText().toString())) {
             showWaiting(false);
             runOnUiThread(new Runnable() {
                 @Override
@@ -263,31 +354,11 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
             });
             return;
         }
-        if(TextUtils.isEmpty(et_yunshubianhao.getText().toString())){
-            showWaiting(false);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
-                            .builder()
-                            .setTitle(getResources().getString(R.string.str_alter))
-                            .setMsg("请输入运输编号")
-                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    alertDialog.dissmiss();
-                                }
-                            });
-                    alertDialog.show();
-                }
-            });
-            return;
-        }
-        List<TransportBatchBusinessParamModel> list=new ArrayList<>();
-        if(null!=selectListData&&selectListData.size()>0){
-            for (ExpressPackageModel model:selectListData){
-                TransportBatchBusinessParamModel entity=new TransportBatchBusinessParamModel();
-                TransportBatchBusinessParamModel.BusinessTRBean businessTRBean=new TransportBatchBusinessParamModel.BusinessTRBean();
+        List<TransportBatchBusinessParamModel> list = new ArrayList<>();
+        if (null != selectListData && selectListData.size() > 0) {
+            for (ExpressPackageModel model : selectListData) {
+                TransportBatchBusinessParamModel entity = new TransportBatchBusinessParamModel();
+                TransportBatchBusinessParamModel.BusinessTRBean businessTRBean = new TransportBatchBusinessParamModel.BusinessTRBean();
                 businessTRBean.setReceive_date("");
                 businessTRBean.setReceiver_id("");
                 businessTRBean.setReceive_check_weight("");
@@ -302,11 +373,11 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
                 businessTRBean.setPrimaryKeys("");
                 businessTRBean.setReturnName("");
                 entity.setBusinessTR(businessTRBean);
-                if(null!=model.getCn_list()&&model.getCn_list().size()>0){
-                    List<TransportBatchBusinessParamModel.ListBusinessBean> list1=new ArrayList<>();
+                if (null != model.getCn_list() && model.getCn_list().size() > 0) {
+                    List<TransportBatchBusinessParamModel.ListBusinessBean> list1 = new ArrayList<>();
                     //TODO 包底下含有子单
-                    for(ExpressModel expressModel : model.getCn_list()){
-                        TransportBatchBusinessParamModel.ListBusinessBean listBusinessBean=new TransportBatchBusinessParamModel.ListBusinessBean();
+                    for (ExpressModel expressModel : model.getCn_list()) {
+                        TransportBatchBusinessParamModel.ListBusinessBean listBusinessBean = new TransportBatchBusinessParamModel.ListBusinessBean();
                         listBusinessBean.setBs_id(expressModel.getBs_id());
                         listBusinessBean.setChild_number(expressModel.getChild_number());
                         list1.add(listBusinessBean);
@@ -316,136 +387,27 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
                 list.add(entity);
             }
         }
-        mPresnter.saveTransportBatchAndBusiness(tv_fahuoshijian.getText().toString(),""+orgListBean.getOg_id()
-                ,""+serverListBean.getServer_id(),serverListBean.getServer_code(),list)
-                .compose(this.<GsonSaveTransportBatchAndBusinessModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<GsonSaveTransportBatchAndBusinessModel>() {
-                    @Override
-                    public void accept(GsonSaveTransportBatchAndBusinessModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(ProductionMasterActivity.this)
-                                    .builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dissmiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                        } else {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(ProductionMasterActivity.this)
-                                    .builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dissmiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        alertDialog = new AlertDialog(ProductionMasterActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
-
+        mPresnter.saveTransportBatchAndBusiness(tv_fahuoshijian.getText().toString(), "" + orgListBean.getOg_id()
+                , "" + serverListBean.getServer_id(), serverListBean.getServer_code(), list);
     }
+
     //TODO 查看收货服务商跟机构
-    private void getOrgServer(){
-        mPresnter.getOrgServer()
-                .compose(this.<GsonOrgServerModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<GsonOrgServerModel>() {
-                    @Override
-                    public void accept(GsonOrgServerModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            if (null != result.getData()) {
-                                handOrgServerResult(result);
-                            }
-                        } else {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(ProductionMasterActivity.this)
-                                    .builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dissmiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        alertDialog = new AlertDialog(ProductionMasterActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
+    private void getOrgServer() {
+        mPresnter.getOrgServer();
     }
 
-    private void handOrgServerResult(GsonOrgServerModel result){
-        showWaiting(false);
-        if(null!=result.getData()){
-            if(null!=result.getData().getOrg_list()&&result.getData().getOrg_list().size()>0){
-                orgList.clear();
-                orgList.addAll(result.getData().getOrg_list());
-            }
-
-            if(null!=result.getData().getServer_list()&&result.getData().getServer_list().size()>0){
-                serverList.clear();
-                serverList.addAll(result.getData().getServer_list());
-            }
-        }
-    }
 
     //TODO 设置出货时间
-    private void handlerLeaveDate(){
+    private void handlerLeaveDate() {
         final DateTimePicker dateTimePicker = new DateTimePicker(this,
-                DateTimePicker.YEAR_MONTH_DAY,DateTimePicker.HOUR_24);
+                DateTimePicker.YEAR_MONTH_DAY, DateTimePicker.HOUR_24);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
 
-        dateTimePicker.setDateRangeStart(calendar.get(Calendar.YEAR),1,1);
-        dateTimePicker.setDateRangeEnd(calendar.get(Calendar.YEAR) +1,12,31);
+        dateTimePicker.setDateRangeStart(calendar.get(Calendar.YEAR), 1, 1);
+        dateTimePicker.setDateRangeEnd(calendar.get(Calendar.YEAR) + 1, 12, 31);
         calendar.setTime(new Date());
-        dateTimePicker.setSelectedItem(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH)+1,
+        dateTimePicker.setSelectedItem(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
                 calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
 
         dateTimePicker.setHeaderView(getPackerHeadView(dateTimePicker, new View.OnClickListener() {
@@ -457,14 +419,14 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
                 int day = Integer.parseInt(dateTimePicker.getSelectedDay());
                 int hour = Integer.parseInt(dateTimePicker.getSelectedHour());
                 int minute = Integer.parseInt(dateTimePicker.getSelectedMinute());
-                selcal.set(year,month -1,day,hour,minute);
-                String years=dateTimePicker.getSelectedYear();
-                String months=dateTimePicker.getSelectedMonth();
-                String days=dateTimePicker.getSelectedDay();
-                String hours=dateTimePicker.getSelectedHour();
-                String minutes=dateTimePicker.getSelectedMinute();
-                String strTime=getString(R.string.str_leave_date_string);
-                strTime=String.format(strTime,years,months,days,hours,minutes);
+                selcal.set(year, month - 1, day, hour, minute);
+                String years = dateTimePicker.getSelectedYear();
+                String months = dateTimePicker.getSelectedMonth();
+                String days = dateTimePicker.getSelectedDay();
+                String hours = dateTimePicker.getSelectedHour();
+                String minutes = dateTimePicker.getSelectedMinute();
+                String strTime = getString(R.string.str_leave_date_string);
+                strTime = String.format(strTime, years, months, days, hours, minutes);
 //                String strTime = getString(R.string.str_leave_date_string,years,months,days,hours,minutes);
                 tv_fahuoshijian.setText(strTime);
             }
@@ -473,7 +435,7 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
         dateTimePicker.show();
     }
 
-    private View getPackerHeadView(final WheelPicker picker, final View.OnClickListener complete_listener){
+    private View getPackerHeadView(final WheelPicker picker, final View.OnClickListener complete_listener) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.layout_leave_type_picker_head, null);
         view.findViewById(R.id.text_view_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -484,7 +446,7 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
         view.findViewById(R.id.text_view_complete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(null != complete_listener){
+                if (null != complete_listener) {
                     complete_listener.onClick(v);
                 }
                 picker.dismiss();
@@ -493,9 +455,38 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
         return view;
     }
 
-    private void showWaiting(boolean isShow){
-        if(null!=waitingDialog){
+    @Override
+    public void showWaiting(boolean isShow) {
+        if (null != waitingDialog) {
             waitingDialog.showDialog(isShow);
         }
+    }
+
+
+    private void showTipeDialog(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog = new AlertDialog(ProductionMasterActivity.this)
+                        .builder()
+                        .setTitle(getResources().getString(R.string.str_alter))
+                        .setMsg(msg)
+                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dissmiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            goBack(0);
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

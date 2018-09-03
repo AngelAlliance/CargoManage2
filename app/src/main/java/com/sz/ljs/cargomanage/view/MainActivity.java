@@ -63,9 +63,9 @@ public class MainActivity extends BaseActivity {
     private void initData() {
         getScanNumberLeng();
 //        //TODO 启动扫描服务
-//        Intent newIntent = new Intent(MainActivity.this, ScanService.class);
-//        newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startService(newIntent);
+        Intent newIntent = new Intent(MainActivity.this, ScanService.class);
+        newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startService(newIntent);
     }
 
     private void setListener() {
@@ -92,31 +92,32 @@ public class MainActivity extends BaseActivity {
                 BaseApplication.startActivity(WareHousingActivity.class);
             }
             break;
-            case 2:{
+            case 2: {
                 //TODO 打包
                 BaseApplication.startActivity(PackGoodsActivity.class);
             }
             break;
-            case 3:{
+            case 3: {
                 //TODO 出库
                 BaseApplication.startActivity(ShipMentsActivity.class);
             }
             break;
-            case 4:{
+            case 4: {
                 //TODO 盘库
                 BaseApplication.startActivity(InventoryActivity.class);
             }
             break;
-            case 5:{
+            case 5: {
                 //TODO 到件扫描
                 BaseApplication.startActivity(ArticleScanActivity.class);
             }
             break;
-            case 6:{
+            case 6: {
                 //TODO 补打标签
                 BaseApplication.startActivity(PatchlabelActivity.class);
             }
-            case 7:{
+            break;
+            case 7: {
                 //TODO 设置
                 BaseApplication.startActivity(SettingActivity.class);
             }
@@ -154,9 +155,9 @@ public class MainActivity extends BaseActivity {
                         if (0 == result.getCode()) {
                             Utils.showToast(MainActivity.this, result.getMsg());
                         } else if (1 == result.getCode()) {
-                            if(!TextUtils.isEmpty(result.getData())){
-                                Log.i("请求运单号位数","length="+result.getData());
-                                GenApi.ScanNumberLeng=Integer.parseInt(result.getData());
+                            if (!TextUtils.isEmpty(result.getData())) {
+                                Log.i("请求运单号位数", "length=" + result.getData());
+                                GenApi.ScanNumberLeng = Integer.parseInt(result.getData());
                             }
                         }
                     }

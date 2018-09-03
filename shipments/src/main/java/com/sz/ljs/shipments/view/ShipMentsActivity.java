@@ -29,6 +29,7 @@ import com.sz.ljs.common.view.FourSidesSlidingListView;
 import com.sz.ljs.common.view.ListDialog;
 import com.sz.ljs.common.view.ScanView;
 import com.sz.ljs.common.view.WaitingDialog;
+import com.sz.ljs.shipments.contract.ShipmentsContract;
 import com.sz.ljs.shipments.model.GsonServiceChannelModel;
 import com.sz.ljs.shipments.model.ShipMentsModel;
 import com.sz.ljs.shipments.presenter.ShipmentsPresenter;
@@ -46,8 +47,8 @@ import io.reactivex.schedulers.Schedulers;
  * 出库界面
  */
 
-public class ShipMentsActivity extends BaseActivity implements View.OnClickListener {
-    private EditText  et_yundanhao;
+public class ShipMentsActivity extends BaseActivity implements View.OnClickListener, ShipmentsContract.View {
+    private EditText et_yundanhao;
     private TextView et_qudao;
     private LinearLayout ll_qudao;
     private ImageView iv_qudao, iv_scan;
@@ -65,7 +66,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
     private ListDialog dialog;
     private String packGoodsexpressCode; //已扫描界面最后一个选择的运单
     private String packGoodsCode; // 最后一个选择的包
-    private List<ExpressPackageModel> selectList=new ArrayList<>();
+    private List<ExpressPackageModel> selectList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +80,8 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
     private void initView() {
         getHeaderData();
         setDaiChuYunMenu();
-        mPresnter=new ShipmentsPresenter();
-        waitingDialog=new WaitingDialog(this);
+        mPresnter = new ShipmentsPresenter(this);
+        waitingDialog = new WaitingDialog(this);
         et_qudao = (TextView) findViewById(R.id.et_qudao);
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         ll_qudao = (LinearLayout) findViewById(R.id.ll_qudao);
@@ -176,10 +177,10 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                     }
                 } else if (ID == 2) {
                     //TODO  生成主单
-                    if(null!=selectList&&selectList.size()>0){
+                    if (null != selectList && selectList.size() > 0) {
                         ShipMentsModel.getInstance().setSelectList(selectList);
-                        startActivityForResult(new Intent(ShipMentsActivity.this,ProductionMasterActivity.class),100);
-                    }else {
+                        startActivityForResult(new Intent(ShipMentsActivity.this, ProductionMasterActivity.class), 100);
+                    } else {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -285,6 +286,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+
     //TODO 处理扫描的单号（扫描就选中）
     private void handlerScanResult(String result) {
         //TODO 已扫描
@@ -293,10 +295,11 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                 //TODO 证明扫描的是包编号
                 for (int i = 0; i < listData.size(); i++) {
                     if (result.equals(listData.get(i).getBag_lable_code())
-                            && "false".equals(listData.get(i).getIsSelect())) {
+                            && ("false".equals(listData.get(i).getIsSelect())
+                            || TextUtils.isEmpty(listData.get(i).getIsSelect()))) {
                         listData.get(i).setIsSelect("true");
-                        selectList.add( listData.get(i));
-                        packGoodsCode=result;
+                        selectList.add(listData.get(i));
+                        packGoodsCode = result;
                         break;
                     } else if (result.equals(listData.get(i).getBag_lable_code())
                             && "true".equals(listData.get(i).getIsSelect())) {
@@ -311,10 +314,11 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                     if (null != listData.get(i).getCn_list() && listData.get(i).getCn_list().size() > 0) {
                         for (int j = 0; j < listData.get(i).getCn_list().size(); j++) {
                             if (result.equals(listData.get(i).getCn_list().get(j).getShipper_hawbcode())
-                                    && "false".equals(listData.get(i).getCn_list().get(j).getIsSelect())) {
+                                    && ("false".equals(listData.get(i).getCn_list().get(j).getIsSelect())
+                                    || TextUtils.isEmpty(listData.get(i).getCn_list().get(j).getIsSelect()))) {
                                 listData.get(i).getCn_list().get(j).setIsSelect("true");
                                 listData.get(i).getCn_list().get(j).setOrder_status("选中");
-                                packGoodsexpressCode=result;
+                                packGoodsexpressCode = result;
                                 break;
                             } else if (result.equals(listData.get(i).getCn_list().get(j).getShipper_hawbcode())
                                     && "true".equals(listData.get(i).getCn_list().get(j).getIsSelect())) {
@@ -328,160 +332,118 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
             }
         }
     }
+
+    @Override
+    public void onResult(int Id, String result) {
+        switch (Id) {
+            case ShipmentsContract.REQUEST_FAIL_ID:
+                showTipDialog(result);
+                break;
+            case ShipmentsContract.REQUEST_SUCCESS_ID:
+                //TODO 获取打包界面初始化数据
+                if (null != ShipMentsModel.getInstance().getShppingCnList()
+                        && ShipMentsModel.getInstance().getShppingCnList().size() > 0) {
+                    listData.clear();
+                    listData.addAll(ShipMentsModel.getInstance().getShppingCnList());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fs_listView.setContentData(listData);
+                        }
+                    });
+                } else {
+                    showTipDialog("暂无数据");
+                }
+                break;
+            case ShipmentsContract.GET_SERVICE_CHANNEL_SUCCESS:
+                //TODO 查询生效渠道
+                if (null != ShipMentsModel.getInstance().getServiceChannelList()
+                        && ShipMentsModel.getInstance().getServiceChannelList().size() > 0) {
+                    serviceChannelList.clear();
+                    serviceChannelList.addAll(ShipMentsModel.getInstance().getServiceChannelList());
+                    final List<ListialogModel> showList = new ArrayList<>();
+                    for (GsonServiceChannelModel.DataBean bean : ShipMentsModel.getInstance().getServiceChannelList()) {
+                        showList.add(new ListialogModel("" + bean.getServer_channelid(), bean.getServer_channel_cnname(), bean.getServer_channel_enname(), false));
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog = new ListDialog(ShipMentsActivity.this, R.style.AlertDialogStyle)
+                                    .creatDialog()
+                                    .setTitle("请选择服务渠道")
+                                    .setSeachEditTextShow(true)
+                                    .setListData(showList)
+                                    .setCallBackListener(new ListDialog.CallBackListener() {
+                                        @Override
+                                        public void Result(int position, String name) {
+                                            for (GsonServiceChannelModel.DataBean bean : serviceChannelList) {
+                                                if (name.equals(bean.getServer_channelid()) ||
+                                                        name.equals(bean.getServer_channel_cnname()) ||
+                                                        name.equals(bean.getServer_channel_enname())) {
+                                                    serviceChanneModel = new GsonServiceChannelModel.DataBean();
+                                                    serviceChanneModel = bean;
+                                                    et_qudao.setText(name);
+                                                    getDepltList();
+                                                    break;
+                                                }
+                                            }
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            dialog.show();
+                        }
+                    });
+                } else {
+                    showTipDialog("暂无数据");
+                }
+                break;
+        }
+    }
+
     //TODO 获取打包界面初始化数据
     private void getDepltList() {
-        showWaiting(true);
         String server_id = "";
         String server_channelid = "";
         if (!TextUtils.isEmpty(et_qudao.getText().toString().trim()) && null != serviceChanneModel) {
             server_id = "" + serviceChanneModel.getServer_id();
             server_channelid = "" + serviceChanneModel.getServer_channelid();
         }
-        mPresnter.getDepltList("" + UserModel.getInstance().getOg_id(), server_id, server_channelid)
-                .compose(this.<GsonDepltListModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<GsonDepltListModel>() {
-                    @Override
-                    public void accept(GsonDepltListModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            if (null != result.getData()) {
-                                handDepltListResult(result);
-                            }
-                        } else {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(ShipMentsActivity.this)
-                                    .builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dissmiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        alertDialog = new AlertDialog(ShipMentsActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
+        mPresnter.getDepltList(""+UserModel.getInstance().getOg_id(), server_id, server_channelid);
     }
 
-
-    private void handDepltListResult(GsonDepltListModel result) {
-        if (null != result.getData().getShppingCnList() && result.getData().getShppingCnList().size() > 0) {
-            listData.clear();
-            listData.addAll(result.getData().getShppingCnList());
-            fs_listView.setContentData(listData);
-        }
-        showWaiting(false);
-    }
 
     //TODO 查询生效渠道
     private void getServiceChannel() {
-        showWaiting(true);
-        mPresnter.getServiceChannel()
-                .compose(this.<GsonServiceChannelModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(new Consumer<GsonServiceChannelModel>() {
-                    @Override
-                    public void accept(GsonServiceChannelModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            if (null != result.getData() && result.getData().size() > 0) {
-                                serviceChannelList.clear();
-                                serviceChannelList.addAll(result.getData());
-                                final List<ListialogModel> showList = new ArrayList<>();
-                                for (GsonServiceChannelModel.DataBean bean : result.getData()) {
-                                    showList.add(new ListialogModel("" + bean.getServer_channelid(), bean.getServer_channel_cnname(), bean.getServer_channel_enname(), false));
-                                }
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dialog = new ListDialog(ShipMentsActivity.this, R.style.AlertDialogStyle)
-                                                .creatDialog()
-                                                .setTitle("请选择服务渠道")
-                                                .setSeachEditTextShow(true)
-                                                .setListData(showList)
-                                                .setCallBackListener(new ListDialog.CallBackListener() {
-                                                    @Override
-                                                    public void Result(int position, String name) {
-                                                        for (GsonServiceChannelModel.DataBean bean : serviceChannelList) {
-                                                            if (name.equals(bean.getServer_channelid()) ||
-                                                                    name.equals(bean.getServer_channel_cnname()) ||
-                                                                    name.equals(bean.getServer_channel_enname())) {
-                                                                serviceChanneModel = new GsonServiceChannelModel.DataBean();
-                                                                serviceChanneModel = bean;
-                                                                et_qudao.setText(name);
-                                                                getDepltList();
-                                                                break;
-                                                            }
-                                                        }
-                                                        dialog.dismiss();
-                                                    }
-                                                });
-                                        dialog.show();
-                                    }
-                                });
-
-                            }
-                        } else {
-                            showWaiting(false);
-                            alertDialog = new AlertDialog(ShipMentsActivity.this)
-                                    .builder()
-                                    .setTitle(getResources().getString(R.string.str_alter))
-                                    .setMsg(result.getMsg())
-                                    .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dissmiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        alertDialog = new AlertDialog(ShipMentsActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qqsb))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
+        mPresnter.getServiceChannel();
     }
 
 
-
-    private void showWaiting(boolean isShow){
-        if(null!=waitingDialog){
+    @Override
+    public void showWaiting(boolean isShow) {
+        if (null != waitingDialog) {
             waitingDialog.showDialog(isShow);
         }
+    }
+
+
+    private void showTipDialog(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog = new AlertDialog(ShipMentsActivity.this)
+                        .builder()
+                        .setTitle(getResources().getString(R.string.str_alter))
+                        .setMsg(msg)
+                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dissmiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
+
     }
 
     //TODO 设置待出运菜单
@@ -498,5 +460,28 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                 , getResources().getString(R.string.str_ydh), getResources().getString(R.string.str_zdtm)
                 , getResources().getString(R.string.str_js), getResources().getString(R.string.str_shizhong)
                 , getResources().getString(R.string.str_ckg)));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case 100:
+                    if (null != data && 0 != data.getIntExtra("type", 0)) {
+                        //TODO 生成主单成功，重新刷新数据
+                        getDepltList();
+                    } else {
+
+                    }
+                    break;
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ShipMentsModel.getInstance().clean();
     }
 }

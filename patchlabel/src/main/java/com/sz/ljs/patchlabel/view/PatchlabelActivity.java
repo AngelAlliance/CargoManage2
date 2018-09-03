@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.posapi.PosApi;
 import android.posapi.PrintQueue;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,6 +22,7 @@ import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.common.utils.BarcodeCreater;
 import com.sz.ljs.common.utils.BitmapTools;
 import com.sz.ljs.common.view.AlertDialog;
+import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.patchlabel.R;
 
 import java.io.UnsupportedEncodingException;
@@ -44,19 +46,21 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
     boolean isCanPrint = true;
     public int level_battry = 50;
     private Bitmap mBitmap = null;
-    private int mLeft = 30; //打印纸左边距
+    private int mLeft = 20; //打印纸左边距
     private int concentration = 60;//打印浓度
+    private WaitingDialog waitingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patchlabel);
         initView();
-        setListener();
         initData();
+        setListener();
     }
 
     private void initView() {
+        waitingDialog=new WaitingDialog(this);
         popuwindow = new YunDanTypePopuwindow(this);
         tv_type = (TextView) findViewById(R.id.tv_type);
         iv_chose = (ImageView) findViewById(R.id.iv_chose);
@@ -105,6 +109,7 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
             @Override
             public void onFinish() {
                 // TODO Auto-generated method stub
+                showWaiteDialog(false);
                 //打印完成
                 showTip(getString(R.string.print_complete));
                 //当前可打印
@@ -116,6 +121,7 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
             public void onFailed(int state) {
                 // TODO Auto-generated method stub
                 isCanPrint = true;
+                showWaiteDialog(false);
                 switch (state) {
                     case PosApi.ERR_POS_PRINT_NO_PAPER:
                         // 打印缺纸
@@ -147,6 +153,7 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
             public void onPrinterSetting(int state) {
                 // TODO Auto-generated method stub
                 isCanPrint = true;
+                showWaiteDialog(false);
                 switch (state) {
                     case 0:
                         showTip("持续有纸");
@@ -180,26 +187,38 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
 
     //TODO 生成一维码图片并且打印出来
     private void creatOneDimensionalCode() {
+        showWaiteDialog(true);
         if (TextUtils.isEmpty(et_danhao.getText().toString())) {
+            showWaiteDialog(false);
             showTip(getResources().getString(R.string.str_qsrydydydh));
             return;
         }
         //如果判断为字节长度大于其字符长度，则判定为无法生成条码的字符
         if (et_danhao.getText().toString().getBytes().length > et_danhao.getText().toString().length()) {
+            showWaiteDialog(false);
             showTip(getResources().getString(R.string.cannot_create_bar));
             return;
         }
+
         //生成一维码
         mBitmap = BarcodeCreater.creatBarcode(getApplicationContext(),
-                et_danhao.getText().toString(), 500, 400, true,
+                et_danhao.getText().toString(), 384, 100, true,
                 1);
         //图片为空则返回
-        if (mBitmap == null)
+        if (mBitmap == null){
+            showWaiteDialog(false);
+            showTip("一维码生成失败");
             return;
+        }
         //打印中，不执行本次操作
-        if (!isCanPrint) return;
+        if (!isCanPrint){
+            showWaiteDialog(false);
+            showTip("正在打印中");
+            return;
+        }
         //电量低于12%不执行打印
         if(level_battry<=12){
+            showWaiteDialog(false);
             showTip("低电量,不能打印,请先充电");
             return;
         }
@@ -214,6 +233,7 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
                     .getBytes("GBK"));
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
+            Log.i("打印的时候出错","error="+e.toString());
             e.printStackTrace();
         }
         //设为不可打印
@@ -365,6 +385,11 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
 
     }
 
+    private void showWaiteDialog(boolean isShow){
+        if(null!=waitingDialog){
+            waitingDialog.showDialog(isShow);
+        }
+    }
     @Override
     protected void onDestroy() {
         // TODO Auto-generated method stub

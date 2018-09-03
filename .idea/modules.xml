@@ -3,11 +3,12 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CargoManage.iml" filepath="$PROJECT_DIR$/CargoManage.iml" />
-      <module fileurl="file://D:\android-studio-project\LiuJingSong\CargoManage2\CargoManage.iml" filepath="D:\android-studio-project\LiuJingSong\CargoManage2\CargoManage.iml" />
-      <module fileurl="file://E:\project\CargoManage\CargoManage2.iml" filepath="E:\project\CargoManage\CargoManage2.iml" />
+      <module fileurl="file://D:/android-studio-project/LiuJingSong/CargoManage2/CargoManage.iml" filepath="D:/android-studio-project/LiuJingSong/CargoManage2/CargoManage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CargoManage2.iml" filepath="$PROJECT_DIR$/CargoManage2.iml" />
+      <module fileurl="file://E:/project/CargoManage/CargoManage2.iml" filepath="E:/project/CargoManage/CargoManage2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/articlescan/articlescan.iml" filepath="$PROJECT_DIR$/articlescan/articlescan.iml" />
-      <module fileurl="file://E:\project\CargoManage\articlescan\articlescan.iml" filepath="E:\project\CargoManage\articlescan\articlescan.iml" />
+      <module fileurl="file://E:/project/CargoManage/articlescan/articlescan.iml" filepath="E:/project/CargoManage/articlescan/articlescan.iml" />
       <module fileurl="file://$PROJECT_DIR$/base/base.iml" filepath="$PROJECT_DIR$/base/base.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/examinegoods/examinegoods.iml" filepath="$PROJECT_DIR$/examinegoods/examinegoods.iml" />
