@@ -18,11 +18,13 @@ import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.base.event.EventID;
 import com.sz.ljs.base.event.EventMSG;
 import com.sz.ljs.cargomanage.R;
+import com.sz.ljs.cargomanage.contract.LoginContract;
 import com.sz.ljs.cargomanage.model.LoginModel;
 import com.sz.ljs.cargomanage.presenter.LoginPresenter;
 import com.sz.ljs.common.constant.ApiTimestampToken;
 import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.Utils;
+import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.WaitingDialog;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
@@ -39,7 +41,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by liujs on 2018/8/9.
  */
 
-public class LoginActivity extends BaseActivity implements View.OnClickListener {
+public class LoginActivity extends BaseActivity implements View.OnClickListener, LoginContract.View {
 
     private EditText et_workNum, et_password;
     private ImageView img_view_workNum_del, img_view_pwd_del;
@@ -47,6 +49,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private ToggleButton according_userPwd_tb;
     private LoginPresenter loginPresenter;
     private WaitingDialog mWaitingDialog = null;
+    private AlertDialog alertDialog;
     private final static String[] RUNTIME_PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -78,13 +81,25 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void initData() {
-        loginPresenter = new LoginPresenter();
+        loginPresenter = new LoginPresenter(this);
     }
 
     private void createDialog() {
         if (null == mWaitingDialog) {
             mWaitingDialog = new WaitingDialog(this);
             mWaitingDialog.setWaitText(getString(R.string.str_login_ing));
+        }
+    }
+
+    @Override
+    public void onResult(int Id, String result) {
+        switch (Id) {
+            case LoginContract.REQUEST_FAIL_ID:
+                showTipeDialog(result);
+                break;
+            case LoginContract.REQUEST_SUCCESS_ID:
+                goHome();
+                break;
         }
     }
 
@@ -154,80 +169,16 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     //TODO 登录
     private void doLogin() {
         if (TextUtils.isEmpty(et_workNum.getText().toString().trim())) {
-            Utils.showToast(LoginActivity.this, getResources().getString(R.string.str_ghbwk));
+            showTipeDialog(getResources().getString(R.string.str_ghbwk));
             return;
         }
         if (TextUtils.isEmpty(et_password.getText().toString().trim())) {
-            Utils.showToast(LoginActivity.this, getResources().getString(R.string.str_mmbwk));
+            showTipeDialog(getResources().getString(R.string.str_mmbwk));
             return;
         }
-//        goHome();
-        showWaiting(true);
-        loginPresenter.doLogin(et_workNum.getText().toString().trim(), et_password.getText().toString().trim())
-                .compose(this.<LoginModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<LoginModel>() {
-                    @Override
-                    public void accept(LoginModel result) throws Exception {
-                        showWaiting(false);
-                        if (0 == result.getCode()) {
-                            Utils.showToast(LoginActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
-                            handelLoginResult(result);
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        //获取失败，提示
-                        showWaiting(false);
-                        Utils.showToast(getBaseActivity(), R.string.str_dlsb);
-                    }
-                });
+        loginPresenter.doLogin(et_workNum.getText().toString().trim(), et_password.getText().toString().trim());
     }
 
-    //TODO 处理登录返回的数据
-    private void handelLoginResult(LoginModel result) {
-        if (null != result && null != result.getData() && null != result.getData().getUserModel()) {
-            LoginModel.DataEntity dataEntity = result.getData();
-            UserModel.getInstance().setAuthentication_code(dataEntity.getUserModel().getAuthentication_code());
-            UserModel.getInstance().setTms_id(dataEntity.getUserModel().getTms_id());
-            UserModel.getInstance().setSt_id_ctreate(dataEntity.getUserModel().getSt_id_ctreate());
-            UserModel.getInstance().setSp_id(dataEntity.getUserModel().getSp_id());
-            UserModel.getInstance().setSt_ename(dataEntity.getUserModel().getSt_ename());
-            UserModel.getInstance().setSt_name(dataEntity.getUserModel().getSt_name());
-            UserModel.getInstance().setCompetence_og_id(dataEntity.getUserModel().getCompetence_og_id());
-            UserModel.getInstance().setOg_id(dataEntity.getUserModel().getOg_id());
-            UserModel.getInstance().setVs_code(dataEntity.getUserModel().getVs_code());
-            UserModel.getInstance().setSt_code(dataEntity.getUserModel().getSt_code());
-            UserModel.getInstance().setSt_id(dataEntity.getUserModel().getSt_id());
-            UserModel.getInstance().setDing_user_id(dataEntity.getUserModel().getDing_user_id());
-            UserModel.getInstance().setOg_shortcode(dataEntity.getUserModel().getOg_shortcode());
-            UserModel.getInstance().setOg_cityenname(dataEntity.getUserModel().getOg_cityenname());
-            UserModel.TokenModelEntity tokenModelEntity = new UserModel.TokenModelEntity();
-            tokenModelEntity.setCreate_date(dataEntity.getTokenModel().getCreate_date());
-            tokenModelEntity.setFailure_time(dataEntity.getTokenModel().getFailure_time());
-            tokenModelEntity.setId(dataEntity.getTokenModel().getId());
-            tokenModelEntity.setToken(dataEntity.getTokenModel().getToken());
-            tokenModelEntity.setSt_id(dataEntity.getTokenModel().getSt_id());
-            UserModel.getInstance().setTokenModel(tokenModelEntity);
-            List<UserModel.PermissionEntity> list = new ArrayList<UserModel.PermissionEntity>();
-            for (LoginModel.DataEntity.PermissionEntity model : dataEntity.getPermission()) {
-                UserModel.PermissionEntity permissionEntity = new UserModel.PermissionEntity();
-                permissionEntity.setMi_ename(model.getMi_ename());
-                permissionEntity.setMi_name(model.getMi_name());
-                list.add(permissionEntity);
-            }
-            UserModel.getInstance().setPermission(list);
-            UserModel.getInstance().setLocalSaveUserNo(et_workNum.getText().toString().trim());
-            UserModel.getInstance().setLocalSavePassword(et_password.getText().toString().trim());
-            ApiTimestampToken.setToken(dataEntity.getTokenModel().getToken());
-            ApiTimestampToken.setUserID(dataEntity.getUserModel().getSt_id());
-//            Log.i("登录成功后","userNo="+UserModel.getInstance().getLocalSaveUserNo()+" ;password="+UserModel.getInstance().getLocalSavePassword());
-            goHome();
-        }
-    }
 
     //TODO 进入主界面
     private void goHome() {
@@ -235,10 +186,29 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         finish();
     }
 
-    private void showWaiting(boolean isShow) {
+    public void showWaiting(boolean isShow) {
         if (null != mWaitingDialog) {
             mWaitingDialog.showDialog(isShow);
         }
+    }
+
+    public void showTipeDialog(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog = new AlertDialog(LoginActivity.this)
+                        .builder()
+                        .setTitle(getResources().getString(R.string.str_alter))
+                        .setMsg(msg)
+                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dissmiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
     }
 
 
@@ -252,6 +222,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
         et_password.setSelection(et_password.length());
     }
+
     @Override
     protected String[] getRuntimePermissions() {
         return RUNTIME_PERMISSIONS;

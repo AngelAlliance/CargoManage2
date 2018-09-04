@@ -314,26 +314,26 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
             });
             return;
         }
-        if (TextUtils.isEmpty(tv_shouhuofuwushao.getText().toString())) {
-            showWaiting(false);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
-                            .builder()
-                            .setTitle(getResources().getString(R.string.str_alter))
-                            .setMsg("请选择收货服务商")
-                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    alertDialog.dissmiss();
-                                }
-                            });
-                    alertDialog.show();
-                }
-            });
-            return;
-        }
+//        if (TextUtils.isEmpty(tv_shouhuofuwushao.getText().toString())) {
+//            showWaiting(false);
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
+//                            .builder()
+//                            .setTitle(getResources().getString(R.string.str_alter))
+//                            .setMsg("请选择收货服务商")
+//                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    alertDialog.dissmiss();
+//                                }
+//                            });
+//                    alertDialog.show();
+//                }
+//            });
+//            return;
+//        }
         if (TextUtils.isEmpty(tv_fahuoshijian.getText().toString())) {
             showWaiting(false);
             runOnUiThread(new Runnable() {
@@ -359,14 +359,14 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
             for (ExpressPackageModel model : selectListData) {
                 TransportBatchBusinessParamModel entity = new TransportBatchBusinessParamModel();
                 TransportBatchBusinessParamModel.BusinessTRBean businessTRBean = new TransportBatchBusinessParamModel.BusinessTRBean();
-                businessTRBean.setReceive_date("");
+                businessTRBean.setReceive_date(TimeUtils.getDateTime());
                 businessTRBean.setReceiver_id("");
                 businessTRBean.setReceive_check_weight("");
                 businessTRBean.setBusiness_gross_weight(model.getBag_weight());
                 businessTRBean.setCheckout_gross_weight(model.getWeighing());
                 businessTRBean.setHawb_bs_id(model.getBag_id());
                 businessTRBean.setHawb_code(model.getBag_lable_code());
-                businessTRBean.setHawb_type("");//暂时不知道填什么
+                businessTRBean.setHawb_type("B");//暂时不知道填什么
                 businessTRBean.setTra_id("");
                 businessTRBean.setTb_id("");
                 businessTRBean.setTableName("");
@@ -387,8 +387,14 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
                 list.add(entity);
             }
         }
+        String server_id="";
+        String server_code="";
+        if(null!=serverListBean){
+            server_id=""+serverListBean.getServer_id();
+            server_code=""+serverListBean.getServer_code();
+        }
         mPresnter.saveTransportBatchAndBusiness(tv_fahuoshijian.getText().toString(), "" + orgListBean.getOg_id()
-                , "" + serverListBean.getServer_id(), serverListBean.getServer_code(), list);
+                , server_id, server_code, list);
     }
 
     //TODO 查看收货服务商跟机构

@@ -11,6 +11,9 @@ import android.widget.GridView;
 
 import com.sz.ljs.articlescan.view.ArticleScanActivity;
 import com.sz.ljs.base.service.ScanService;
+import com.sz.ljs.cargomanage.contract.LoginContract;
+import com.sz.ljs.common.view.AlertDialog;
+import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.inventory.view.InventoryActivity;
 import com.sz.ljs.shipments.view.ShipMentsActivity;
 import com.ljs.examinegoods.view.ExamineGoodsActivity;
@@ -37,11 +40,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements LoginContract.View {
     private GridView gv_homeMenu;
     private List<HomeMenuModel> homeMenuList = new ArrayList<>();
     private HomeMenuAdapter homeMenuAdapter;
     private LoginPresenter mPresenter;
+    private AlertDialog alertDialog;
+    private WaitingDialog waitingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,18 +59,30 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initView() {
-        mPresenter = new LoginPresenter();
+        mPresenter = new LoginPresenter(this);
+        waitingDialog = new WaitingDialog(this);
         gv_homeMenu = (GridView) findViewById(R.id.gv_homeMenu);
         homeMenuAdapter = new HomeMenuAdapter(this, homeMenuList);
         gv_homeMenu.setAdapter(homeMenuAdapter);
     }
 
     private void initData() {
-        getScanNumberLeng();
+        mPresenter.getScanNumberLeng();
 //        //TODO 启动扫描服务
         Intent newIntent = new Intent(MainActivity.this, ScanService.class);
         newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startService(newIntent);
+    }
+
+    @Override
+    public void onResult(int Id, String result) {
+        switch (Id) {
+            case LoginContract.REQUEST_FAIL_ID:
+                showTipeDialog(result);
+                break;
+            case LoginContract.REQUEST_SUCCESS_ID:
+                break;
+        }
     }
 
     private void setListener() {
@@ -143,31 +160,31 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    //TODO 返回输入运单N位得时候调用接口
-    private void getScanNumberLeng() {
-        mPresenter.getScanNumberLeng()
-                .compose(this.<ScanNumberLengModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ScanNumberLengModel>() {
-                    @Override
-                    public void accept(ScanNumberLengModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            Utils.showToast(MainActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
-                            if (!TextUtils.isEmpty(result.getData())) {
-                                Log.i("请求运单号位数", "length=" + result.getData());
-                                GenApi.ScanNumberLeng = Integer.parseInt(result.getData());
+
+    @Override
+    public void showWaiting(boolean show) {
+        if (null != waitingDialog) {
+            waitingDialog.showDialog(show);
+        }
+    }
+
+    public void showTipeDialog(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog = new AlertDialog(MainActivity.this)
+                        .builder()
+                        .setTitle(getResources().getString(R.string.str_alter))
+                        .setMsg(msg)
+                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dissmiss();
                             }
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        //获取失败，提示
-                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
-                    }
-                });
+                        });
+                alertDialog.show();
+            }
+        });
     }
 
 }

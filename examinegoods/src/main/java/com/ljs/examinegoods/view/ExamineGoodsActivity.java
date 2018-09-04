@@ -143,6 +143,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
     private void initData() {
         MediaPlayerUtils.setRingVolume(true, ExamineGoodsActivity.this);
+        MscManager.getInstance().init(ExamineGoodsActivity.this,0);
         adapter = new PhotoGridAdapter(this, photoList);
         gv_photo.setAdapter(adapter);
     }

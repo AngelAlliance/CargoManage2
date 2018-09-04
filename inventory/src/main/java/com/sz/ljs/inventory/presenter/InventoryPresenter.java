@@ -2,6 +2,7 @@ package com.sz.ljs.inventory.presenter;
 
 import com.google.gson.Gson;
 import com.sz.ljs.common.base.GsonResponseHandler;
+import com.sz.ljs.common.base.HDateGsonAdapter;
 import com.sz.ljs.common.base.IHttpUtilsCallBack;
 import com.sz.ljs.common.base.IResponseHandler;
 import com.sz.ljs.common.constant.ApiUrl;
@@ -13,6 +14,9 @@ import com.sz.ljs.inventory.contract.InventoryContract;
 import com.sz.ljs.inventory.model.BsListModel;
 import com.sz.ljs.inventory.model.FindExpressRuesltModel;
 import com.sz.ljs.inventory.model.InventoryModel;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +52,7 @@ public class InventoryPresenter implements InventoryContract.Presenter {
         param.put(ApiUrl.NUMBER, number);
         param.put(ApiUrl.SUMMARY, ApiUrl.summary);
         param.put(ApiUrl.USERID, "" + UserModel.getInstance().getSt_id());
-        HttpUtils.post(GenApi.URL + ApiUrl.FIND_EXPRESS_BYID, token, param, new GsonResponseHandler<FindExpressRuesltModel>() {
+        HttpUtils.post(GenApi.URL + ApiUrl.FIND_EXPRESS_BYID, token, param, new IHttpUtilsCallBack() {
             @Override
             public void onFailure(int statusCode, String error_msg) {
                 mContract.showWaiting(false);
@@ -57,34 +61,38 @@ public class InventoryPresenter implements InventoryContract.Presenter {
             }
 
             @Override
-            public void onSuccess(int statusCode, FindExpressRuesltModel result) {
-                handDepltListResult(result);
-
+            public void onSuccess(String result) throws Exception {
+                mContract.showWaiting(false);
+                if (null != result) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        int result_type = jsonObject.getInt(GenApi.JSON_KEY_TYPE);
+                        String message = jsonObject.getString(GenApi.JSON_KEY_MESSAGE);
+                        resultMessage = message;
+                        if (1 == result_type) {
+                            handDepltListResult(result);
+                            mContract.OnSuccess(InventoryContract.REQUEST_SUCCESS_ID);
+                        }
+                    } catch (JSONException e) {
+                        resultMessage =  e.getMessage();
+                        mContract.OnError(InventoryContract.REQUEST_FAIL_ID);
+                    }
+                }
             }
         });
     }
 
 
     //TODO 处理运单数据
-    private void handDepltListResult(FindExpressRuesltModel result) {
-        mContract.showWaiting(false);
-        resultMessage = result.getMsg();
-        try {
-            int type = result.getCode();
-            if (type == 1) {
-                if (null != result.getData()) {
-                    mContract.OnSuccess(InventoryContract.REQUEST_SUCCESS_ID);
-                    if (null != result.getData().getExpressEntity()) {
-                        result.getData().getExpressEntity().setIsSelect("true");
-                        result.getData().getExpressEntity().setOrder_status("选中");
-                        InventoryModel.getInstance().setExpress(result.getData().getExpressEntity());
-                    }
-                }
-            } else {
-                mContract.OnError(InventoryContract.REQUEST_FAIL_ID);
+    private void handDepltListResult(String result) {
+        Gson gson = HDateGsonAdapter.createGson();
+        FindExpressRuesltModel model=gson.fromJson(result,FindExpressRuesltModel.class);
+        if (null!=model&&null != model.getData()) {
+            if (null != model.getData().getExpressEntity()) {
+                model.getData().getExpressEntity().setIsSelect("true");
+                model.getData().getExpressEntity().setOrder_status("选中");
+                InventoryModel.getInstance().setExpress(model.getData().getExpressEntity());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -103,7 +111,7 @@ public class InventoryPresenter implements InventoryContract.Presenter {
         param.put(ApiUrl.USERID, "" + UserModel.getInstance().getSt_id());
         param.put("og_en_name", "" + UserModel.getInstance().getOg_cityenname());
         param.put("BsListString", new Gson().toJson(list));
-        HttpUtils.post(GenApi.URL + ApiUrl.ADD_EXPRESSS_TRACK, token, param, new GsonResponseHandler<BaseResultModel>() {
+        HttpUtils.post(GenApi.URL + ApiUrl.ADD_EXPRESSS_TRACK, token, param, new IHttpUtilsCallBack() {
             @Override
             public void onFailure(int statusCode, String error_msg) {
                 mContract.showWaiting(false);
@@ -112,20 +120,22 @@ public class InventoryPresenter implements InventoryContract.Presenter {
             }
 
             @Override
-            public void onSuccess(int statusCode, BaseResultModel result) {
+            public void onSuccess(String result) throws Exception {
                 mContract.showWaiting(false);
                 if (null != result) {
-                    int type = result.getCode();
-                    resultMessage = result.getMsg();
-                    if (1 == type) {
-                        mContract.OnSuccess(InventoryContract.ADD_EXPRESSS_TRACK_SUCCESS);
-                    } else {
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        int result_type = jsonObject.getInt(GenApi.JSON_KEY_TYPE);
+                        String message = jsonObject.getString(GenApi.JSON_KEY_MESSAGE);
+                        resultMessage = message;
+                        if (1 == result_type) {
+                            mContract.OnSuccess(InventoryContract.ADD_EXPRESSS_TRACK_SUCCESS);
+                        }
+                    } catch (JSONException e) {
+                        resultMessage =  e.getMessage();
                         mContract.OnError(InventoryContract.REQUEST_FAIL_ID);
                     }
-                } else {
-                    mContract.OnError(InventoryContract.REQUEST_FAIL_ID);
                 }
-
             }
         });
     }

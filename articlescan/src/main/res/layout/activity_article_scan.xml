@@ -218,7 +218,8 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingTop="10dp">
+            android:paddingTop="10dp"
+            >
             <!--按钮布局-->
             <GridView
                 android:id="@+id/gv_menu"
@@ -229,7 +230,7 @@
                 android:numColumns="3"
                 android:scrollbars="none"
                 android:verticalSpacing="10dp"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <com.sz.ljs.common.view.FourSidesSlidingListView
                 android:id="@+id/fs_yisaomiao_list"

@@ -233,13 +233,19 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
         switch (id) {
             case InventoryContract.REQUEST_SUCCESS_ID:
                 //TODO 根据运单号查询数据成功
-                if (null != InventoryModel.getInstance().getExpressList()
-                        && InventoryModel.getInstance().getExpressList().size() > 0) {
-                    panKulistData.clear();
-                    panKulistData.addAll(InventoryModel.getInstance().getExpressList());
-                    fs_cxkcxx_list.setContentDataForNoPackage(panKulistData);
-                    setweightAndPices();
-                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (null != InventoryModel.getInstance().getExpressList()
+                                && InventoryModel.getInstance().getExpressList().size() > 0) {
+                            panKulistData.clear();
+                            panKulistData.addAll(InventoryModel.getInstance().getExpressList());
+                            fs_cxkcxx_list.setContentDataForNoPackage(panKulistData);
+                            setweightAndPices();
+                        }
+                    }
+                });
+
                 break;
             case InventoryContract.ADD_EXPRESSS_TRACK_SUCCESS:
                 //TODO 批量提交盘库成功
@@ -263,6 +269,7 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
                                                     bsList.clear();
                                                     fs_cxkcxx_list.setContentDataForNoPackage(panKulistData);
                                                     setweightAndPices();
+                                                    et_yundanhao.setText("");
                                                 }
                                                 alertDialog.dissmiss();
                                             }

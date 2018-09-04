@@ -1,5 +1,7 @@
 package com.sz.ljs.warehousing.model;
 
+import android.util.Log;
+
 import com.sz.ljs.common.model.OrderModel;
 
 import java.util.ArrayList;
@@ -19,40 +21,40 @@ public class WareHouSingModel {
     }
 
     private List<ServiceModel> serviceModelList = new ArrayList<>();
-    private List<CustomerModel.DataEntity> customerList=new ArrayList<>();
-    private List<SubnitModel> subnitList=new ArrayList<>();
-    private List<OrderModel.DataEntity.ExtraserviceEntity> extrasList=new ArrayList<>();
+    private List<CustomerModel.DataEntity> customerList = new ArrayList<>();
+    private List<SubnitModel> subnitList = new ArrayList<>();
+    private List<OrderModel.DataEntity.ExtraserviceEntity> extrasList = new ArrayList<>();
     private double volume = 0;  //总材积
     private double TotalVolumeWeight;//总材积重
     private double TotalChargeWeight;   //总计费重
     private double TotalGrossWeight;   //总实重
 
-    private List<GsonIncidentalModel.DataBean> incidentalList=new ArrayList<>();
-    private List<CountryModel.DataEntity> countryList=new ArrayList<>();
-    private List<ProductModel.DataEntity> productList=new ArrayList<>();
-    private List<CustomerModel.DataEntity> customerResultList=new ArrayList<>();
+    private List<GsonIncidentalModel.DataBean> incidentalList = new ArrayList<>();
+    private List<CountryModel.DataEntity> countryList = new ArrayList<>();
+    private List<ProductModel.DataEntity> productList = new ArrayList<>();
+    private List<CustomerModel.DataEntity> customerResultList = new ArrayList<>();
     private SelectCurrentDayBatchModel.DataEntity selectCurrentDayBatchModel;
     private CalculationVolumeWeightModel.DataEntity calculationVolumWeightModel;
     private OrderModel orderModel;
     private ChenckInModel.DataEntity chenckInResultModel;
 
-    public void release(){
+    public void release() {
         serviceModelList.clear();
         customerList.clear();
         subnitList.clear();
         extrasList.clear();
-        volume=0;
-        TotalVolumeWeight=0;
-        TotalChargeWeight=0;
-        TotalGrossWeight=0;
+        volume = 0;
+        TotalVolumeWeight = 0;
+        TotalChargeWeight = 0;
+        TotalGrossWeight = 0;
         incidentalList.clear();
         countryList.clear();
         productList.clear();
         customerResultList.clear();
-        selectCurrentDayBatchModel=null;
-        calculationVolumWeightModel=null;
-        orderModel=null;
-        chenckInResultModel=null;
+        selectCurrentDayBatchModel = null;
+        calculationVolumWeightModel = null;
+        orderModel = null;
+        chenckInResultModel = null;
     }
 
     public void setServiceModelList(List<ServiceModel> list) {
@@ -60,9 +62,12 @@ public class WareHouSingModel {
         list1.addAll(list);
         serviceModelList.clear();
         serviceModelList.addAll(list1);
+        Log.i("添加之后大小", "size=" + serviceModelList.size());
     }
-    public List<ServiceModel> getServiceModelList(){
-        return serviceModelList;
+
+    public List<ServiceModel> getServiceModelList() {
+        Log.i("返回这里的对象",""+this.serviceModelList);
+        return this.serviceModelList;
     }
 
 
@@ -83,19 +88,19 @@ public class WareHouSingModel {
         extrasList.addAll(list1);
     }
 
-    public void setCustomerList(List<CustomerModel.DataEntity> list){
+    public void setCustomerList(List<CustomerModel.DataEntity> list) {
         List<CustomerModel.DataEntity> list1 = new ArrayList<>();
         list1.addAll(list);
         customerList.clear();
         customerList.addAll(list1);
     }
 
-    public CustomerModel.DataEntity getCustomerModel(int customer_id){
-        CustomerModel.DataEntity model=new CustomerModel.DataEntity();
-        if(null!=customerList&&customerList.size()>0){
-            for (CustomerModel.DataEntity bean:customerList){
-                if(customer_id==bean.getCustomer_id()){
-                    model= bean;
+    public CustomerModel.DataEntity getCustomerModel(int customer_id) {
+        CustomerModel.DataEntity model = new CustomerModel.DataEntity();
+        if (null != customerList && customerList.size() > 0) {
+            for (CustomerModel.DataEntity bean : customerList) {
+                if (customer_id == bean.getCustomer_id()) {
+                    model = bean;
                     break;
                 }
             }
@@ -108,7 +113,7 @@ public class WareHouSingModel {
     }
 
     public void setSubnitList(List<SubnitModel> list) {
-        List<SubnitModel> list1=new ArrayList<>();
+        List<SubnitModel> list1 = new ArrayList<>();
         list1.addAll(list);
         subnitList.clear();
         subnitList.addAll(list1);
@@ -155,7 +160,7 @@ public class WareHouSingModel {
     }
 
     public void setIncidentalList(List<GsonIncidentalModel.DataBean> list) {
-        List<GsonIncidentalModel.DataBean> list1=new ArrayList<>();
+        List<GsonIncidentalModel.DataBean> list1 = new ArrayList<>();
         list1.addAll(list);
         incidentalList.clear();
         incidentalList.addAll(list1);
@@ -166,7 +171,7 @@ public class WareHouSingModel {
     }
 
     public void setCountryList(List<CountryModel.DataEntity> list) {
-        List<CountryModel.DataEntity> lists=new ArrayList<>();
+        List<CountryModel.DataEntity> lists = new ArrayList<>();
         lists.addAll(list);
         countryList.clear();
         countryList.addAll(lists);
@@ -177,7 +182,7 @@ public class WareHouSingModel {
     }
 
     public void setProductList(List<ProductModel.DataEntity> list) {
-        List<ProductModel.DataEntity> lists=new ArrayList<>();
+        List<ProductModel.DataEntity> lists = new ArrayList<>();
         lists.addAll(list);
         productList.clear();
         productList.addAll(lists);
@@ -188,7 +193,7 @@ public class WareHouSingModel {
     }
 
     public void setCustomerResultList(List<CustomerModel.DataEntity> list) {
-        List<CustomerModel.DataEntity> lists=new ArrayList<>();
+        List<CustomerModel.DataEntity> lists = new ArrayList<>();
         lists.addAll(list);
         customerResultList.clear();
         customerResultList.addAll(lists);

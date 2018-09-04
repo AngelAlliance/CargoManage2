@@ -71,7 +71,7 @@ public class ShipmentsPresenter implements ShipmentsContract.Presenter {
                         if (1 == result_type) {
                             handDepltListResult(result);
                             mContract.onResult(ShipmentsContract.REQUEST_SUCCESS_ID, message);
-                        }else {
+                        } else {
                             mContract.onResult(ShipmentsContract.REQUEST_FAIL_ID, message);
                         }
                     } catch (JSONException e) {
@@ -86,15 +86,15 @@ public class ShipmentsPresenter implements ShipmentsContract.Presenter {
     private void handDepltListResult(String result) {
         Gson gson = HDateGsonAdapter.createGson();
         GsonDepltListModel gsonDepltListModel = gson.fromJson(result, GsonDepltListModel.class);
-        if(null!=gsonDepltListModel&&null!=gsonDepltListModel.getData()
-                &&null!=gsonDepltListModel.getData().getBaleList()
-                &&gsonDepltListModel.getData().getBaleList().size()>0){
+        if (null != gsonDepltListModel && null != gsonDepltListModel.getData()
+                && null != gsonDepltListModel.getData().getBaleList()
+                && gsonDepltListModel.getData().getBaleList().size() > 0) {
             ShipMentsModel.getInstance().setBaleList(gsonDepltListModel.getData().getBaleList());
         }
-        if(null!=gsonDepltListModel&&null!=gsonDepltListModel.getData()
-                &&null!=gsonDepltListModel.getData().getShppingCnList()
-                &&gsonDepltListModel.getData().getShppingCnList().size()>0){
-                ShipMentsModel.getInstance().setShppingCnList(gsonDepltListModel.getData().getShppingCnList());
+        if (null != gsonDepltListModel && null != gsonDepltListModel.getData()
+                && null != gsonDepltListModel.getData().getShppingCnList()
+                && gsonDepltListModel.getData().getShppingCnList().size() > 0) {
+            ShipMentsModel.getInstance().setShppingCnList(gsonDepltListModel.getData().getShppingCnList());
         }
 
     }
@@ -131,7 +131,7 @@ public class ShipmentsPresenter implements ShipmentsContract.Presenter {
                         if (1 == result_type) {
                             handServiceChannel(result);
                             mContract.onResult(ShipmentsContract.GET_SERVICE_CHANNEL_SUCCESS, message);
-                        }else {
+                        } else {
                             mContract.onResult(ShipmentsContract.REQUEST_FAIL_ID, message);
                         }
 
@@ -147,8 +147,8 @@ public class ShipmentsPresenter implements ShipmentsContract.Presenter {
     private void handServiceChannel(String result) {
         Gson gson = HDateGsonAdapter.createGson();
         GsonServiceChannelModel gsonServiceChannelModel = gson.fromJson(result, GsonServiceChannelModel.class);
-        if(null!=gsonServiceChannelModel&&null!=gsonServiceChannelModel.getData()
-                &&gsonServiceChannelModel.getData().size()>0){
+        if (null != gsonServiceChannelModel && null != gsonServiceChannelModel.getData()
+                && gsonServiceChannelModel.getData().size() > 0) {
             ShipMentsModel.getInstance().setServiceChannelList(gsonServiceChannelModel.getData());
         }
     }
@@ -185,7 +185,7 @@ public class ShipmentsPresenter implements ShipmentsContract.Presenter {
                         if (1 == result_type) {
                             handOrgServer(result);
                             mContract.onResult(ShipmentsContract.GET_ORG_SERVER_SUCCESS, message);
-                        }else {
+                        } else {
                             mContract.onResult(ShipmentsContract.REQUEST_FAIL_ID, message);
                         }
 
@@ -201,12 +201,12 @@ public class ShipmentsPresenter implements ShipmentsContract.Presenter {
     private void handOrgServer(String result) {
         Gson gson = HDateGsonAdapter.createGson();
         GsonOrgServerModel gsonOrgServerModel = gson.fromJson(result, GsonOrgServerModel.class);
-        if(null!=gsonOrgServerModel&&null!=gsonOrgServerModel.getData()
-                &&null!=gsonOrgServerModel.getData().getOrg_list()&&gsonOrgServerModel.getData().getOrg_list().size()>0){
+        if (null != gsonOrgServerModel && null != gsonOrgServerModel.getData()
+                && null != gsonOrgServerModel.getData().getOrg_list() && gsonOrgServerModel.getData().getOrg_list().size() > 0) {
             ShipMentsModel.getInstance().setOrg_list(gsonOrgServerModel.getData().getOrg_list());
         }
-        if(null!=gsonOrgServerModel&&null!=gsonOrgServerModel.getData()
-                &&null!=gsonOrgServerModel.getData().getServer_list()&&gsonOrgServerModel.getData().getServer_list().size()>0){
+        if (null != gsonOrgServerModel && null != gsonOrgServerModel.getData()
+                && null != gsonOrgServerModel.getData().getServer_list() && gsonOrgServerModel.getData().getServer_list().size() > 0) {
             ShipMentsModel.getInstance().setServer_list(gsonOrgServerModel.getData().getServer_list());
         }
 
@@ -232,6 +232,7 @@ public class ShipmentsPresenter implements ShipmentsContract.Presenter {
         param.put("to_server_id", to_server_id);
         param.put("to_server_code", to_server_code);
         param.put("TransportBatchBusinessParam", new Gson().toJson(list));
+        Log.i("生成主单请求参数", "param=" + param);
         HttpUtils.post(GenApi.URL + ApiUrl.SAVE_TRANSPORTBATCH_AND_BUSINESS, token, param, new IHttpUtilsCallBack() {
             @Override
             public void onFailure(int statusCode, String error_msg) {
@@ -243,7 +244,6 @@ public class ShipmentsPresenter implements ShipmentsContract.Presenter {
             public void onSuccess(String result) throws Exception {
                 mContract.showWaiting(false);
                 if (null != result) {
-//                    Log.i("出库生成主单返回数据", "result=" + result);
                     try {
                         JSONObject jsonObject = new JSONObject(result);
                         int result_type = jsonObject.getInt(GenApi.JSON_KEY_TYPE);

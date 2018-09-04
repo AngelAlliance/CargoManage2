@@ -52,6 +52,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
 
     //TODO 获取杂费项
     public void getIncidental() {
+        warehouContract.showWaiting(true);
         Map<String, String> param = new HashMap<>();
         String token = "";
         if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
@@ -100,6 +101,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
 
     //TODO 查询国家
     public void getCountry() {
+        warehouContract.showWaiting(true);
         Map<String, String> param = new HashMap<>();
         String token = "";
         if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
@@ -148,6 +150,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
 
     //TODO 查询生效得销售产品
     public void getProduct() {
+        warehouContract.showWaiting(true);
         Map<String, String> param = new HashMap<>();
         String token = "";
         if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
@@ -196,6 +199,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
 
     //TODO 根据客户名称查询客户资料  customer_name:客户名称(必填)
     public void getCustomer(String customer_name) {
+        warehouContract.showWaiting(true);
         Map<String, String> param = new HashMap<>();
         param.put(WarehouContract.SUMMARY, WarehouContract.summary);
         param.put(WarehouContract.USERID, "" + UserModel.getInstance().getSt_id());
@@ -245,6 +249,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
 
     //TODO 入库时选择客户生成到货总单 customer_id:客户id  customer_code:客户代码  userId:员工id   og_id:机构id 深圳、广州  og_short_code:地区简码
     public void selectCurrentDayBatch(String customer_id, String customer_code) {
+        warehouContract.showWaiting(true);
         Map<String, String> param = new HashMap<>();
         param.put(WarehouContract.SUMMARY, WarehouContract.summary);
         param.put(WarehouContract.CUSTOMER_ID, customer_id);
@@ -298,6 +303,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
     //TODO 查询材积重、计费重 grossweight:重量  length:长  width:宽  height:高  product_code：产品代码(选填)  country_code:国家简码(选填)  arrival_date:到货时间  customer_id:客户id
     public void calculationVolumeWeight(String grossweight, String length, String width, String height
             , String product_code, String country_code, String arrival_date, String customer_id) {
+        warehouContract.showWaiting(true);
         Map<String, String> param = new HashMap<>();
         param.put(WarehouContract.SUMMARY, WarehouContract.summary);
         param.put(WarehouContract.GROSSWEIGHT, grossweight);
@@ -353,6 +359,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
 
     //TODO 根据订单号查询订单信息
     public void getOrderByNumber(String number) {
+        warehouContract.showWaiting(true);
         Map<String, String> param = new HashMap<>();
         String token = "";
         if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
@@ -401,6 +408,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
 
     //TODO 入库接口
     public void chenckIn(ChenckInRequestModel requestModel) {
+        warehouContract.showWaiting(true);
         Map<String, String> param = new HashMap<>();
         if (!TextUtils.isEmpty(requestModel.getOrder_id())) {
             param.put("order_id", requestModel.getOrder_id());

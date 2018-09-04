@@ -13,7 +13,10 @@ import com.sz.ljs.base.event.EventID;
 import com.sz.ljs.base.event.EventMSG;
 import com.sz.ljs.common.utils.Utils;
 import com.sz.ljs.common.view.AlertDialog;
+import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.setting.R;
+import com.sz.ljs.setting.contract.SettingContract;
+import com.sz.ljs.setting.presenter.SettingPresenter;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -29,6 +32,7 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     private TextView tv_banben;
     private Button bt_loginOut;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +43,7 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void initView() {
+
         ll_xiugaimima = (LinearLayout) findViewById(R.id.ll_xiugaimima);
         ll_guanyu = (LinearLayout) findViewById(R.id.ll_guanyu);
         ll_banbengengxin = (LinearLayout) findViewById(R.id.ll_banbengengxin);
@@ -58,8 +63,9 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void initData() {
-        tv_banben.setText(""+getShowVersion());
+        tv_banben.setText("" + getShowVersion());
     }
+
 
 
     @Override
@@ -86,12 +92,12 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
         }
     }
 
-    private String getShowVersion(){
-        return getString(R.string.str_dqbb) +":v" + Utils.getVersionName(SettingActivity.this);
+    private String getShowVersion() {
+        return getString(R.string.str_dqbb) + ":v" + Utils.getVersionName(SettingActivity.this);
     }
 
     //TODO 注销用户
-    private void handlerLogOff(){
+    private void handlerLogOff() {
         new AlertDialog(SettingActivity.this).builder()
                 .setTitle(getString(R.string.str_login_out))
                 .setMsg(getString(R.string.str_Logout_tips))
@@ -103,4 +109,6 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
                     }
                 }).show();
     }
+
+
 }

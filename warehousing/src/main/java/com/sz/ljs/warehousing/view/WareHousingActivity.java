@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.nostra13.universalimageloader.utils.L;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.base.BaseApplication;
 import com.sz.ljs.common.constant.GenApi;
@@ -332,7 +333,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         switch (Id) {
             case WarehouContract.REQUEST_FAIL_ID:
                 showTipeDialog(result);
-                if ("没有数据".equals(WareHouSingModel.getInstance().getOrderModel().getMsg())) {
+                if ("没有数据".equals(result)) {
                     //TODO 没有返回订单详情的时候
                     isWenTiDan = true;
                     et_kehucankaodanhao.setFocusable(false);
@@ -485,8 +486,15 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
 
     //TODO 获取材积重等
     private void calculationVolumeWeight(String grossweight, String length, String width, String height) {
-        mPresenter.calculationVolumeWeight(grossweight, length, width, height, "", "", ""
-                , "" + customerId);
+        String arrival_date = "";
+        if (null != selectCurrentDayBatchEntity) {
+            arrival_date = selectCurrentDayBatchEntity.getArrival_date();
+        } else {
+            showTipeDialog("请选择客户代码或者填写正确运单号");
+            return;
+        }
+        mPresenter.calculationVolumeWeight(grossweight, length, width, height, "", ""
+                , arrival_date, "" + customerId);
     }
 
     //TODO 入库
@@ -711,7 +719,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
             switch (requestCode) {
                 case 1000: {
                     subnitList.clear();
-                    subnitList = WareHouSingModel.getInstance().getSubnitList();
+                    List<SubnitModel> list = new ArrayList<>();
+                    list = WareHouSingModel.getInstance().getSubnitList();
+                    subnitList.addAll(list);
                     et_shizhong.setText("" + WareHouSingModel.getInstance().getTotalGrossWeight());
                     et_jianshu.setText("" + subnitList.size());
                     Log.i("多件返回后", "subnitList.size()=" + subnitList.size());
@@ -719,7 +729,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 break;
                 case 1001: {
                     serviceList.clear();
-                    serviceList = WareHouSingModel.getInstance().getServiceModelList();
+                    List<ServiceModel> list = new ArrayList<>();
+                    list = WareHouSingModel.getInstance().getServiceModelList();
+                    serviceList.addAll(list);
                     Log.i("服务费返回后", "serviceList.size()=" + serviceList.size());
                 }
                 break;

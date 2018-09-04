@@ -9,6 +9,12 @@ public class ApiUrl {
     public static final String USERID = "userId";   //用户名
     public static final String SUMMARY = "summary";  //zhbg_ips2018_cn得MD532位小写加密
 
+    //TODO 登录
+    public static final String USER_LOGIN = "user/UserLogin";
+
+    //TODO 返回输入运单N位得时候调用接口
+    public static final String GET_SCANNUMBER_LENG = "user/GetScanNumberLeng";
+
     //TODO 获取打包页面初始化数据 og_id:机构id   service_id:服务id   server_channelid:服务渠道id
     public static final String GET_DEPLT_LIST = "user/GetDepltList";
 
@@ -77,5 +83,14 @@ public class ApiUrl {
 
     //TODO 入库接口
     public static final String CHENCK_IN = "user/ChenckIn";
+
+    //TODO 修改密码
+    public static final String UPDATE_PASSWORD = "user/UpdatePassWord";
+
+    //TODO 到件扫描初始化数据接口
+    public static final String SELECT_SHIPMENT_BAGRECEIVE = "user/SelectShipmentBagReceive";
+
+    //TODO 到件扫描 扫描 包编号就调用接口
+    public static final String TRANSPORTBATCHBUSINESS_RECEIPT = "user/TransportBatchBusinessReceipt";
 
 }
