@@ -15,9 +15,11 @@ import android.widget.TextView;
 
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.common.utils.Utils;
+import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ScanView;
 import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.warehousing.R;
+import com.sz.ljs.warehousing.contract.WarehouContract;
 import com.sz.ljs.warehousing.model.CalculationVolumeWeightModel;
 import com.sz.ljs.warehousing.model.SubnitModel;
 import com.sz.ljs.warehousing.model.WareHouSingModel;
@@ -34,7 +36,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 添加子单界面
  */
-public class AddSubunitActivity extends BaseActivity implements View.OnClickListener {
+public class AddSubunitActivity extends BaseActivity implements View.OnClickListener, WarehouContract.View {
     private LinearLayout ll_addView;
     private TextView tv_zongjianshu, tv_zongshizhong, tv_zongcaiji;
     private Button btn_queren, btn_xinzeng;
@@ -52,6 +54,8 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
     private WaitingDialog mWaitingDialog;
     private int et_changIndex = 0, et_kuanIndex = 0, et_gaoIndex = 0;
     private boolean isXinZen = false, isQueRen = false;
+    private AlertDialog alertDialog;
+    private int index = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +66,7 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
     }
 
     private void initView() {
-        mPresenter = new WarehouPresenter();
+        mPresenter = new WarehouPresenter(this);
         mWaitingDialog = new WaitingDialog(this);
         pices = getIntent().getIntExtra("pice", 1);
         orderId = getIntent().getStringExtra("orderId");
@@ -117,71 +121,73 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
         });
     }
 
-    //TODO 查询材积重、计费重
-    private void calculationVolumeWeight(final int position, String grossweight,String length, String width, String height) {
-        mPresenter.calculationVolumeWeight(grossweight, length, width, height, "", "", arrival_date
-                , "" + customerId)
-                .compose(this.<CalculationVolumeWeightModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<CalculationVolumeWeightModel>() {
-                    @Override
-                    public void accept(CalculationVolumeWeightModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            showWaiting(false);
-                            Utils.showToast(AddSubunitActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
-                            showWaiting(false);
-                            SubnitModel model = new SubnitModel();
-                            model.setPosition(position);
-                            if (null != result.getData() && null != result.getData().getLstCargoVolume()) {
-                                model.setList(result.getData().getLstCargoVolume());
-                            }
-                            if (null != subnitList && subnitList.size() > 0) {
-                                for (int i = 0; i < subnitList.size(); i++) {
-                                    if (position == subnitList.get(i).getPosition()) {
-                                        TotalVolumeWeight = TotalVolumeWeight - subnitList.get(i).getList().get(0).getVolumeWeight();
-                                        TotalChargeWeight = TotalVolumeWeight - subnitList.get(i).getList().get(0).getChargeWeight();
-                                        zongshizhong = zongshizhong - subnitList.get(i).getList().get(0).getGrossWeight();
-                                        volume = volume + result.getData().getVolume();
-                                        break;
-                                    }
-                                }
-                            }
-                            subnitList.add(model);
-                            TotalVolumeWeight = TotalVolumeWeight + result.getData().getTotalVolumeWeight();
-                            TotalChargeWeight = TotalVolumeWeight + result.getData().getTotalChargeWeight();
-                            zongshizhong = zongshizhong + result.getData().getTotalGrossWeight();
-                            volume = volume + result.getData().getVolume();
-                            tv_zongshizhong.setText("" + zongshizhong + "KG");
-                            tv_zongcaiji.setText("" + volume + "M²");
-                            View view = ll_addView.getChildAt(position);
-                            TextView tv_isTiJiao = (TextView) view.findViewById(R.id.tv_isTiJiao);
-                            tv_isTiJiao.setText("已提交");
-                            if (true == isXinZen) {
-                                addView();
-                                isXinZen = false;
-                            } else if (true == isQueRen) {
-                                isQueRen = false;
-                                //TODO 点击了确认，要返回去了
-                                WareHouSingModel.getInstance().setSubnitList(subnitList);
-                                WareHouSingModel.getInstance().setVolume(volume);
-                                WareHouSingModel.getInstance().setTotalChargeWeight(TotalChargeWeight);
-                                WareHouSingModel.getInstance().setTotalGrossWeight(zongshizhong);
-                                WareHouSingModel.getInstance().setTotalVolumeWeight(TotalVolumeWeight);
-                                setResult(RESULT_OK);
-                                finish();
-                            }
+    @Override
+    public void onResult(int Id, String result) {
+        switch (Id) {
+            case WarehouContract.REQUEST_FAIL_ID:
+                showTipeDialog(result);
+                break;
+            case WarehouContract.CALCULATION_VOLUME_WEIGHT:
+                //TODO 获取材积重等
+                handCalculationVolumeWeight();
+                break;
+        }
+    }
+
+    //TODO 处理材积重、计费重返回数据
+    private void handCalculationVolumeWeight() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                SubnitModel model = new SubnitModel();
+                model.setPosition(index);
+                if (null != WareHouSingModel.getInstance().getCalculationVolumWeightModel() && null != WareHouSingModel.getInstance().getCalculationVolumWeightModel().getLstCargoVolume()) {
+                    model.setList(WareHouSingModel.getInstance().getCalculationVolumWeightModel().getLstCargoVolume());
+                }
+                if (null != subnitList && subnitList.size() > 0) {
+                    for (int i = 0; i < subnitList.size(); i++) {
+                        if (index == subnitList.get(i).getPosition()) {
+                            TotalVolumeWeight = TotalVolumeWeight - subnitList.get(i).getList().get(0).getVolumeWeight();
+                            TotalChargeWeight = TotalVolumeWeight - subnitList.get(i).getList().get(0).getChargeWeight();
+                            zongshizhong = zongshizhong - subnitList.get(i).getList().get(0).getGrossWeight();
+                            volume = volume + WareHouSingModel.getInstance().getCalculationVolumWeightModel().getVolume();
+                            break;
                         }
                     }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
-                    }
-                });
+                }
+                subnitList.add(model);
+                TotalVolumeWeight = TotalVolumeWeight + WareHouSingModel.getInstance().getCalculationVolumWeightModel().getTotalVolumeWeight();
+                TotalChargeWeight = TotalVolumeWeight + WareHouSingModel.getInstance().getCalculationVolumWeightModel().getTotalChargeWeight();
+                zongshizhong = zongshizhong + WareHouSingModel.getInstance().getCalculationVolumWeightModel().getTotalGrossWeight();
+                volume = volume + WareHouSingModel.getInstance().getCalculationVolumWeightModel().getVolume();
+                tv_zongshizhong.setText("" + zongshizhong + "KG");
+                tv_zongcaiji.setText("" + volume + "M²");
+                View view = ll_addView.getChildAt(index);
+                TextView tv_isTiJiao = (TextView) view.findViewById(R.id.tv_isTiJiao);
+                tv_isTiJiao.setText("已提交");
+                if (true == isXinZen) {
+                    addView();
+                    isXinZen = false;
+                } else if (true == isQueRen) {
+                    isQueRen = false;
+                    //TODO 点击了确认，要返回去了
+                    WareHouSingModel.getInstance().setSubnitList(subnitList);
+                    WareHouSingModel.getInstance().setVolume(volume);
+                    WareHouSingModel.getInstance().setTotalChargeWeight(TotalChargeWeight);
+                    WareHouSingModel.getInstance().setTotalGrossWeight(zongshizhong);
+                    WareHouSingModel.getInstance().setTotalVolumeWeight(TotalVolumeWeight);
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            }
+        });
+    }
+
+    //TODO 查询材积重、计费重
+    private void calculationVolumeWeight(final int position, String grossweight, String length, String width, String height) {
+        index = position;
+        mPresenter.calculationVolumeWeight(grossweight, length, width, height, "", "", arrival_date
+                , "" + customerId);
     }
 
     //TODO 移除
@@ -294,18 +300,18 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
             EditText et_kuan = (EditText) view.findViewById(R.id.et_kuan);
             EditText et_gao = (EditText) view.findViewById(R.id.et_gao);
             if (TextUtils.isEmpty(tv_isTiJiao.getText().toString().trim())) {
-                if(TextUtils.isEmpty(et_shizhong.getText().toString().trim())){
-                    Utils.showToast(getBaseActivity(),"重量不能为空");
+                if (TextUtils.isEmpty(et_shizhong.getText().toString().trim())) {
+                    Utils.showToast(getBaseActivity(), "重量不能为空");
                     return;
                 }
                 //表示这个item还没完成提交
                 if (!TextUtils.isEmpty(et_chang.getText().toString().trim())
                         && !TextUtils.isEmpty(et_kuan.getText().toString().trim())
                         && !TextUtils.isEmpty(et_gao.getText().toString().trim())) {
-                    calculationVolumeWeight(i,et_shizhong.getText().toString().trim(), et_chang.getText().toString().trim(),
+                    calculationVolumeWeight(i, et_shizhong.getText().toString().trim(), et_chang.getText().toString().trim(),
                             et_kuan.getText().toString().trim(), et_gao.getText().toString().trim());
                 } else {
-                Utils.showToast(getBaseActivity(), "请输入完整");
+                    Utils.showToast(getBaseActivity(), "请输入完整");
                 }
                 break;
             }
@@ -320,8 +326,8 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
             EditText et_shizhong = (EditText) view1.findViewById(R.id.et_shizhong);
             EditText et_kuan = (EditText) view1.findViewById(R.id.et_kuan);
             EditText et_gao = (EditText) view1.findViewById(R.id.et_gao);
-            if(TextUtils.isEmpty(et_shizhong.getText().toString().trim())){
-                Utils.showToast(getBaseActivity(),"重量不能为空");
+            if (TextUtils.isEmpty(et_shizhong.getText().toString().trim())) {
+                Utils.showToast(getBaseActivity(), "重量不能为空");
                 return;
             }
             if (!TextUtils.isEmpty(et_chang.getText().toString().trim())
@@ -336,10 +342,28 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
         }
     }
 
-    private void showWaiting(boolean isShow) {
+    public void showWaiting(boolean isShow) {
         if (null != mWaitingDialog) {
             mWaitingDialog.showDialog(isShow);
         }
     }
 
+
+    private void showTipeDialog(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog = new AlertDialog(AddSubunitActivity.this).builder()
+                        .setTitle(getResources().getString(R.string.str_alter))
+                        .setMsg(msg)
+                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dissmiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
+    }
 }

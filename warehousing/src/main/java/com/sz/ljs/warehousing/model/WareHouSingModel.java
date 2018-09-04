@@ -27,6 +27,15 @@ public class WareHouSingModel {
     private double TotalChargeWeight;   //总计费重
     private double TotalGrossWeight;   //总实重
 
+    private List<GsonIncidentalModel.DataBean> incidentalList=new ArrayList<>();
+    private List<CountryModel.DataEntity> countryList=new ArrayList<>();
+    private List<ProductModel.DataEntity> productList=new ArrayList<>();
+    private List<CustomerModel.DataEntity> customerResultList=new ArrayList<>();
+    private SelectCurrentDayBatchModel.DataEntity selectCurrentDayBatchModel;
+    private CalculationVolumeWeightModel.DataEntity calculationVolumWeightModel;
+    private OrderModel orderModel;
+    private ChenckInModel.DataEntity chenckInResultModel;
+
     public void release(){
         serviceModelList.clear();
         customerList.clear();
@@ -36,6 +45,14 @@ public class WareHouSingModel {
         TotalVolumeWeight=0;
         TotalChargeWeight=0;
         TotalGrossWeight=0;
+        incidentalList.clear();
+        countryList.clear();
+        productList.clear();
+        customerResultList.clear();
+        selectCurrentDayBatchModel=null;
+        calculationVolumWeightModel=null;
+        orderModel=null;
+        chenckInResultModel=null;
     }
 
     public void setServiceModelList(List<ServiceModel> list) {
@@ -129,4 +146,83 @@ public class WareHouSingModel {
         TotalGrossWeight = totalGrossWeight;
     }
 
+    public List<CustomerModel.DataEntity> getCustomerList() {
+        return customerList;
+    }
+
+    public List<GsonIncidentalModel.DataBean> getIncidentalList() {
+        return incidentalList;
+    }
+
+    public void setIncidentalList(List<GsonIncidentalModel.DataBean> list) {
+        List<GsonIncidentalModel.DataBean> list1=new ArrayList<>();
+        list1.addAll(list);
+        incidentalList.clear();
+        incidentalList.addAll(list1);
+    }
+
+    public List<CountryModel.DataEntity> getCountryList() {
+        return countryList;
+    }
+
+    public void setCountryList(List<CountryModel.DataEntity> list) {
+        List<CountryModel.DataEntity> lists=new ArrayList<>();
+        lists.addAll(list);
+        countryList.clear();
+        countryList.addAll(lists);
+    }
+
+    public List<ProductModel.DataEntity> getProductList() {
+        return productList;
+    }
+
+    public void setProductList(List<ProductModel.DataEntity> list) {
+        List<ProductModel.DataEntity> lists=new ArrayList<>();
+        lists.addAll(list);
+        productList.clear();
+        productList.addAll(lists);
+    }
+
+    public List<CustomerModel.DataEntity> getCustomerResultList() {
+        return customerResultList;
+    }
+
+    public void setCustomerResultList(List<CustomerModel.DataEntity> list) {
+        List<CustomerModel.DataEntity> lists=new ArrayList<>();
+        lists.addAll(list);
+        customerResultList.clear();
+        customerResultList.addAll(lists);
+    }
+
+    public SelectCurrentDayBatchModel.DataEntity getSelectCurrentDayBatchModel() {
+        return selectCurrentDayBatchModel;
+    }
+
+    public void setSelectCurrentDayBatchModel(SelectCurrentDayBatchModel.DataEntity selectCurrentDayBatchModel) {
+        this.selectCurrentDayBatchModel = selectCurrentDayBatchModel;
+    }
+
+    public CalculationVolumeWeightModel.DataEntity getCalculationVolumWeightModel() {
+        return calculationVolumWeightModel;
+    }
+
+    public void setCalculationVolumWeightModel(CalculationVolumeWeightModel.DataEntity calculationVolumWeightModel) {
+        this.calculationVolumWeightModel = calculationVolumWeightModel;
+    }
+
+    public OrderModel getOrderModel() {
+        return orderModel;
+    }
+
+    public void setOrderModel(OrderModel orderModel) {
+        this.orderModel = orderModel;
+    }
+
+    public ChenckInModel.DataEntity getChenckInResultModel() {
+        return chenckInResultModel;
+    }
+
+    public void setChenckInResultModel(ChenckInModel.DataEntity chenckInResultModel) {
+        this.chenckInResultModel = chenckInResultModel;
+    }
 }

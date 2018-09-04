@@ -15,10 +15,12 @@ import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.Utils;
+import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ListDialog;
 import com.sz.ljs.common.view.SelectionPopForBottomView;
 import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.warehousing.R;
+import com.sz.ljs.warehousing.contract.WarehouContract;
 import com.sz.ljs.warehousing.model.GsonIncidentalModel;
 import com.sz.ljs.warehousing.model.ServiceModel;
 import com.sz.ljs.warehousing.model.WareHouSingModel;
@@ -35,7 +37,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 附加服务界面
  */
-public class AddServiceActivity extends BaseActivity implements View.OnClickListener {
+public class AddServiceActivity extends BaseActivity implements View.OnClickListener, WarehouContract.View {
     private LinearLayout ll_addView;
     private Button btn_queren, btn_xinzeng;
     private List<ServiceModel> serviceList = new ArrayList<>();
@@ -48,6 +50,8 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
     private boolean isXinZen = false, isQueRen = false;
     private int pice = 1;
     private boolean isHave = false;
+    private AlertDialog alertDialog;
+    private View views;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +69,7 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
         } else {
             pice = 1;
         }
-        mPresenter = new WarehouPresenter();
+        mPresenter = new WarehouPresenter(this);
         mWaitingDialog = new WaitingDialog(this);
         ll_addView = (LinearLayout) findViewById(R.id.ll_addView);
         btn_queren = (Button) findViewById(R.id.btn_queren);
@@ -130,69 +134,68 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    @Override
+    public void onResult(int Id, String result) {
+        switch (Id) {
+            case WarehouContract.REQUEST_FAIL_ID:
+                showTipeDialog(result);
+                break;
+            case WarehouContract.GET_INCIDENTAL_SUCCESS:
+                //TODO 请求杂费项内容
+                if (null != WareHouSingModel.getInstance().getIncidentalList() && WareHouSingModel.getInstance().getIncidentalList().size() > 0) {
+                    handelServiceResult(WareHouSingModel.getInstance().getIncidentalList(), views);
+                }
+                break;
+        }
+    }
 
     //TODO 请求杂费项内容
     private void choseZaFeiXiang(final View view) {
-        showWaiting(true);
+        views = view;
         if (null == mPresenter) {
-            mPresenter = new WarehouPresenter();
+            mPresenter = new WarehouPresenter(this);
         }
-        mPresenter.getIncidental()
-                .compose(this.<GsonIncidentalModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<GsonIncidentalModel>() {
-                    @Override
-                    public void accept(GsonIncidentalModel result) throws Exception {
-                        showWaiting(false);
-                        if (0 == result.getCode()) {
-                            Utils.showToast(getBaseActivity(), result.getMsg());
-                        } else if (1 == result.getCode()) {
-                            handelServiceResult(result, view);
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        //获取失败，提示
-                        showWaiting(false);
-                        Utils.showToast(getBaseActivity(), R.string.str_dlsb);
-                    }
-                });
+        mPresenter.getIncidental();
     }
 
     //TODO 杂费项数据处理
-    private void handelServiceResult(GsonIncidentalModel result, final View view) {
-        if (null != result && null != result.getData() && result.getData().size() > 0) {
-            beanList.clear();
-            beanList.addAll(result.getData());
-            showList.clear();
-            for (GsonIncidentalModel.DataBean brean : beanList) {
-                showList.add(new ListialogModel(brean.getExtra_service_kind(), brean.getExtra_service_cnname(), brean.getExtra_service_enname(), false));
-            }
-            dialog = new ListDialog(AddServiceActivity.this, R.style.AlertDialogStyle)
-                    .creatDialog()
-                    .setTitle("请选择杂费项")
-                    .setSeachEditTextShow(true)
-                    .setListData(showList)
-                    .setCallBackListener(new ListDialog.CallBackListener() {
-                        @Override
-                        public void Result(int position, String name) {
-                            int index = (Integer) view.getTag();
-                            View view1 = ll_addView.getChildAt(index);
-                            TextView et_zafeixiang = (TextView) view1.findViewById(R.id.et_zafeixiang);
-                            TextView tv_zfx_code = (TextView) view1.findViewById(R.id.tv_zfx_code);
-                            for (GsonIncidentalModel.DataBean brean : beanList) {
-                                if (name.equals(brean.getExtra_service_cnname())) {
-                                    tv_zfx_code.setText(brean.getExtra_service_kind());
-                                    et_zafeixiang.setText(brean.getExtra_service_cnname());
-                                    break;
+    private void handelServiceResult(final List<GsonIncidentalModel.DataBean> result, final View view) {
+        if (null != result && result.size() > 0) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    beanList.clear();
+                    beanList.addAll(result);
+                    showList.clear();
+                    for (GsonIncidentalModel.DataBean brean : beanList) {
+                        showList.add(new ListialogModel(brean.getExtra_service_kind(), brean.getExtra_service_cnname(), brean.getExtra_service_enname(), false));
+                    }
+                    dialog = new ListDialog(AddServiceActivity.this, R.style.AlertDialogStyle)
+                            .creatDialog()
+                            .setTitle("请选择杂费项")
+                            .setSeachEditTextShow(true)
+                            .setListData(showList)
+                            .setCallBackListener(new ListDialog.CallBackListener() {
+                                @Override
+                                public void Result(int position, String name) {
+                                    int index = (Integer) view.getTag();
+                                    View view1 = ll_addView.getChildAt(index);
+                                    TextView et_zafeixiang = (TextView) view1.findViewById(R.id.et_zafeixiang);
+                                    TextView tv_zfx_code = (TextView) view1.findViewById(R.id.tv_zfx_code);
+                                    for (GsonIncidentalModel.DataBean brean : beanList) {
+                                        if (name.equals(brean.getExtra_service_cnname())) {
+                                            tv_zfx_code.setText(brean.getExtra_service_kind());
+                                            et_zafeixiang.setText(brean.getExtra_service_cnname());
+                                            break;
+                                        }
+                                    }
+                                    views = null;
+                                    dialog.dismiss();
                                 }
-                            }
-                            dialog.dismiss();
-                        }
-                    });
-            dialog.show();
+                            });
+                    dialog.show();
+                }
+            });
         }
     }
 
@@ -249,6 +252,7 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
         }
         ll_addView.addView(view);
     }
+
     //TODO 新增
     private void addView2() {
         View view = LayoutInflater.from(AddServiceActivity.this).inflate(R.layout.view_service, null);
@@ -296,7 +300,7 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
                     Utils.showToast(getBaseActivity(), "杂费项或费用不能为空");
                 }
                 break;
-            }else {
+            } else {
                 //TODO 这时候先检测列表中是否含有这个数据
                 for (int j = 0; j < serviceList.size(); j++) {
                     if (serviceList.get(j).getPosition() == i) {
@@ -344,10 +348,29 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
         }
     }
 
-    private void showWaiting(boolean isShow) {
+    public void showWaiting(boolean isShow) {
         if (null != mWaitingDialog) {
             mWaitingDialog.showDialog(isShow);
         }
     }
+
+    private void showTipeDialog(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog = new AlertDialog(AddServiceActivity.this).builder()
+                        .setTitle(getResources().getString(R.string.str_alter))
+                        .setMsg(msg)
+                        .setPositiveButton(getResources().getString(R.string.str_yes), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dissmiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
+    }
+
 
 }

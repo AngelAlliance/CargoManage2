@@ -40,6 +40,7 @@ import com.ljs.examinegoods.adapter.InspectionItemAdapter;
 import com.ljs.examinegoods.adapter.PhotoGridAdapter;
 import com.ljs.examinegoods.contract.ExamineGoodsContract;
 import com.ljs.examinegoods.model.DetectionByModel;
+import com.ljs.examinegoods.model.ExamineGoodsModel;
 import com.ljs.examinegoods.model.ImageType;
 import com.ljs.examinegoods.model.ItemTypeModel;
 import com.qiloo.ble.AndBleScanner;
@@ -54,6 +55,8 @@ import com.ljs.examinegoods.presenter.ExamineGoodsPresenter;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.BluetoothManager;
+import com.sz.ljs.common.utils.MediaPlayerUtils;
+import com.sz.ljs.common.utils.MscManager;
 import com.sz.ljs.common.utils.Utils;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ListDialog;
@@ -77,7 +80,7 @@ import io.reactivex.schedulers.Schedulers;
  * 验货界面
  */
 
-public class ExamineGoodsActivity extends BaseActivity implements View.OnClickListener {
+public class ExamineGoodsActivity extends BaseActivity implements View.OnClickListener, ExamineGoodsContract.View {
     public static final String TAG = "ExamineGoodsActivity";
     private EditText et_yundanhao, et_kehucankaodanhao, et_wenti, et_jianshu;
     private ImageView iv_scan, iv_yiyanhuo, iv_scan2;
@@ -96,21 +99,11 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private OrderModel orderModel;
     private List<ImageType> Imagelist = new ArrayList<>();
     private ListDialog dialog;
-    private BluetoothManager bluetoothManager;
     private AlertDialog alertDialog;
     private NoscrollListView listview;
     private InspectionItemAdapter inspectionAdapter;
     private List<DetectionByModel.DataBean> detectionList = new ArrayList<>();
-    private Handler handl;
-    //蓝牙搜索
-    private AndBleScanner mScanner;
-    private List<ScanInfo> bleList = new ArrayList<ScanInfo>();
-    // 语音合成对象
-    private SpeechSynthesizer mTts;
-    // 引擎类型
-    private String mEngineType = SpeechConstant.TYPE_CLOUD;
-    // 默认发音人
-    private String voicer = "vixy";
+    private Bitmap bitmaps;
 
 
     @Override
@@ -125,11 +118,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void initView() {
-        mScanner = new AndBleScanner.Builder()
-                .setScanTimeOut(30)
-                .build();
         waitingDialog = new WaitingDialog(this);
-        mPresenter = new ExamineGoodsPresenter();
+        mPresenter = new ExamineGoodsPresenter(this);
         listview = (NoscrollListView) findViewById(R.id.lv_listView);
         et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         et_kehucankaodanhao = (EditText) findViewById(R.id.et_kehucankaodanhao);
@@ -152,24 +142,9 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
 
     private void initData() {
+        MediaPlayerUtils.setRingVolume(true, ExamineGoodsActivity.this);
         adapter = new PhotoGridAdapter(this, photoList);
         gv_photo.setAdapter(adapter);
-        // 初始化合成对象
-        mTts = SpeechSynthesizer.createSynthesizer(this, new InitListener() {
-            @Override
-            public void onInit(int i) {
-                if (i != ErrorCode.SUCCESS) {
-                    Utils.showToast(getBaseActivity(), "初始化失败,错误码：" + i);
-                } else {
-                    // 初始化成功，之后可以调用startSpeaking方法
-                    // 注：有的开发者在onCreate方法中创建完合成对象之后马上就调用startSpeaking进行合成，
-                    // 正确的做法是将onCreate中的startSpeaking调用移至这里
-                }
-            }
-        });
-
-        // 设置参数
-//        setParam();
     }
 
 
@@ -184,8 +159,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() >= GenApi.ScanNumberLeng) {
                     //TODO 当运单号大于8位的时候就开始请求数据
-//                    int code = mTts.startSpeaking(s.toString(), mTtsListener);
-//                        Log.i("语音播报", "code=" + code);
+                    MscManager.getInstance().speech(s.toString());
                     getOrderByNumber();
                 }
             }
@@ -279,7 +253,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                         String str = PhotosUtils.bitmapToHexString(bitmap);
                         Log.i("图片转成16进制之后的字符串", "str=" + PhotosUtils.bitmapToHexString(bitmap));
                         if (!TextUtils.isEmpty(str)) {
-                            uploadFile(bitmap, str);
+                            bitmaps = bitmap;
+                            mPresenter.uploadFile(str);
                         }
                     }
                 }
@@ -310,7 +285,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 }
             });
         } else if (id == R.id.iv_yiyanhuo) {
-            isWenTiJian=false;
+            isWenTiJian = false;
             if (null != detectionList && detectionList.size() > 0) {
                 for (DetectionByModel.DataBean model : detectionList) {
                     if (true == model.isChaYi()) {
@@ -334,71 +309,121 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         }
     }
 
-    //TODO 图片上传
-    private void uploadFile(final Bitmap bitmap, String str) {
-        showWaiting(true);
-        mPresenter.uploadFile(str)
-                .compose(this.<UploadFileResultModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<UploadFileResultModel>() {
-                    @Override
-                    public void accept(final UploadFileResultModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            Imagelist.add(new ImageType(result.getData(), "A"));
-                            photoList.add(bitmap);
-                            adapter.notifyDataSetChanged();
-                        } else {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-                        }
+    @Override
+    public void onResult(int Id, final String result) {
+        switch (Id) {
+            case ExamineGoodsContract.REQUEST_FAIL_ID:
+                showTipeDialog(result);
+                break;
+            case ExamineGoodsContract.GETORDERBYNUMBER_SUCCESS:
+                //TODO 根据订单号查询订单信息
+                if (null != ExamineGoodsModel.getInstance().getOrderModel() && null !=  ExamineGoodsModel.getInstance().getOrderModel().getData()) {
+                    if (null == orderModel) {
+                        orderModel = new OrderModel();
                     }
-                }, new Consumer<Throwable>() {
+                    orderModel =  ExamineGoodsModel.getInstance().getOrderModel();
+                    if (!TextUtils.isEmpty( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_info())) {
+                        tv_goods_type.setText( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_info());
+                        getDetectionBy( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_info());
+                    }
+                    if (!TextUtils.isEmpty( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_pieces())) {
+                        tv_goods_jianshu.setText( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_pieces());
+                    }
+                    ExamineGoodsModel.getInstance().setOrderModel(null);
+                }else {
+                    showTipeDialog("暂无订单信息数据");
+                }
+                break;
+            case ExamineGoodsContract.GET_ITEM_TYPE_SUCCESS:
+                //TODO 查询所有得货物类型
+                if (null != ExamineGoodsModel.getInstance().getItemTypeList() && ExamineGoodsModel.getInstance().getItemTypeList().size() > 0) {
+                    typeList.clear();
+                    typeList.addAll(ExamineGoodsModel.getInstance().getItemTypeList());
+                    showList.clear();
+                    for (ItemTypeModel.DataBean bean : ExamineGoodsModel.getInstance().getItemTypeList()) {
+                        showList.add(new ListialogModel("", bean.getItem_cn_name(), bean.getItem_en_name(), false));
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog = new ListDialog(ExamineGoodsActivity.this)
+                                    .creatDialog()
+                                    .setTitle("请选择货物类型")
+                                    .setListData(showList)
+                                    .setCallBackListener(new ListDialog.CallBackListener() {
+                                        @Override
+                                        public void Result(int position, String name) {
+
+                                        }
+                                    });
+                            dialog.show();
+                        }
+                    });
+                }else {
+                    showTipeDialog("暂无数据");
+                }
+                break;
+            case ExamineGoodsContract.GET_DETECTIONBY_SUCCESS:
+                //TODO 根据货物类型差检查项
+                if (null != ExamineGoodsModel.getInstance().getDetectionList() && ExamineGoodsModel.getInstance().getDetectionList().size() > 0) {
+                    for (DetectionByModel.DataBean model : ExamineGoodsModel.getInstance().getDetectionList()) {
+                        model.setSelect_value(model.getDefult_value());
+                        if ("D".equals(model.getValue()) || model.getDefult_value().equals(model.getValue())) {
+                            //TODO 如果相同，则表示没有差异
+                            model.setChaYi(false);
+                        } else {
+                            model.setChaYi(true);
+                        }
+                        detectionList.add(model);
+                    }
+                    inspectionAdapter.notifyDataSetChanged();
+                    ExamineGoodsModel.getInstance().getDetectionList().clear();
+                }else {
+                    detectionList.clear();
+                    inspectionAdapter.notifyDataSetChanged();
+                    showTipeDialog("暂无货物类型检查项数据");
+                }
+                break;
+            case ExamineGoodsContract.SAVE_DETECTIONORDER_SUCCESS:
+                //TODO 添加问题件或者保存验货结果
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void accept(Throwable throwable) throws Exception {
-//                        showWaiting(false);
-                        //获取失败，提示
-                        showWaiting(false);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                        .builder()
-                                        .setTitle(getResources().getString(R.string.str_alter))
-                                        .setMsg(getResources().getString(R.string.str_qqsb))
-                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                alertDialog.dissmiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
-                        });
+                    public void run() {
+                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                                .builder()
+                                .setTitle(getResources().getString(R.string.str_alter))
+                                .setMsg(result)
+                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        alertDialog.dissmiss();
+                                        //TODO 打印标签
+                                    }
+                                });
+                        alertDialog.show();
+                        clean();
                     }
                 });
+                break;
+            case ExamineGoodsContract.UPLOAD_FILE_SUCCESS:
+                //TODO 图片上传
+                if (null != ExamineGoodsModel.getInstance().getFileResultModel()) {
+                    Imagelist.add(new ImageType(ExamineGoodsModel.getInstance().getFileResultModel().getData(), "A"));
+                    photoList.add(bitmaps);
+                    adapter.notifyDataSetChanged();
+                    bitmaps = null;
+                    ExamineGoodsModel.getInstance().setFileResultModel(null);
+                } else {
+
+                }
+                break;
+        }
     }
 
     //TODO 提交问题件或者保存验货单
     private void saveDetecTionOrder() {
         //TODO 检查是否是问题件
-        isWenTiJian=false;
+        isWenTiJian = false;
         if (null != detectionList && detectionList.size() > 0) {
             for (DetectionByModel.DataBean model : detectionList) {
                 if (true == model.isChaYi()) {
@@ -408,108 +433,28 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             }
         }
         if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                            .builder()
-                            .setTitle(getResources().getString(R.string.str_alter))
-                            .setMsg(getResources().getString(R.string.str_ydhbnwk))
-                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    alertDialog.dissmiss();
-                                }
-                            });
-                    alertDialog.show();
-                }
-            });
+            showTipeDialog(getResources().getString(R.string.str_ydhbnwk));
             return;
         }
-//        if (TextUtils.isEmpty(et_kehucankaodanhao.getText().toString().trim())) {
-//            Utils.showToast(getBaseActivity(), getResources().getString(R.string.str_khckdhbnwk));
-//            return;
-//        }
         if (true == isWenTiJian) {
             if (TextUtils.isEmpty(et_wenti.getText().toString().trim())) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_wtmsbnwk))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
+                showTipeDialog(getResources().getString(R.string.str_wtmsbnwk));
                 return;
             }
             if (null == Imagelist || Imagelist.size() <= 0) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_zpbnwk))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
+                showTipeDialog(getResources().getString(R.string.str_zpbnwk));
                 return;
             }
         } else {
             if (false == isYanHuo) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_qgxyyh))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
+                showTipeDialog(getResources().getString(R.string.str_qgxyyh));
                 return;
             }
             if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                .builder()
-                                .setTitle(getResources().getString(R.string.str_alter))
-                                .setMsg(getResources().getString(R.string.str_jsbnwk))
-                                .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        alertDialog.dissmiss();
-                                    }
-                                });
-                        alertDialog.show();
-                    }
-                });
+                showTipeDialog(getResources().getString(R.string.str_jsbnwk));
                 return;
             }
         }
-        showWaiting(true);
         SaveDeteTionOrderRequestModel requestModel = new SaveDeteTionOrderRequestModel();
         requestModel.setNumber(et_yundanhao.getText().toString().trim());
         requestModel.setReference_number(et_kehucankaodanhao.getText().toString());
@@ -539,76 +484,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             requestModel.setUserId(String.valueOf(UserModel.getInstance().getSt_id()));
         }
         requestModel.setSummary(ExamineGoodsContract.summary);
-        mPresenter.saveDetecTionOrder(requestModel)
-                .compose(this.<SaveDetecTionOrderResultModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<SaveDetecTionOrderResultModel>() {
-
-                    @Override
-                    public void accept(final SaveDetecTionOrderResultModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-                            clean();
-                        } else {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                        .builder()
-                                        .setTitle(getResources().getString(R.string.str_alter))
-                                        .setMsg(getResources().getString(R.string.str_qqsb))
-                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                alertDialog.dissmiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
-                        });
-                    }
-                });
+        mPresenter.saveDetecTionOrder(requestModel);
     }
 
     //TODO 清空界面数据
@@ -633,202 +509,18 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
     //TODO 查询所有得货物类型
     private void getItemType() {
-        showWaiting(true);
-        mPresenter.getItemType()
-                .compose(this.<ItemTypeModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ItemTypeModel>() {
-                    @Override
-                    public void accept(ItemTypeModel result) throws Exception {
-                        if (0 == result.getCode()) {
-                            showWaiting(false);
-                            Utils.showToast(ExamineGoodsActivity.this, result.getMsg());
-                        } else if (1 == result.getCode()) {
-                            showWaiting(false);
-                            if (null != result && null != result.getData() && result.getData().size() > 0) {
-                                typeList.clear();
-                                typeList.addAll(result.getData());
-                                showList.clear();
-                                for (ItemTypeModel.DataBean bean : result.getData()) {
-                                    showList.add(new ListialogModel("", bean.getItem_cn_name(), bean.getItem_en_name(), false));
-                                }
-                                dialog = new ListDialog(ExamineGoodsActivity.this)
-                                        .creatDialog()
-                                        .setTitle("请选择货物类型")
-                                        .setListData(showList)
-                                        .setCallBackListener(new ListDialog.CallBackListener() {
-                                            @Override
-                                            public void Result(int position, String name) {
-
-                                            }
-                                        });
-                                dialog.show();
-
-                            }
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        Utils.showToast(getBaseActivity(), R.string.str_qqsb);
-                    }
-                });
+        mPresenter.getItemType();
     }
 
     //TODO 根据货物类型差检查项  detection_name:货物类型中文名称
     private void getDetectionBy(String detection_name) {
-        showWaiting(true);
-        mPresenter.getDetectionBy(detection_name)
-                .compose(this.<DetectionByModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<DetectionByModel>() {
-                    @Override
-                    public void accept(final DetectionByModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            showWaiting(false);
-                            if (null != result.getData() && result.getData().size() > 0) {
-                                handelDetectionResult(result);
-                            }
-                        } else {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    detectionList.clear();
-                                                    inspectionAdapter.notifyDataSetChanged();
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        showWaiting(false);
-                        //获取失败，提示
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                        .builder()
-                                        .setTitle(getResources().getString(R.string.str_alter))
-                                        .setMsg(getResources().getString(R.string.str_qqsb))
-                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                alertDialog.dissmiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
-                        });
-                    }
-                });
+        mPresenter.getDetectionBy(detection_name);
     }
 
-    private void handelDetectionResult(DetectionByModel result) {
-        if (null != result.getData() && result.getData().size() > 0) {
-            for (DetectionByModel.DataBean model : result.getData()) {
-                model.setSelect_value(model.getDefult_value());
-                if ("D".equals(model.getValue()) || model.getDefult_value().equals(model.getValue())) {
-                    //TODO 如果相同，则表示没有差异
-                    model.setChaYi(false);
-                } else {
-                    model.setChaYi(true);
-                }
-                detectionList.add(model);
-            }
-            inspectionAdapter.notifyDataSetChanged();
-        }
-
-    }
 
     //TODO 根据运单号请求运单数据
     private void getOrderByNumber() {
-
-        mPresenter.getOrderByNumber(et_yundanhao.getText().toString().trim())
-                .compose(this.<OrderModel>bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<OrderModel>() {
-                    @Override
-                    public void accept(final OrderModel result) throws Exception {
-                        if (1 == result.getCode()) {
-                            handelOrderResult(result);
-                        } else {
-                            showWaiting(false);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                            .builder()
-                                            .setTitle(getResources().getString(R.string.str_alter))
-                                            .setMsg(result.getMsg())
-                                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dissmiss();
-                                                }
-                                            });
-                                    alertDialog.show();
-                                }
-                            });
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        //获取失败，提示
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                alertDialog = new AlertDialog(ExamineGoodsActivity.this)
-                                        .builder()
-                                        .setTitle(getResources().getString(R.string.str_alter))
-                                        .setMsg(getResources().getString(R.string.str_qqsb))
-                                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                alertDialog.dissmiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
-                        });
-                    }
-                });
-    }
-
-    //TODO 处理运单数据
-    private void handelOrderResult(OrderModel result) {
-        if (null != result && null != result.getData()) {
-            if (null == orderModel) {
-                orderModel = new OrderModel();
-            }
-            orderModel = result;
-            if (!TextUtils.isEmpty(result.getData().getOrder_info())) {
-                tv_goods_type.setText(result.getData().getOrder_info());
-                getDetectionBy(result.getData().getOrder_info());
-            }
-            if (!TextUtils.isEmpty(result.getData().getOrder_pieces())) {
-                tv_goods_jianshu.setText(result.getData().getOrder_pieces());
-            }
-
-        }
+        mPresenter.getOrderByNumber(et_yundanhao.getText().toString().trim());
     }
 
     //为listview动态设置高度（有多少条目就显示多少条目）
@@ -852,210 +544,28 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         listView.setLayoutParams(params);
     }
 
-    //TODO 打印
-    private void Printing() {
-        bluetoothManager = new BluetoothManager(ExamineGoodsActivity.this)
-                .setStateChangCallBack(new BluetoothManager.IBluetoothStateChangCallBack() {
-                    @Override
-                    public void onStateChang(int state) {
-                        switch (state) {
-                            case BluetoothAdapter.STATE_ON: {
-                                Scan();
-                            }
-                            break;
-                            case BluetoothAdapter.STATE_OFF: {
-                                stopScan();
-                            }
-                            break;
-                        }
-                    }
-                });
-        if (!BluetoothManager.BluetoothState()) { //表示未开启
-            alertDialog = new AlertDialog(ExamineGoodsActivity.this).builder()
-                    .setMsg(getString(R.string.str_bluetooth_is_close))
-                    .setPositiveButton(getString(R.string.str_yes), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            BluetoothManager.openBluetooth();
-                            alertDialog.dissmiss();
-                        }
-                    })
-                    .setNegativeButton(getString(R.string.str_cancel), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            alertDialog.dissmiss();
-                        }
-                    });
-            alertDialog.show();
-        } else {
-            Scan();
-        }
-    }
-
-    //TODO 蓝牙搜索
-    private void Scan() {
-        mScanner.searchBle()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ScanInfo>() {
-
-                    @Override
-                    public void accept(ScanInfo scanInfo) throws Exception {
-                        String tmp = "Addr=" + scanInfo.getScanDevice().getAddress()
-                                + " Rssi=" + scanInfo.getRssi()
-                                + " UUID=" + scanInfo.getAdvData().getAdvData()
-                                + " LocalName=" + scanInfo.getAdvData().getLocalName();
-                        Log.i("设备信息", "tmp=" + tmp);
-                        for (final ScanInfo mdevice : bleList) { // 将设备储存进扫描列表
-                            if (mdevice.getScanDevice().getAddress().equals(scanInfo.getScanDevice().getAddress())) {
-                                handl.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            bleList.remove(mdevice);
-                                        } catch (Exception e) {
-                                            Log.e(TAG
-                                                    , e.toString());
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                        bleList.add(scanInfo);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {//出错的信息
-                    }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {//扫描完成的
-                        handl.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Scan();
-                                } catch (Exception e) {
-
-                                    Log.e(TAG
-                                            , e.toString());
-                                }
-                            }
-                        });
-                    }
-                });
-    }
-
-    //TODO 停止搜索
-    private void stopScan() {
-        mScanner.stopScan();
-    }
-
-    private void showWaiting(boolean isShow) {
+    public void showWaiting(boolean isShow) {
         if (null != waitingDialog) {
             waitingDialog.showDialog(isShow);
         }
     }
 
-    /**
-     * 参数设置
-     *
-     * @return
-     */
-    private void setParam() {
-        // 清空参数
-        mTts.setParameter(SpeechConstant.PARAMS, null);
-        // 根据合成引擎设置相应参数
-        if (mEngineType.equals(SpeechConstant.TYPE_CLOUD)) {
-            mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
-            //onevent回调接口实时返回音频流数据
-            //mTts.setParameter(SpeechConstant.TTS_DATA_NOTIFY, "1");
-            // 设置在线合成发音人
-            mTts.setParameter(SpeechConstant.VOICE_NAME, voicer);
-            //设置合成语速
-            mTts.setParameter(SpeechConstant.SPEED, "50");
-            //设置合成音调
-            mTts.setParameter(SpeechConstant.PITCH, "50");
-            //设置合成音量
-            mTts.setParameter(SpeechConstant.VOLUME, "100");
-        } else {
-            mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_LOCAL);
-            // 设置本地合成发音人 voicer为空，默认通过语记界面指定发音人。
-            mTts.setParameter(SpeechConstant.VOICE_NAME, "");
-            /**
-             * TODO 本地合成不设置语速、音调、音量，默认使用语记设置
-             * 开发者如需自定义参数，请参考在线合成参数设置
-             */
-        }
-        //设置播放器音频流类型
-        mTts.setParameter(SpeechConstant.STREAM_TYPE, "3");
-        // 设置播放合成音频打断音乐播放，默认为true
-        mTts.setParameter(SpeechConstant.KEY_REQUEST_FOCUS, "true");
-
-        // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
-        // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
-        mTts.setParameter(SpeechConstant.AUDIO_FORMAT, "pcm");
-        mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/msc/tts.pcm");
-    }
-
-    /**
-     * 合成回调监听。
-     */
-    private SynthesizerListener mTtsListener = new SynthesizerListener() {
-
-        @Override
-        public void onSpeakBegin() {
-            showTip("开始播放");
-        }
-
-        @Override
-        public void onSpeakPaused() {
-            showTip("暂停播放");
-        }
-
-        @Override
-        public void onSpeakResumed() {
-            showTip("继续播放");
-        }
-
-        @Override
-        public void onBufferProgress(int percent, int beginPos, int endPos,
-                                     String info) {
-            // 合成进度
-        }
-
-        @Override
-        public void onSpeakProgress(int percent, int beginPos, int endPos) {
-            // 播放进度
-
-            if (!"henry".equals(voicer) || !"xiaoyan".equals(voicer) ||
-                    !"xiaoyu".equals(voicer) || !"catherine".equals(voicer))
-                endPos++;
-            Log.e(TAG, "beginPos = " + beginPos + "  endPos = " + endPos);
-        }
-
-        @Override
-        public void onCompleted(SpeechError error) {
-            if (error == null) {
-                showTip("播放完成");
-            } else if (error != null) {
-                showTip(error.getPlainDescription(true));
+    private void showTipeDialog(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog = new AlertDialog(ExamineGoodsActivity.this)
+                        .builder()
+                        .setTitle(getResources().getString(R.string.str_alter))
+                        .setTitle(msg)
+                        .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dissmiss();
+                            }
+                        });
+                alertDialog.show();
             }
-        }
-
-        @Override
-        public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
-            // 以下代码用于获取与云端的会话id，当业务出错时将会话id提供给技术支持人员，可用于查询会话日志，定位出错原因
-            // 若使用本地能力，会话id为null
-            Log.e(TAG, "TTS Demo onEvent >>>" + eventType);
-            if (SpeechEvent.EVENT_SESSION_ID == eventType) {
-                String sid = obj.getString(SpeechEvent.KEY_EVENT_SESSION_ID);
-                Log.d(TAG, "session id =" + sid);
-            }
-        }
-    };
-
-    private void showTip(final String str) {
-        Utils.showToast(getBaseActivity(), str);
+        });
     }
 }
