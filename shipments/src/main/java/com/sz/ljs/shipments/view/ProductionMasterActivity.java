@@ -293,65 +293,16 @@ public class ProductionMasterActivity extends BaseActivity implements View.OnCli
 
     //TODO 生成主单
     private void saveTransportBatchAndBusiness() {
-        showWaiting(true);
         if (TextUtils.isEmpty(tv_xiayizhan.getText().toString())) {
-            showWaiting(false);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
-                            .builder()
-                            .setTitle(getResources().getString(R.string.str_alter))
-                            .setMsg("请选择下一站地址")
-                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    alertDialog.dissmiss();
-                                }
-                            });
-                    alertDialog.show();
-                }
-            });
+            showTipeDialog("请选择下一站地址");
             return;
         }
 //        if (TextUtils.isEmpty(tv_shouhuofuwushao.getText().toString())) {
-//            showWaiting(false);
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
-//                            .builder()
-//                            .setTitle(getResources().getString(R.string.str_alter))
-//                            .setMsg("请选择收货服务商")
-//                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    alertDialog.dissmiss();
-//                                }
-//                            });
-//                    alertDialog.show();
-//                }
-//            });
+//            showTipeDialog("请选择收货服务商");
 //            return;
 //        }
         if (TextUtils.isEmpty(tv_fahuoshijian.getText().toString())) {
-            showWaiting(false);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    alertDialog = new AlertDialog(ProductionMasterActivity.this)
-                            .builder()
-                            .setTitle(getResources().getString(R.string.str_alter))
-                            .setMsg("请选择发货时间")
-                            .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    alertDialog.dissmiss();
-                                }
-                            });
-                    alertDialog.show();
-                }
-            });
+            showTipeDialog("请选择发货时间");
             return;
         }
         List<TransportBatchBusinessParamModel> list = new ArrayList<>();

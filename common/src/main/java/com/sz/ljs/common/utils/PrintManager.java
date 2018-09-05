@@ -16,6 +16,7 @@ import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.WaitingDialog;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * Created by liujs
@@ -137,27 +138,17 @@ public class PrintManager {
 
 
     //TODO 生成一维码图片并且打印出来
-    public void creatOneDimensionalCode(String str) {
+    public void creatOneDimensionalCode(List<String> str) {
         showWaiteDialog(true);
-        if (TextUtils.isEmpty(str)) {
+        if (null==str||str.size()<=0) {
             showWaiteDialog(false);
             showTip(mContext.getResources().getString(R.string.str_qsrydydydh));
             return;
         }
         //如果判断为字节长度大于其字符长度，则判定为无法生成条码的字符
-        if (str.getBytes().length > str.length()) {
+        if (str.get(0).getBytes().length > str.get(0).length()) {
             showWaiteDialog(false);
             showTip(mContext.getResources().getString(R.string.cannot_create_bar));
-            return;
-        }
-
-        //生成一维码
-        mBitmap = BarcodeCreater.creatBarcode(mContext,str, 384, 100, true,
-                1);
-        //图片为空则返回
-        if (mBitmap == null){
-            showWaiteDialog(false);
-            showTip("一维码生成失败");
             return;
         }
         //打印中，不执行本次操作
@@ -172,20 +163,39 @@ public class PrintManager {
             showTip("低电量,不能打印,请先充电");
             return;
         }
-        byte[] printData = BitmapTools.bitmap2PrinterBytes(mBitmap);
-        if(concentration<=25){
-            concentration=25;
+
+        for (int i=0;i<str.size();i++){
+            //生成一维码
+            mBitmap = BarcodeCreater.creatBarcode(mContext,str.get(i), 384, 100, true,
+                    1);
+            //图片为空则返回
+            if (mBitmap == null){
+                showWaiteDialog(false);
+                showTip("一维码生成失败");
+                return;
+            }
+            byte[] printData = BitmapTools.bitmap2PrinterBytes(mBitmap);
+            if(concentration<=25){
+                concentration=25;
+            }
+            mPrintQueue.addBmp(concentration, mLeft, mBitmap.getWidth(),
+                    mBitmap.getHeight(), printData);
+            mPrintQueue.addAction(PrintQueue.PRINTER_CMD_KEY_CHECKBLACK);
+            try {
+                mPrintQueue.addText(concentration, "\n\n\n\n\n".toString()
+                        .getBytes("GBK"));
+            } catch (UnsupportedEncodingException e) {
+                // TODO Auto-generated catch block
+                Log.i("打印的时候出错","error="+e.toString());
+                e.printStackTrace();
+            }
+            try {
+                Thread.sleep(200);
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
         }
-        mPrintQueue.addBmp(concentration, mLeft, mBitmap.getWidth(),
-                mBitmap.getHeight(), printData);
-        try {
-            mPrintQueue.addText(concentration, "\n\n\n\n\n".toString()
-                    .getBytes("GBK"));
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            Log.i("打印的时候出错","error="+e.toString());
-            e.printStackTrace();
-        }
+
         //设为不可打印
         isCanPrint=false;
         //打印队列开始执行

@@ -231,14 +231,54 @@
                 android:scrollbars="none"
                 android:verticalSpacing="10dp"
                 android:visibility="gone" />
+            <com.sz.ljs.common.view.SyncHorizontalScrollView
+                android:id="@+id/header_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:overScrollMode="never"
+                android:scrollbars="none">
 
-            <com.sz.ljs.common.view.FourSidesSlidingListView
-                android:id="@+id/fs_yisaomiao_list"
+                <com.sz.ljs.common.view.NoscrollListView
+                    android:id="@+id/lv_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    android:visibility="visible" />
+            </com.sz.ljs.common.view.SyncHorizontalScrollView>
+            <ScrollView
+                android:id="@+id/scroll_content"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:visibility="visible"
-                app:isShowzz="1" />
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:visibility="visible">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+                    <com.sz.ljs.common.view.SyncHorizontalScrollView
+                        android:id="@+id/data_horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:overScrollMode="never"
+                        android:scrollbars="none">
+
+                        <com.sz.ljs.common.view.NoscrollExpandableListView
+                            android:id="@+id/lv_data"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:overScrollMode="never"
+                            android:scrollbars="none"
+                            android:groupIndicator="@null"/>
+
+                    </com.sz.ljs.common.view.SyncHorizontalScrollView>
+                </LinearLayout>
+            </ScrollView>
+
         </LinearLayout>
 
     </LinearLayout>

@@ -152,4 +152,6 @@
     <string name="label">检测到黑标</string>
     <string name="str_qsrydydydh">请输入需要补打标签的运单号或者子单号</string>
     <string name="cannot_create_bar">当前数据不能生成一维码</string>
+    <string name="str_fgs">分公司</string>
+    <string name="str_ps">票数</string>
 </resources>

@@ -27,6 +27,8 @@ import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.patchlabel.R;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -102,7 +104,20 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
             popuwindow.showPopupWindow(tv_type);
         } else if (id == R.id.ll_dayin) {
             //TODO 打印
-            PrintManager.getInstance().creatOneDimensionalCode(et_danhao.getText().toString().trim());
+            List<String> str = new ArrayList<>();
+            if (!TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
+                int num = Integer.parseInt(et_jianshu.getText().toString().trim());
+                if (num > 20) {
+                    showTip("输入件数太多，无法打印");
+                    return;
+                }
+                for (int i = 0; i < num; i++) {
+                    str.add(et_danhao.getText().toString().trim() + "-00" + i);
+                }
+            } else {
+                str.add(et_danhao.getText().toString().trim());
+            }
+            PrintManager.getInstance().creatOneDimensionalCode(str);
 //            creatOneDimensionalCode();
         }
     }

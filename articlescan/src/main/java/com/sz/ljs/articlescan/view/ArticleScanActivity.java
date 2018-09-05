@@ -4,16 +4,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.sz.ljs.articlescan.R;
+import com.sz.ljs.articlescan.adapter.DataExpandableListAdapter;
+import com.sz.ljs.articlescan.adapter.TitleAdapter;
 import com.sz.ljs.articlescan.contract.ArticleScanContract;
 import com.sz.ljs.articlescan.model.ArticleScanModel;
 import com.sz.ljs.articlescan.model.GsonOrgServerModel;
 import com.sz.ljs.articlescan.model.GsonSelectShipmentBagReceiveModel;
+import com.sz.ljs.articlescan.model.TitleModel;
 import com.sz.ljs.articlescan.presenter.ArticleScanPresenter;
 import com.sz.ljs.base.BaseActivity;
 import com.sz.ljs.common.adapter.MenuAdapter;
@@ -24,6 +30,9 @@ import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.FourSidesSlidingListView;
 import com.sz.ljs.common.view.ListDialog;
+import com.sz.ljs.common.view.NoscrollExpandableListView;
+import com.sz.ljs.common.view.NoscrollListView;
+import com.sz.ljs.common.view.SyncHorizontalScrollView;
 import com.sz.ljs.common.view.WaitingDialog;
 
 import java.util.ArrayList;
@@ -43,20 +52,24 @@ import cn.qqtheme.framework.picker.WheelPicker;
 public class ArticleScanActivity extends BaseActivity implements ArticleScanContract.View, View.OnClickListener {
     private TextView tv_arrive_time, tv_last_station, tv_qudao;
     private LinearLayout ll_arrive_time, ll_last_station, ll_qudao;
+    private SyncHorizontalScrollView header_horizontal,data_horizontal;
+    private NoscrollListView lv_header;
+    private NoscrollExpandableListView lv_data;
     private List<MenuModel> dcyMenuList = new ArrayList<>();
-    private List<FourSidesSlidListTitileModel> yiSaoMiaoHeaderList = new ArrayList<>();
-    private FourSidesSlidingListView fs_yisaomiao_list;
     private GridView gv_menu;
     private MenuAdapter dcyMenuAdapter;
     private WaitingDialog waitingDialog;
     private AlertDialog alertDialog;
     private ArticleScanPresenter mPresenter;
-    private List<GsonSelectShipmentBagReceiveModel.DataBean> shipmentBagList = new ArrayList<>();
     private List<GsonOrgServerModel.DataBean.OrgListBean> orgList = new ArrayList<>();
     private GsonOrgServerModel.DataBean.OrgListBean orgListBean;
     private List<GsonOrgServerModel.DataBean.ServerListBean> serverList = new ArrayList<>();
     private GsonOrgServerModel.DataBean.ServerListBean serverListBean;
     private ListDialog dialog;
+    private DataExpandableListAdapter dataAdapter;
+    private TitleAdapter titleAdapter;
+    private List<GsonSelectShipmentBagReceiveModel.DataBean> shipmentBagList = new ArrayList<>();
+    private List<TitleModel> titleList=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +90,14 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
         ll_qudao = (LinearLayout) findViewById(R.id.ll_qudao);
         tv_qudao = (TextView) findViewById(R.id.tv_qudao);
         gv_menu = (GridView) findViewById(R.id.gv_menu);
-        fs_yisaomiao_list = (FourSidesSlidingListView) findViewById(R.id.fs_yisaomiao_list);
+        header_horizontal = (SyncHorizontalScrollView) findViewById(R.id.header_horizontal);
+        data_horizontal = (SyncHorizontalScrollView) findViewById(R.id.data_horizontal);
+        lv_header = (NoscrollListView) findViewById(R.id.lv_header);
+        lv_data = (NoscrollExpandableListView) findViewById(com.sz.ljs.common.R.id.lv_data);
+        header_horizontal.setScrollView(data_horizontal);
+        data_horizontal.setScrollView(header_horizontal);
         setDaiChuYunMenu();
-        getYiSaoMiaoHeaderData();
+        getHeaderData();
 
     }
 
@@ -87,7 +105,12 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
 //        mPresenter.SelectShipmentBagReceive();
         dcyMenuAdapter = new MenuAdapter(this, dcyMenuList);
         gv_menu.setAdapter(dcyMenuAdapter);
-        fs_yisaomiao_list.setHeaderData(yiSaoMiaoHeaderList);
+        titleAdapter=new TitleAdapter(this,titleList);
+        lv_header.setAdapter(titleAdapter);
+        setListViewHeight(lv_header);
+        dataAdapter=new DataExpandableListAdapter(this,shipmentBagList);
+        lv_data.setAdapter(dataAdapter);
+        setListViewHeight(lv_data);
     }
 
 
@@ -135,9 +158,14 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
                 //TODO 初始化界面数据请求成功
                 if (null != ArticleScanModel.getInstance().getShipmentBagList()
                         && ArticleScanModel.getInstance().getShipmentBagList().size() > 0) {
-                    shipmentBagList.clear();
-                    shipmentBagList.addAll(ArticleScanModel.getInstance().getShipmentBagList());
-
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            shipmentBagList.clear();
+                            shipmentBagList.addAll(ArticleScanModel.getInstance().getShipmentBagList());
+                            dataAdapter.notifyDataSetChanged();
+                        }
+                    });
                 } else {
                     showTipeDialog("暂无数据");
                 }
@@ -233,12 +261,10 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
     }
 
     //TODO 设置打包界面已扫描界面数据标题栏
-    private void getYiSaoMiaoHeaderData() {
-        yiSaoMiaoHeaderList.add(new FourSidesSlidListTitileModel(2, getResources().getString(R.string.str_gx)
-                , getResources().getString(R.string.str_bbh), ""
-                , getResources().getString(R.string.str_ydh), getResources().getString(R.string.str_zdtm)
-                , getResources().getString(R.string.str_js), getResources().getString(R.string.str_shizhong)
-                , getResources().getString(R.string.str_ckg)));
+    private void getHeaderData() {
+        titleList.add(new TitleModel(getResources().getString(R.string.str_bbh), getResources().getString(R.string.str_fgs)
+                , getResources().getString(R.string.str_fwqd), getResources().getString(R.string.str_js)
+                , getResources().getString(R.string.str_ps)));
     }
 
     @Override
@@ -323,6 +349,25 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
         });
         return view;
     }
-
+    //为listview动态设置高度（有多少条目就显示多少条目）
+    public void setListViewHeight(ListView listView) {
+        //获取listView的adapter
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            return;
+        }
+        int totalHeight = 0;
+        //listAdapter.getCount()返回数据项的数目
+        for (int i = 0, len = listAdapter.getCount(); i < len; i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+        // listView.getDividerHeight()获取子项间分隔符占用的高度
+        // params.height最后得到整个ListView完整显示需要的高度
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+    }
 
 }

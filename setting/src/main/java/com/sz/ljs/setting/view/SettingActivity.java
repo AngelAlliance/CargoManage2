@@ -31,6 +31,8 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     private ImageView iv_tishiyin, iv_zhendong;
     private TextView tv_banben;
     private Button bt_loginOut;
+    private boolean isOpenTiShi=false;
+    private boolean isOpenZhenDong=false;
 
 
     @Override
@@ -43,7 +45,6 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void initView() {
-
         ll_xiugaimima = (LinearLayout) findViewById(R.id.ll_xiugaimima);
         ll_guanyu = (LinearLayout) findViewById(R.id.ll_guanyu);
         ll_banbengengxin = (LinearLayout) findViewById(R.id.ll_banbengengxin);
@@ -82,10 +83,22 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
 
         } else if (id == R.id.iv_tishiyin) {
             //TODO 提示音
-
+            if(false==isOpenTiShi){
+                isOpenTiShi=true;
+                iv_tishiyin.setImageResource(R.mipmap.setting_riv1);
+            }else {
+                isOpenTiShi=false;
+                iv_tishiyin.setImageResource(R.mipmap.setting_riv0);
+            }
         } else if (id == R.id.iv_zhendong) {
             //TODO 震动
-
+            if(false==isOpenZhenDong){
+                isOpenZhenDong=true;
+                iv_zhendong.setImageResource(R.mipmap.setting_riv1);
+            }else {
+                isOpenZhenDong=false;
+                iv_zhendong.setImageResource(R.mipmap.setting_riv0);
+            }
         } else if (id == R.id.bt_loginOut) {
             //TODO 退出登录
             handlerLogOff();
