@@ -12,6 +12,7 @@ import android.widget.GridView;
 import com.sz.ljs.articlescan.view.ArticleScanActivity;
 import com.sz.ljs.base.service.ScanService;
 import com.sz.ljs.cargomanage.contract.LoginContract;
+import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.inventory.view.InventoryActivity;
@@ -47,12 +48,13 @@ public class MainActivity extends BaseActivity implements LoginContract.View {
     private LoginPresenter mPresenter;
     private AlertDialog alertDialog;
     private WaitingDialog waitingDialog;
+    private List<UserModel.PermissionEntity> menuList=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getHomeMenu(0);
+        getHomeMenu();
         initView();
         setListener();
         initData();
@@ -143,10 +145,8 @@ public class MainActivity extends BaseActivity implements LoginContract.View {
     }
 
     //TODO 获取首页菜单，根据用户权限来获取
-    private void getHomeMenu(int type) {
+    private void getHomeMenu() {
         homeMenuList.clear();
-        switch (type) {
-            case 0: {
                 homeMenuList.add(new HomeMenuModel(0, getResources().getString(R.string.str_yh), R.mipmap.icon_yanhuo));
                 homeMenuList.add(new HomeMenuModel(1, getResources().getString(R.string.str_rk), R.mipmap.icon_ruku));
                 homeMenuList.add(new HomeMenuModel(2, getResources().getString(R.string.str_db), R.mipmap.icon_packgoods));
@@ -155,9 +155,31 @@ public class MainActivity extends BaseActivity implements LoginContract.View {
                 homeMenuList.add(new HomeMenuModel(5, getResources().getString(R.string.str_djsm), R.mipmap.icon_daojiansaomiao));
                 homeMenuList.add(new HomeMenuModel(6, getResources().getString(R.string.str_bdbq), R.mipmap.icon_budabiaoqian));
                 homeMenuList.add(new HomeMenuModel(7, getResources().getString(R.string.str_sz), R.mipmap.icon_setting));
-            }
-            break;
-        }
+//        if(null!=UserModel.getInstance().getPermission()
+//                &&UserModel.getInstance().getPermission().size()>0){
+//            menuList=UserModel.getInstance().getPermission();
+//            for (int i=0;i<menuList.size();i++){
+//                if(getResources().getString(R.string.str_yh).equals(menuList.get(i).getMi_name())){
+//                    homeMenuList.add(new HomeMenuModel(0, getResources().getString(R.string.str_yh), R.mipmap.icon_yanhuo));
+//                }else if(getResources().getString(R.string.str_rk).equals(menuList.get(i).getMi_name())){
+//                    homeMenuList.add(new HomeMenuModel(1, getResources().getString(R.string.str_rk), R.mipmap.icon_ruku));
+//                }else if(getResources().getString(R.string.str_db).equals(menuList.get(i).getMi_name())){
+//                    homeMenuList.add(new HomeMenuModel(2, getResources().getString(R.string.str_db), R.mipmap.icon_packgoods));
+//                }else if(getResources().getString(R.string.str_ck).equals(menuList.get(i).getMi_name())){
+//                    homeMenuList.add(new HomeMenuModel(3, getResources().getString(R.string.str_ck), R.mipmap.icon_chuku));
+//                }else if(getResources().getString(R.string.str_pk).equals(menuList.get(i).getMi_name())){
+//                    homeMenuList.add(new HomeMenuModel(4, getResources().getString(R.string.str_pk), R.mipmap.icon_panku));
+//                }else if(getResources().getString(R.string.str_djsm).equals(menuList.get(i).getMi_name())){
+//                    homeMenuList.add(new HomeMenuModel(5, getResources().getString(R.string.str_djsm), R.mipmap.icon_daojiansaomiao));
+//                }else if(getResources().getString(R.string.str_bdbq).equals(menuList.get(i).getMi_name())){
+//                    homeMenuList.add(new HomeMenuModel(6, getResources().getString(R.string.str_bdbq), R.mipmap.icon_budabiaoqian));
+//                }else if(getResources().getString(R.string.str_sz).equals(menuList.get(i).getMi_name())){
+//                    homeMenuList.add(new HomeMenuModel(7, getResources().getString(R.string.str_sz), R.mipmap.icon_setting));
+//                }
+//            }
+//        }else {
+//            showTipeDialog("您没有权限操作");
+//        }
     }
 
 

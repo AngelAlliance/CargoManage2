@@ -4,6 +4,7 @@ import com.sz.ljs.base.interfacecallback.IGenView;
 
 public interface ArticleScanContract {
     public static final int REQUEST_FAIL_ID = -1;//网络失败，网络请求失败
+    public static final int BAG_RECEIVE_FAIL_ID = -2;//初始化数据失败
     public static final int REQUEST_SUCCESS_ID = 1;//网络请求成功
     public static final int BUSINESS_RECEIPT_SUCCESS_ID = 2;//网络请求成功
     public static final int GET_ORG_SERVER_SUCCESS = 3;//查看收货服务商跟机构

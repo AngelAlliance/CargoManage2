@@ -52,17 +52,17 @@ public class CalculationVolumeWeightModel {
          * volume : 0.001728
          */
 
-        private int TotalGrossWeight;   //总实重
+        private double TotalGrossWeight;   //总实重
         private double TotalVolumeWeight;  //总材积重
         private double TotalChargeWeight;   //总计费重
         private double volume;  //体积
         private List<LstCargoVolumeEntity> LstCargoVolume;
 
-        public int getTotalGrossWeight() {
+        public double getTotalGrossWeight() {
             return TotalGrossWeight;
         }
 
-        public void setTotalGrossWeight(int TotalGrossWeight) {
+        public void setTotalGrossWeight(double TotalGrossWeight) {
             this.TotalGrossWeight = TotalGrossWeight;
         }
 
@@ -116,9 +116,9 @@ public class CalculationVolumeWeightModel {
              * volume_id :
              */
 
-            private int Length; //长
-            private int Width;  //宽
-            private int Height;  //高
+            private double Length; //长
+            private double Width;  //宽
+            private double Height;  //高
             private double volume;  //体积
             private double GrossWeight;  //重量
             private double VolumeWeight;  //材积重
@@ -131,23 +131,23 @@ public class CalculationVolumeWeightModel {
             private int Girth;
             private String volume_id;
 
-            public int getLength() {
+            public double getLength() {
                 return Length;
             }
 
-            public void setLength(int Length) {
+            public void setLength(double Length) {
                 this.Length = Length;
             }
 
-            public int getWidth() {
+            public double getWidth() {
                 return Width;
             }
 
-            public void setWidth(int Width) {
+            public void setWidth(double Width) {
                 this.Width = Width;
             }
 
-            public int getHeight() {
+            public double getHeight() {
                 return Height;
             }
 

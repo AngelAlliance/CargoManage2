@@ -68,7 +68,7 @@ public interface WarehouContract {
         public void getCountry();
 
         //TODO 查询生效得销售产品
-        public void getProduct();
+        public void getProduct(String country_code);
 
         //TODO 根据客户名称查询客户资料 customer_name:客户名称(必填)
         public void getCustomer(String customer_name);

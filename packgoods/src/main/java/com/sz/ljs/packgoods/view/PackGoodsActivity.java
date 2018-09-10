@@ -54,7 +54,7 @@ import io.reactivex.schedulers.Schedulers;
  * 打包界面
  */
 
-public class PackGoodsActivity extends BaseActivity implements View.OnClickListener,PackgoodsContract.View {
+public class PackGoodsActivity extends BaseActivity implements View.OnClickListener, PackgoodsContract.View {
     private EditText et_yundanhao;
     private TextView tv_yundanhao, et_qudao;
     private LinearLayout ll_qudao, ll_daichuyun, ll_yisaomiao;
@@ -129,7 +129,15 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!TextUtils.isEmpty(s) && s.length() >= GenApi.ScanNumberLeng) {
+                if (!TextUtils.isEmpty(s)) {
+                    if (getResources().getString(R.string.str_tmbh).equals(tv_yundanhao.getText().toString().trim())) {
+                        //TODO 待出运
+                        if (et_yundanhao.getText().toString().trim().startsWith("PPNO")) {
+                            strExpressCode = et_yundanhao.getText().toString().trim();
+                            packageGoods();
+                            return;
+                        }
+                    }
                     handlerScanResult(s.toString());
                 }
             }
@@ -211,6 +219,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 }
                 packGoodsCode = "";
                 packGoodsexpressCode = yiSaoMiaolistData.get(groupPosition).getCn_list().get(childPosition).getShipper_hawbcode();
+                et_yundanhao.setText("");
                 fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
             }
         });
@@ -453,7 +462,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 for (int i = 0; i < danChuYunlistData.size(); i++) {
                     if (result.equals(danChuYunlistData.get(i).getShipper_hawbcode())
                             && ("false".equals(danChuYunlistData.get(i).getIsSelect())
-                            ||TextUtils.isEmpty(danChuYunlistData.get(i).getIsSelect()))) {
+                            || TextUtils.isEmpty(danChuYunlistData.get(i).getIsSelect()))) {
                         danChuYunlistData.get(i).setIsSelect("true");
                         danChuYunlistData.get(i).setOrder_status("选中");
                         break;
@@ -463,6 +472,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         break;
                     }
                 }
+                et_yundanhao.setText("");
+                et_yundanhao.setFocusable(true);
                 fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
             }
         } else if (getResources().getString(R.string.str_ydh).equals(tv_yundanhao.getText().toString().trim())) {
@@ -473,7 +484,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
                         if (result.equals(yiSaoMiaolistData.get(i).getBag_lable_code())
                                 && ("false".equals(yiSaoMiaolistData.get(i).getIsSelect())
-                                ||TextUtils.isEmpty(yiSaoMiaolistData.get(i).getIsSelect()))) {
+                                || TextUtils.isEmpty(yiSaoMiaolistData.get(i).getIsSelect()))) {
                             yiSaoMiaolistData.get(i).setIsSelect("true");
                             packGoodsCode = result;
                             break;
@@ -483,6 +494,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             break;
                         }
                     }
+                    et_yundanhao.setText("");
+                    et_yundanhao.setFocusable(true);
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
                 } else {
                     //TODO 扫描的是子单号
@@ -491,7 +504,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             for (int j = 0; j < yiSaoMiaolistData.get(i).getCn_list().size(); j++) {
                                 if (result.equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getShipper_hawbcode())
                                         && ("false".equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect())
-                                        ||TextUtils.isEmpty(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect()))) {
+                                        || TextUtils.isEmpty(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect()))) {
                                     packGoodsexpressCode = result;
                                     yiSaoMiaolistData.get(i).getCn_list().get(j).setIsSelect("true");
                                     yiSaoMiaolistData.get(i).getCn_list().get(j).setOrder_status("选中");
@@ -504,6 +517,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             }
                         }
                     }
+                    et_yundanhao.setText("");
+                    et_yundanhao.setFocusable(true);
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
                 }
             }
@@ -512,7 +527,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     public void onResult(int Id, String result) {
-        switch (Id){
+        switch (Id) {
             case PackgoodsContract.REQUEST_FAIL_ID:
                 showTipeDialog(result);
                 break;
@@ -525,6 +540,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            et_yundanhao.setText("");
+                            et_yundanhao.setFocusable(true);
                             fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
                         }
                     });
@@ -535,6 +552,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            et_yundanhao.setText("");
+                            et_yundanhao.setFocusable(true);
                             fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
                         }
                     });
@@ -542,11 +561,26 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 break;
             case PackgoodsContract.BAG_PUTBUSINESS_SUCCESS:
                 //TODO 把运单从某个包提出
-                getDepltList();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getDepltList();
+                    }
+                });
+
                 break;
             case PackgoodsContract.BAG_WEIGHING_SUCCESS:
                 //TODO 称量包的重量
-                getDepltList();
+                model = null;
+                if ("重量不符".equals(result)) {
+                    showTipeDialog(result);
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getDepltList();
+                    }
+                });
                 break;
             case PackgoodsContract.GET_SERVICECHANNEL_SUCCESS:
                 //TODO 生效渠道
@@ -586,7 +620,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             dialog.show();
                         }
                     });
-                }else {
+                } else {
                     showTipeDialog("暂无数据");
                 }
                 break;
@@ -602,14 +636,13 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                                 .setPositiveButton(getResources().getString(R.string.confirm), new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        getDepltList();
                                         alertDialog.dissmiss();
                                     }
                                 });
                         alertDialog.show();
                     }
                 });
-
+                getDepltList();
                 break;
             case PackgoodsContract.UNPACKING_SUCCESS:
                 //TODO 拆包
@@ -617,6 +650,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 break;
         }
     }
+
     //TODO 运单打包 strExpressCode:包的号码 例如：PPNO-9908    og_id:机构id 登陆时返回  server_channelid:服务渠道   list:运单集合
     private void packageGoods() {
         if (!TextUtils.isEmpty(strExpressCode)) {
@@ -695,7 +729,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         }
                     });
             bagWeightDialog.show();
-        }else {
+        } else {
             showTipeDialog("请选择要称重的包");
         }
     }
@@ -839,8 +873,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     }
 
 
-
-    private void showTipeDialog(final String msg){
+    private void showTipeDialog(final String msg) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

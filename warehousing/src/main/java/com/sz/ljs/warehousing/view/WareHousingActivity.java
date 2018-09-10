@@ -262,7 +262,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 showTipeDialog("请先选择目的国家");
                 return;
             }
-            getProduct();
+            if (null != countryModel) {
+                getProduct(countryModel.getCountry_code());
+            }
         } else if (id == R.id.ll_duojian) {
             //TODO 多件
             if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
@@ -278,7 +280,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
             if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
                 intent.putExtra("orderId", "");
             } else {
-                intent.putExtra("orderId", Integer.valueOf(et_yundanhao.getText().toString().trim()));
+                intent.putExtra("orderId", et_yundanhao.getText().toString().trim());
             }
             if (null != selectCurrentDayBatchEntity) {
                 intent.putExtra("arrival_date", selectCurrentDayBatchEntity.getArrival_date());
@@ -652,13 +654,20 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         et_xiaoshouchanpin.setText(WareHouSingModel.getInstance().getOrderModel().getData().getProduct_cnname());
                     }
 
-                    if (null != orderModel.getData() && null != orderModel.getData().getExtraservice() && orderModel.getData().getExtraservice().size() > 0) {
+                    if (null != orderModel.getData()&& orderModel.getData().getExtraservice().size() > 0) {
                         WareHouSingModel.getInstance().setExtrasList(orderModel.getData().getExtraservice());
                         serviceList.clear();
                         for (int i = 0; i < orderModel.getData().getExtraservice().size(); i++) {
-                            ServiceModel models = new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
-                                    , "", Double.valueOf(orderModel.getData().getExtraservice().get(i).getExtra_servicevalue())
-                                    , orderModel.getData().getExtraservice().get(i).getExtra_servicecode(), orderModel.getData().getExtraservice().get(i).getExtra_service_cnname(), "");
+                            ServiceModel models;
+                            if(!TextUtils.isEmpty(orderModel.getData().getExtraservice().get(i).getExtra_servicevalue())){
+                                models= new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
+                                        , "", Double.valueOf(orderModel.getData().getExtraservice().get(i).getExtra_servicevalue())
+                                        , orderModel.getData().getExtraservice().get(i).getExtra_servicecode(), orderModel.getData().getExtraservice().get(i).getExtra_service_cnname(), "");
+                            }else {
+                                models = new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
+                                        , "", 0.0
+                                        , orderModel.getData().getExtraservice().get(i).getExtra_servicecode(), orderModel.getData().getExtraservice().get(i).getExtra_service_cnname(), "");
+                            }
                             serviceList.add(models);
                         }
                         WareHouSingModel.getInstance().setServiceModelList(serviceList);
@@ -708,8 +717,8 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
     }
 
     //TODO 查询生效得销售产品
-    private void getProduct() {
-        mPresenter.getProduct();
+    private void getProduct(String country_code) {
+        mPresenter.getProduct(country_code);
     }
 
     @Override
@@ -781,10 +790,16 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         WareHouSingModel.getInstance().release();
     }
 
-    public void showWaiting(boolean isShow) {
-        if (null != mWaitingDialog) {
-            mWaitingDialog.showDialog(isShow);
-        }
+    public void showWaiting(final boolean isShow) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (null != mWaitingDialog) {
+                    mWaitingDialog.showDialog(isShow);
+                }
+            }
+        });
+
     }
 
 

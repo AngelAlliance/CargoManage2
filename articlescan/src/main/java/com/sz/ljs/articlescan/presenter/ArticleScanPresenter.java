@@ -62,7 +62,7 @@ public class ArticleScanPresenter implements ArticleScanContract.Presenter {
                             handShipmentBagResult(result);
                             mContract.onResult(ArticleScanContract.REQUEST_SUCCESS_ID, message);
                         } else {
-                            mContract.onResult(ArticleScanContract.REQUEST_FAIL_ID, message);
+                            mContract.onResult(ArticleScanContract.BAG_RECEIVE_FAIL_ID, message);
                         }
                     } catch (JSONException e) {
                         mContract.onResult(ArticleScanContract.REQUEST_FAIL_ID, e.getMessage());

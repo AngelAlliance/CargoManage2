@@ -57,6 +57,7 @@ import com.sz.ljs.common.model.UserModel;
 import com.sz.ljs.common.utils.BluetoothManager;
 import com.sz.ljs.common.utils.MediaPlayerUtils;
 import com.sz.ljs.common.utils.MscManager;
+import com.sz.ljs.common.utils.PrintManager;
 import com.sz.ljs.common.utils.Utils;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ListDialog;
@@ -104,6 +105,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private InspectionItemAdapter inspectionAdapter;
     private List<DetectionByModel.DataBean> detectionList = new ArrayList<>();
     private Bitmap bitmaps;
+    private String yunDanHao = "";
+    private String pice = "";
 
 
     @Override
@@ -118,6 +121,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void initView() {
+        PrintManager.getInstance().init(this);
         waitingDialog = new WaitingDialog(this);
         mPresenter = new ExamineGoodsPresenter(this);
         listview = (NoscrollListView) findViewById(R.id.lv_listView);
@@ -143,7 +147,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
     private void initData() {
         MediaPlayerUtils.setRingVolume(true, ExamineGoodsActivity.this);
-        MscManager.getInstance().init(ExamineGoodsActivity.this,0);
+        MscManager.getInstance().init(ExamineGoodsActivity.this, 0);
         adapter = new PhotoGridAdapter(this, photoList);
         gv_photo.setAdapter(adapter);
     }
@@ -318,22 +322,27 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 break;
             case ExamineGoodsContract.GETORDERBYNUMBER_SUCCESS:
                 //TODO 根据订单号查询订单信息
-                if (null != ExamineGoodsModel.getInstance().getOrderModel() && null !=  ExamineGoodsModel.getInstance().getOrderModel().getData()) {
-                    if (null == orderModel) {
-                        orderModel = new OrderModel();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (null != ExamineGoodsModel.getInstance().getOrderModel() && null != ExamineGoodsModel.getInstance().getOrderModel().getData()) {
+                            if (null == orderModel) {
+                                orderModel = new OrderModel();
+                            }
+                            orderModel = ExamineGoodsModel.getInstance().getOrderModel();
+                            if (!TextUtils.isEmpty(ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_info())) {
+                                tv_goods_type.setText(ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_info());
+                                getDetectionBy(ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_info());
+                            }
+                            if (!TextUtils.isEmpty(ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_pieces())) {
+                                tv_goods_jianshu.setText(ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_pieces());
+                            }
+                            ExamineGoodsModel.getInstance().setOrderModel(null);
+                        } else {
+                            showTipeDialog("暂无订单信息数据");
+                        }
                     }
-                    orderModel =  ExamineGoodsModel.getInstance().getOrderModel();
-                    if (!TextUtils.isEmpty( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_info())) {
-                        tv_goods_type.setText( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_info());
-                        getDetectionBy( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_info());
-                    }
-                    if (!TextUtils.isEmpty( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_pieces())) {
-                        tv_goods_jianshu.setText( ExamineGoodsModel.getInstance().getOrderModel().getData().getOrder_pieces());
-                    }
-                    ExamineGoodsModel.getInstance().setOrderModel(null);
-                }else {
-                    showTipeDialog("暂无订单信息数据");
-                }
+                });
                 break;
             case ExamineGoodsContract.GET_ITEM_TYPE_SUCCESS:
                 //TODO 查询所有得货物类型
@@ -360,33 +369,41 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                             dialog.show();
                         }
                     });
-                }else {
+                } else {
                     showTipeDialog("暂无数据");
                 }
                 break;
             case ExamineGoodsContract.GET_DETECTIONBY_SUCCESS:
                 //TODO 根据货物类型差检查项
-                if (null != ExamineGoodsModel.getInstance().getDetectionList() && ExamineGoodsModel.getInstance().getDetectionList().size() > 0) {
-                    for (DetectionByModel.DataBean model : ExamineGoodsModel.getInstance().getDetectionList()) {
-                        model.setSelect_value(model.getDefult_value());
-                        if ("D".equals(model.getValue()) || model.getDefult_value().equals(model.getValue())) {
-                            //TODO 如果相同，则表示没有差异
-                            model.setChaYi(false);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (null != ExamineGoodsModel.getInstance().getDetectionList() && ExamineGoodsModel.getInstance().getDetectionList().size() > 0) {
+                            for (DetectionByModel.DataBean model : ExamineGoodsModel.getInstance().getDetectionList()) {
+                                model.setSelect_value(model.getDefult_value());
+                                if ("D".equals(model.getValue()) || model.getDefult_value().equals(model.getValue())) {
+                                    //TODO 如果相同，则表示没有差异
+                                    model.setChaYi(false);
+                                } else {
+                                    model.setChaYi(true);
+                                }
+                                detectionList.add(model);
+                            }
+                            inspectionAdapter.notifyDataSetChanged();
+                            ExamineGoodsModel.getInstance().getDetectionList().clear();
                         } else {
-                            model.setChaYi(true);
+                            detectionList.clear();
+                            inspectionAdapter.notifyDataSetChanged();
+                            showTipeDialog("暂无货物类型检查项数据");
                         }
-                        detectionList.add(model);
                     }
-                    inspectionAdapter.notifyDataSetChanged();
-                    ExamineGoodsModel.getInstance().getDetectionList().clear();
-                }else {
-                    detectionList.clear();
-                    inspectionAdapter.notifyDataSetChanged();
-                    showTipeDialog("暂无货物类型检查项数据");
-                }
+                });
+
                 break;
             case ExamineGoodsContract.SAVE_DETECTIONORDER_SUCCESS:
                 //TODO 添加问题件或者保存验货结果
+                yunDanHao = et_yundanhao.getText().toString().trim();
+                pice = et_jianshu.getText().toString().trim();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -399,6 +416,18 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                                     public void onClick(View v) {
                                         alertDialog.dissmiss();
                                         //TODO 打印标签
+                                        if (isWenTiJian) {
+
+                                        } else {
+                                            if (TextUtils.isEmpty(pice)) {
+                                                print(1, yunDanHao);
+                                            } else {
+                                                print(Integer.parseInt(pice)
+                                                        , yunDanHao);
+                                            }
+                                        }
+
+
                                     }
                                 });
                         alertDialog.show();
@@ -408,17 +437,42 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 break;
             case ExamineGoodsContract.UPLOAD_FILE_SUCCESS:
                 //TODO 图片上传
-                if (null != ExamineGoodsModel.getInstance().getFileResultModel()) {
-                    Imagelist.add(new ImageType(ExamineGoodsModel.getInstance().getFileResultModel().getData(), "A"));
-                    photoList.add(bitmaps);
-                    adapter.notifyDataSetChanged();
-                    bitmaps = null;
-                    ExamineGoodsModel.getInstance().setFileResultModel(null);
-                } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (null != ExamineGoodsModel.getInstance().getFileResultModel()) {
+                            Imagelist.add(new ImageType(ExamineGoodsModel.getInstance().getFileResultModel().getData(), "A"));
+                            photoList.add(bitmaps);
+                            adapter.notifyDataSetChanged();
+                            bitmaps = null;
+                            ExamineGoodsModel.getInstance().setFileResultModel(null);
+                        } else {
 
-                }
+                        }
+                    }
+                });
                 break;
         }
+    }
+
+    //TODO 打印标签
+    private void print(int pices, String code) {
+        List<String> str = new ArrayList<>();
+        if (pices == 1) {
+            str.add(code);
+        } else {
+            if (pices > 20) {
+                showTipeDialog("输入件数太多，无法打印");
+                return;
+            }
+            for (int i = 1; i <= pices; i++) {
+                str.add(code + "-00" + i);
+            }
+        }
+        Log.i("验货这里打印标签", "标签数据:" + str);
+        PrintManager.getInstance().creatOneDimensionalCode(str);
+        pice = "";
+        yunDanHao = "";
     }
 
     //TODO 提交问题件或者保存验货单
@@ -498,11 +552,14 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         tv_goods_jianshu.setText("");
         ll_jianshu.setBackgroundResource(R.drawable.login_edittext_bg);
         isYanHuo = false;
+        iv_yiyanhuo.setImageResource(R.mipmap.fb_b);
         isWenTiJian = false;
         showList.clear();
         typeList.clear();
         orderModel = null;
         Imagelist.clear();
+        photoList.clear();
+        adapter.notifyDataSetChanged();
         detectionList.clear();
         adapter.notifyDataSetChanged();
         inspectionAdapter.notifyDataSetChanged();
@@ -568,5 +625,11 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 alertDialog.show();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PrintManager.getInstance().release();
     }
 }

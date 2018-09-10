@@ -149,7 +149,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
     }
 
     //TODO 查询生效得销售产品
-    public void getProduct() {
+    public void getProduct(String country_code) {
         warehouContract.showWaiting(true);
         Map<String, String> param = new HashMap<>();
         String token = "";

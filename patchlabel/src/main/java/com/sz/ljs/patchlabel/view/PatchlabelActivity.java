@@ -111,8 +111,12 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
                     showTip("输入件数太多，无法打印");
                     return;
                 }
-                for (int i = 0; i < num; i++) {
-                    str.add(et_danhao.getText().toString().trim() + "-00" + i);
+                if (num == 1) {
+                    str.add(et_danhao.getText().toString().trim());
+                }else {
+                    for (int i = 1; i <= num; i++) {
+                        str.add(et_danhao.getText().toString().trim() + "-00" + i);
+                    }
                 }
             } else {
                 str.add(et_danhao.getText().toString().trim());
@@ -158,7 +162,7 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
-
+        PrintManager.getInstance().release();
 //		unregisterReceiver(receiver);
     }
 }

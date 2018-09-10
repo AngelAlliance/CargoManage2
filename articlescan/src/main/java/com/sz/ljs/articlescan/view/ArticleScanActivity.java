@@ -2,10 +2,14 @@ package com.sz.ljs.articlescan.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -27,6 +31,8 @@ import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
 import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.MenuModel;
 import com.sz.ljs.common.model.UserModel;
+import com.sz.ljs.common.utils.PrintManager;
+import com.sz.ljs.common.utils.TimeUtils;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.FourSidesSlidingListView;
 import com.sz.ljs.common.view.ListDialog;
@@ -52,7 +58,8 @@ import cn.qqtheme.framework.picker.WheelPicker;
 public class ArticleScanActivity extends BaseActivity implements ArticleScanContract.View, View.OnClickListener {
     private TextView tv_arrive_time, tv_last_station, tv_qudao;
     private LinearLayout ll_arrive_time, ll_last_station, ll_qudao;
-    private SyncHorizontalScrollView header_horizontal,data_horizontal;
+    private EditText et_yundanhao;
+    private SyncHorizontalScrollView header_horizontal, data_horizontal;
     private NoscrollListView lv_header;
     private NoscrollExpandableListView lv_data;
     private List<MenuModel> dcyMenuList = new ArrayList<>();
@@ -69,7 +76,9 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
     private DataExpandableListAdapter dataAdapter;
     private TitleAdapter titleAdapter;
     private List<GsonSelectShipmentBagReceiveModel.DataBean> shipmentBagList = new ArrayList<>();
-    private List<TitleModel> titleList=new ArrayList<>();
+    private List<TitleModel> titleList = new ArrayList<>();
+    private String serviceId = "";
+    private String og_Id = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +90,7 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
     }
 
     private void initView() {
+        PrintManager.getInstance().init(this);
         waitingDialog = new WaitingDialog(this);
         mPresenter = new ArticleScanPresenter(this);
         tv_arrive_time = (TextView) findViewById(R.id.tv_arrive_time);
@@ -89,6 +99,7 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
         ll_last_station = (LinearLayout) findViewById(R.id.ll_last_station);
         ll_qudao = (LinearLayout) findViewById(R.id.ll_qudao);
         tv_qudao = (TextView) findViewById(R.id.tv_qudao);
+        et_yundanhao = (EditText) findViewById(R.id.et_yundanhao);
         gv_menu = (GridView) findViewById(R.id.gv_menu);
         header_horizontal = (SyncHorizontalScrollView) findViewById(R.id.header_horizontal);
         data_horizontal = (SyncHorizontalScrollView) findViewById(R.id.data_horizontal);
@@ -102,13 +113,15 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
     }
 
     private void initData() {
-//        mPresenter.SelectShipmentBagReceive();
+        tv_arrive_time.setText(TimeUtils.getDate());
+        mPresenter.getOrgServer();
+        mPresenter.SelectShipmentBagReceive(TimeUtils.getDateTime(), "", "");
         dcyMenuAdapter = new MenuAdapter(this, dcyMenuList);
         gv_menu.setAdapter(dcyMenuAdapter);
-        titleAdapter=new TitleAdapter(this,titleList);
+        titleAdapter = new TitleAdapter(this, titleList);
         lv_header.setAdapter(titleAdapter);
         setListViewHeight(lv_header);
-        dataAdapter=new DataExpandableListAdapter(this,shipmentBagList);
+        dataAdapter = new DataExpandableListAdapter(this, shipmentBagList);
         lv_data.setAdapter(dataAdapter);
         setListViewHeight(lv_data);
     }
@@ -128,6 +141,32 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
                         startActivity(intent);
                         break;
                 }
+            }
+        });
+        et_yundanhao.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(final CharSequence s, int start, int before, int count) {
+                if (!TextUtils.isEmpty(s)) {
+                    forEach(s.toString());
+//                    if ("PPNO-00981".equals(s.toString())) {
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                mPresenter.TransportBatchBusinessReceipt(s.toString());
+//                            }
+//                        });
+//                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
@@ -161,18 +200,29 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            et_yundanhao.setText("");
+                            et_yundanhao.setFocusable(true);
                             shipmentBagList.clear();
                             shipmentBagList.addAll(ArticleScanModel.getInstance().getShipmentBagList());
                             dataAdapter.notifyDataSetChanged();
                         }
                     });
                 } else {
+                    shipmentBagList.clear();
+                    et_yundanhao.setText("");
+                    et_yundanhao.setFocusable(true);
+                    dataAdapter.notifyDataSetChanged();
                     showTipeDialog("暂无数据");
                 }
                 break;
-
+            case ArticleScanContract.BAG_RECEIVE_FAIL_ID:
+                shipmentBagList.clear();
+                dataAdapter.notifyDataSetChanged();
+                showTipeDialog("暂无数据");
+                break;
             case ArticleScanContract.BUSINESS_RECEIPT_SUCCESS_ID:
                 showTipeDialog(result);
+                slectShipmentBagReceive();
                 break;
             case ArticleScanContract.GET_ORG_SERVER_SUCCESS:
                 //TODO 获取收货服务机构及上一站数据
@@ -191,6 +241,23 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
         }
     }
 
+
+    //TODO 遍历查询数据，并且进行扫描处理
+    private void forEach(String str) {
+        if (null != shipmentBagList) {
+            for (int i = 0; i < shipmentBagList.size(); i++) {
+                if (null != shipmentBagList.get(i).getBagReceiveList() &&
+                        shipmentBagList.get(i).getBagReceiveList().size() > 0) {
+                    for (int j = 0; j < shipmentBagList.get(i).getBagReceiveList().size(); j++) {
+                        if (str.equals(shipmentBagList.get(i).getBagReceiveList().get(j).getHawb_code())) {
+                            mPresenter.TransportBatchBusinessReceipt(shipmentBagList.get(i).getBagReceiveList().get(j).getTb_id());
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     //TODO 选择上一站
     private void selectXiaYiZhan() {
@@ -212,6 +279,8 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
                                 if (name.equals(model.getOg_name())) {
                                     orgListBean = model;
                                     tv_last_station.setText(model.getOg_name());
+                                    og_Id = "" + model.getOg_id();
+                                    slectShipmentBagReceive();
                                     break;
                                 }
                             }
@@ -223,7 +292,11 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
 
     }
 
-
+    //TODO 到件扫描初始化数据接口  arrival_date:到件时间  from_og_id:上一站  server_channelid:服务渠道
+    private void slectShipmentBagReceive(){
+        mPresenter.SelectShipmentBagReceive(tv_arrive_time.getText().toString().trim()
+                , og_Id, serviceId);
+    }
     //TODO 请选择服务渠道
     private void selectShouHuoFuWuShang() {
         final List<ListialogModel> showList = new ArrayList<>();
@@ -244,6 +317,10 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
                                 if (name.equals(model.getServer_shortname())) {
                                     serverListBean = model;
                                     tv_qudao.setText(model.getServer_shortname());
+                                    serviceId = "" + model.getServer_id();
+                                    slectShipmentBagReceive();
+//                                    mPresenter.SelectShipmentBagReceive(tv_arrive_time.getText().toString().trim()
+//                                            , og_Id, serviceId);
                                     break;
                                 }
                             }
@@ -324,6 +401,9 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
                 String strTime = getString(R.string.str_leave_date_strings);
                 strTime = String.format(strTime, years, months, days);
                 tv_arrive_time.setText(strTime);
+                slectShipmentBagReceive();
+//                mPresenter.SelectShipmentBagReceive(tv_arrive_time.getText().toString().trim()
+//                        , og_Id, serviceId);
             }
         }));
         dateTimePicker.setResetWhileWheel(false);
@@ -349,6 +429,7 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
         });
         return view;
     }
+
     //为listview动态设置高度（有多少条目就显示多少条目）
     public void setListViewHeight(ListView listView) {
         //获取listView的adapter

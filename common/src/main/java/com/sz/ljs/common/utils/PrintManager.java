@@ -48,9 +48,10 @@ public class PrintManager {
         return instance;
     }
 
+
     public void init(Context context) {
         this.mContext = context;
-        waitingDialog=new WaitingDialog(mContext);
+        waitingDialog = new WaitingDialog(mContext);
         // 获取PosApi实例
         mPosSDK = BaseApplication.getInstance().getPosApi();
         //监听初始化回调结果
@@ -72,13 +73,6 @@ public class PrintManager {
                 showTip(mContext.getResources().getString(R.string.print_complete));
                 //当前可打印
                 isCanPrint = true;
-                if (mBitmap != null) {
-                    mBitmap.recycle();
-                }
-
-                if (mPrintQueue != null) {
-                    mPrintQueue.close();
-                }
             }
 
             //打印失败
@@ -128,8 +122,8 @@ public class PrintManager {
                         showTip(mContext.getResources().getString(R.string.no_paper));
                         break;
                     case 2:
-                        //检测到黑标
-                        showTip(mContext.getResources().getString(R.string.label));
+//                        //检测到黑标
+//                        showTip(mContext.getResources().getString(R.string.label));
                         break;
                 }
             }
@@ -137,10 +131,21 @@ public class PrintManager {
     }
 
 
+    //TODO 释放资源
+    public void release() {
+        if (mBitmap != null) {
+            mBitmap.recycle();
+        }
+
+        if (mPrintQueue != null) {
+            mPrintQueue.close();
+        }
+    }
+
     //TODO 生成一维码图片并且打印出来
     public void creatOneDimensionalCode(List<String> str) {
         showWaiteDialog(true);
-        if (null==str||str.size()<=0) {
+        if (null == str || str.size() <= 0) {
             showWaiteDialog(false);
             showTip(mContext.getResources().getString(R.string.str_qsrydydydh));
             return;
@@ -152,55 +157,64 @@ public class PrintManager {
             return;
         }
         //打印中，不执行本次操作
-        if (!isCanPrint){
+        if (!isCanPrint) {
             showWaiteDialog(false);
             showTip("正在打印中");
             return;
         }
         //电量低于12%不执行打印
-        if(level_battry<=12){
+        if (level_battry <= 12) {
             showWaiteDialog(false);
             showTip("低电量,不能打印,请先充电");
             return;
         }
 
-        for (int i=0;i<str.size();i++){
+        for (int i = 0; i < str.size(); i++) {
             //生成一维码
-            mBitmap = BarcodeCreater.creatBarcode(mContext,str.get(i), 384, 100, true,
+            mBitmap = BarcodeCreater.creatBarcode(mContext, str.get(i), 384, 100, true,
                     1);
             //图片为空则返回
-            if (mBitmap == null){
+            if (mBitmap == null) {
                 showWaiteDialog(false);
                 showTip("一维码生成失败");
                 return;
             }
             byte[] printData = BitmapTools.bitmap2PrinterBytes(mBitmap);
-            if(concentration<=25){
-                concentration=25;
+            if (concentration <= 25) {
+                concentration = 25;
             }
-            mPrintQueue.addBmp(concentration, mLeft, mBitmap.getWidth(),
-                    mBitmap.getHeight(), printData);
-            mPrintQueue.addAction(PrintQueue.PRINTER_CMD_KEY_CHECKBLACK);
             try {
                 mPrintQueue.addText(concentration, "\n\n\n\n\n".toString()
                         .getBytes("GBK"));
             } catch (UnsupportedEncodingException e) {
                 // TODO Auto-generated catch block
-                Log.i("打印的时候出错","error="+e.toString());
+                Log.i("打印的时候出错", "error=" + e.toString());
                 e.printStackTrace();
             }
+            mPrintQueue.addBmp(concentration, mLeft, mBitmap.getWidth(),
+                    mBitmap.getHeight(), printData);
+//            try {
+//                mPrintQueue.addText(concentration, "\n\n\n".toString()
+//                        .getBytes("GBK"));
+//            } catch (UnsupportedEncodingException e) {
+//                // TODO Auto-generated catch block
+//                Log.i("打印的时候出错","error="+e.toString());
+//                e.printStackTrace();
+//            }
+            mPrintQueue.addAction(PrintQueue.PRINTER_CMD_KEY_CHECKBLACK);
             try {
                 Thread.sleep(200);
-            }catch (InterruptedException e){
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
         //设为不可打印
-        isCanPrint=false;
+        isCanPrint = false;
         //打印队列开始执行
         mPrintQueue.printStart();
     }
+
     /**
      * 初始化
      */
@@ -300,6 +314,7 @@ public class PrintManager {
             }
         }
     };
+
     /**
      * 接受电量改变广播
      */
@@ -316,8 +331,8 @@ public class PrintManager {
         }
     }
 
-    private void showWaiteDialog(boolean isShow){
-        if(null!=waitingDialog){
+    private void showWaiteDialog(boolean isShow) {
+        if (null != waitingDialog) {
             waitingDialog.showDialog(isShow);
         }
     }
