@@ -19,6 +19,8 @@ import com.sz.ljs.common.constant.GenApi;
 import com.sz.ljs.common.model.ExpressModel;
 import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
 import com.sz.ljs.common.model.MenuModel;
+import com.sz.ljs.common.utils.MediaPlayerUtils;
+import com.sz.ljs.common.utils.MscManager;
 import com.sz.ljs.common.utils.Utils;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.FourSidesSlidingListView;
@@ -59,6 +61,7 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
     private AlertDialog alertDialog;
     private List<ExpressModel> selectList = new ArrayList<>();
     private List<BsListModel> bsList = new ArrayList<>();
+    private String yunDanHao = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +131,8 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
     private void initData() {
         fs_cxkcxx_list.setHeaderData(panKuHeaderList);
         fs_cxkcxx_list.setContentDataForNoPackage(panKulistData);
+        MediaPlayerUtils.setRingVolume(true, InventoryActivity.this);
+        MscManager.getInstance().init(InventoryActivity.this, 0);
     }
 
     @Override
@@ -227,6 +232,26 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
         }
     }
 
+    //TODO 播报语言
+    private void speackYuYin() {
+        if (!TextUtils.isEmpty(yunDanHao)) {
+            if (null != panKulistData && panKulistData.size() > 0) {
+                int pic = 0;
+                for (ExpressModel model : panKulistData) {
+                    if ("true".equals(model.getIsSelect())) {
+                        pic++;
+                    }
+                    if (yunDanHao.equals(model.getShipper_hawbcode()) && "true".equals(model.getIsSelect())) {
+                        //TODO 重复扫描
+                        MscManager.getInstance().speech("重复扫描");
+                        return;
+                    }
+                }
+                MscManager.getInstance().speech(pic + "件");
+            }
+        }
+    }
+
     @Override
     public <T> void OnSuccess(T result) {
         int id = (Integer) result;
@@ -238,10 +263,14 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
                     public void run() {
                         if (null != InventoryModel.getInstance().getExpressList()
                                 && InventoryModel.getInstance().getExpressList().size() > 0) {
+                            yunDanHao = et_yundanhao.getText().toString().trim();
                             panKulistData.clear();
                             panKulistData.addAll(InventoryModel.getInstance().getExpressList());
                             fs_cxkcxx_list.setContentDataForNoPackage(panKulistData);
+                            et_yundanhao.setText("");
+                            et_yundanhao.setFocusable(true);
                             setweightAndPices();
+                            speackYuYin();
                         }
                     }
                 });
@@ -249,6 +278,7 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
                 break;
             case InventoryContract.ADD_EXPRESSS_TRACK_SUCCESS:
                 //TODO 批量提交盘库成功
+                MscManager.getInstance().speech("操作成功");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -288,6 +318,7 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
         int id = (Integer) Error;
         switch (id) {
             case InventoryContract.REQUEST_FAIL_ID:
+                MscManager.getInstance().speech(mPresenter.getMessage());
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

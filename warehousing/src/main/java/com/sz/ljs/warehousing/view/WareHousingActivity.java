@@ -24,6 +24,8 @@ import com.sz.ljs.common.model.BaseResultModel;
 import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.OrderModel;
 import com.sz.ljs.common.model.UserModel;
+import com.sz.ljs.common.utils.MediaPlayerUtils;
+import com.sz.ljs.common.utils.MscManager;
 import com.sz.ljs.common.utils.Utils;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ListDialog;
@@ -125,7 +127,8 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void initData() {
-
+        MediaPlayerUtils.setRingVolume(true, WareHousingActivity.this);
+        MscManager.getInstance().init(WareHousingActivity.this, 0);
     }
 
     private void setListener() {
@@ -335,6 +338,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         switch (Id) {
             case WarehouContract.REQUEST_FAIL_ID:
                 showTipeDialog(result);
+                MscManager.getInstance().speech(result);
                 if ("没有数据".equals(result)) {
                     //TODO 没有返回订单详情的时候
                     isWenTiDan = true;
@@ -364,6 +368,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 break;
             case WarehouContract.CHENCK_IN_SUCCESS:
                 //TODO 入库
+                MscManager.getInstance().speech("操作成功");
                 if (null != WareHouSingModel.getInstance().getChenckInResultModel()) {
                     runOnUiThread(new Runnable() {
                         @Override

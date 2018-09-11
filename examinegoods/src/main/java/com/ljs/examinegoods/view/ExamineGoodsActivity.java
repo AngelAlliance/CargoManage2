@@ -164,7 +164,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() >= GenApi.ScanNumberLeng) {
                     //TODO 当运单号大于8位的时候就开始请求数据
-                    MscManager.getInstance().speech(s.toString());
+//                    MscManager.getInstance().speech("运单号扫描成功");
                     getOrderByNumber();
                 }
             }
@@ -318,6 +318,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     public void onResult(int Id, final String result) {
         switch (Id) {
             case ExamineGoodsContract.REQUEST_FAIL_ID:
+                MscManager.getInstance().speech(result);
                 showTipeDialog(result);
                 break;
             case ExamineGoodsContract.GETORDERBYNUMBER_SUCCESS:
@@ -404,6 +405,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 //TODO 添加问题件或者保存验货结果
                 yunDanHao = et_yundanhao.getText().toString().trim();
                 pice = et_jianshu.getText().toString().trim();
+                MscManager.getInstance().speech("操作成功");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -420,9 +422,9 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
                                         } else {
                                             if (TextUtils.isEmpty(pice)) {
-                                                print(1, yunDanHao);
+                                                print(2, yunDanHao);
                                             } else {
-                                                print(Integer.parseInt(pice)
+                                                print(Integer.parseInt(pice)+1
                                                         , yunDanHao);
                                             }
                                         }
@@ -462,6 +464,7 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
             str.add(code);
         } else {
             if (pices > 20) {
+                MscManager.getInstance().speech("输入件数太多，无法打印");
                 showTipeDialog("输入件数太多，无法打印");
                 return;
             }

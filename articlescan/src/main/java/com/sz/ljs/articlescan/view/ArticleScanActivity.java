@@ -31,6 +31,8 @@ import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
 import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.MenuModel;
 import com.sz.ljs.common.model.UserModel;
+import com.sz.ljs.common.utils.MediaPlayerUtils;
+import com.sz.ljs.common.utils.MscManager;
 import com.sz.ljs.common.utils.PrintManager;
 import com.sz.ljs.common.utils.TimeUtils;
 import com.sz.ljs.common.view.AlertDialog;
@@ -113,6 +115,8 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
     }
 
     private void initData() {
+        MediaPlayerUtils.setRingVolume(true, ArticleScanActivity.this);
+        MscManager.getInstance().init(ArticleScanActivity.this, 0);
         tv_arrive_time.setText(TimeUtils.getDate());
         mPresenter.getOrgServer();
         mPresenter.SelectShipmentBagReceive(TimeUtils.getDateTime(), "", "");
@@ -191,6 +195,7 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
     public void onResult(int Id, String result) {
         switch (Id) {
             case ArticleScanContract.REQUEST_FAIL_ID:
+                MscManager.getInstance().speech(result);
                 showTipeDialog(result);
                 break;
             case ArticleScanContract.REQUEST_SUCCESS_ID:
@@ -221,6 +226,7 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
                 showTipeDialog("暂无数据");
                 break;
             case ArticleScanContract.BUSINESS_RECEIPT_SUCCESS_ID:
+                MscManager.getInstance().speech("操作成功");
                 showTipeDialog(result);
                 slectShipmentBagReceive();
                 break;

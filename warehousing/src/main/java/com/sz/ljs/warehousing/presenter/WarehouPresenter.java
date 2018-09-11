@@ -160,6 +160,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
         }
         param.put(WarehouContract.USERID, "" + UserModel.getInstance().getSt_id());
         param.put(WarehouContract.SUMMARY, WarehouContract.summary);
+        param.put("country_code", country_code);
         HttpUtils.post(GenApi.URL + ApiUrl.GET_GETPRODUCT, token, param, new IHttpUtilsCallBack() {
             @Override
             public void onFailure(int statusCode, String error_msg) {

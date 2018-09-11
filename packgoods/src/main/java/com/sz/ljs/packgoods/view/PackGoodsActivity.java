@@ -22,6 +22,8 @@ import com.sz.ljs.common.model.ExpressPackageModel;
 import com.sz.ljs.common.model.FourSidesSlidListTitileModel;
 import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.UserModel;
+import com.sz.ljs.common.utils.MediaPlayerUtils;
+import com.sz.ljs.common.utils.MscManager;
 import com.sz.ljs.common.utils.Utils;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.FourSidesSlidingListView;
@@ -413,6 +415,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void initData() {
+        MediaPlayerUtils.setRingVolume(true, PackGoodsActivity.this);
+        MscManager.getInstance().init(PackGoodsActivity.this, 0);
         dcyMenuAdapter = new MenuAdapter(this, dcyMenuList);
         gv_daichuyun_menu.setAdapter(dcyMenuAdapter);
         ysmMenuAdapter = new MenuAdapter(this, ysmMenuList);
@@ -475,6 +479,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 et_yundanhao.setText("");
                 et_yundanhao.setFocusable(true);
                 fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
+                yunDanHaoSpeackYuYin(danChuYunlistData, result);
             }
         } else if (getResources().getString(R.string.str_ydh).equals(tv_yundanhao.getText().toString().trim())) {
             //TODO 已扫描
@@ -497,6 +502,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     et_yundanhao.setText("");
                     et_yundanhao.setFocusable(true);
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
+                    baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 1);
                 } else {
                     //TODO 扫描的是子单号
                     for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
@@ -520,7 +526,70 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     et_yundanhao.setText("");
                     et_yundanhao.setFocusable(true);
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
+                    baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 2);
                 }
+            }
+        }
+    }
+
+    //TODO 扫描包编号播报语言
+    private void baoBianHaoSpeackYuYin(List<ExpressPackageModel> list, String content, int type) {
+        if (!TextUtils.isEmpty(content)) {
+            if (null != list && list.size() > 0) {
+                int pic = 0;
+                if (1 == type) {
+                    //TODO 包编号
+                    for (ExpressPackageModel model : list) {
+                        if ("true".equals(model.getIsSelect())) {
+                            pic++;
+                        }
+                        if (content.equals(model.getBag_lable_code()) && "true".equals(model.getIsSelect())) {
+                            //TODO 重复扫描
+                            MscManager.getInstance().speech("重复扫描");
+                            return;
+                        }
+                    }
+                    MscManager.getInstance().speech(pic + "件包编号");
+                } else if (2 == type) {
+                    //TODO 运单号
+                    for (int i = 0; i < list.size(); i++) {
+                        if (null != list.get(i).getCn_list() && list.get(i).getCn_list().size() > 0) {
+                            for (int j = 0; j < list.get(i).getCn_list().size(); j++) {
+                                if ("true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
+                                    pic++;
+                                }
+                                if (content.equals(list.get(i).getCn_list().get(j).getShipper_hawbcode()) && "true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
+                                    //TODO 重复扫描
+                                    MscManager.getInstance().speech("重复扫描");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    MscManager.getInstance().speech(pic + "件运单号");
+                }
+
+            }
+        }
+
+    }
+
+    //TODO 扫描运单号播报语言
+    private void yunDanHaoSpeackYuYin(List<ExpressModel> list, String content) {
+        if (!TextUtils.isEmpty(content)) {
+            if (null != list && list.size() > 0) {
+                int pic = 0;
+                for (ExpressModel model : list) {
+                    if ("true".equals(model.getIsSelect())) {
+                        pic++;
+                    }
+                    if (content.equals(model.getShipper_hawbcode()) && "true".equals(model.getIsSelect())) {
+                        //TODO 重复扫描
+                        MscManager.getInstance().speech("重复扫描");
+                        return;
+                    }
+                }
+                MscManager.getInstance().speech(pic + "件运单号");
             }
         }
     }
@@ -529,6 +598,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
     public void onResult(int Id, String result) {
         switch (Id) {
             case PackgoodsContract.REQUEST_FAIL_ID:
+                MscManager.getInstance().speech(result);
                 showTipeDialog(result);
                 break;
             case PackgoodsContract.REQUEST_SUCCESS_ID:
@@ -561,6 +631,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 break;
             case PackgoodsContract.BAG_PUTBUSINESS_SUCCESS:
                 //TODO 把运单从某个包提出
+                MscManager.getInstance().speech("操作成功");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -571,6 +642,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 break;
             case PackgoodsContract.BAG_WEIGHING_SUCCESS:
                 //TODO 称量包的重量
+                MscManager.getInstance().speech("操作成功");
                 model = null;
                 if ("重量不符".equals(result)) {
                     showTipeDialog(result);
@@ -626,6 +698,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 break;
             case PackgoodsContract.ADD_BUSSINESSPACKAGE_SUCCESS:
                 //TODO 运单打包
+                MscManager.getInstance().speech("操作成功");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -646,6 +719,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 break;
             case PackgoodsContract.UNPACKING_SUCCESS:
                 //TODO 拆包
+                MscManager.getInstance().speech("操作成功");
                 getDepltList();
                 break;
         }

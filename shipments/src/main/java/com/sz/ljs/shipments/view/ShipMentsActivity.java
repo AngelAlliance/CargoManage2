@@ -24,6 +24,8 @@ import com.sz.ljs.common.model.GsonDepltListModel;
 import com.sz.ljs.common.model.ListialogModel;
 import com.sz.ljs.common.model.MenuModel;
 import com.sz.ljs.common.model.UserModel;
+import com.sz.ljs.common.utils.MediaPlayerUtils;
+import com.sz.ljs.common.utils.MscManager;
 import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.FourSidesSlidingListView;
 import com.sz.ljs.common.view.ListDialog;
@@ -263,6 +265,8 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void initData() {
+        MediaPlayerUtils.setRingVolume(true, ShipMentsActivity.this);
+        MscManager.getInstance().init(ShipMentsActivity.this, 0);
         dcyMenuAdapter = new MenuAdapter(this, dcyMenuList);
         gv_menu.setAdapter(dcyMenuAdapter);
         fs_listView.setHeaderData(headerList);
@@ -308,6 +312,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                     }
                 }
                 fs_listView.setContentData(listData);
+                baoBianHaoSpeackYuYin(listData,result,1);
             } else {
                 //TODO 扫描的是子单号
                 for (int i = 0; i < listData.size(); i++) {
@@ -329,14 +334,57 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                     }
                 }
                 fs_listView.setContentData(listData);
+                baoBianHaoSpeackYuYin(listData,result,2);
             }
         }
     }
 
+    //TODO 扫描包编号播报语言
+    private void baoBianHaoSpeackYuYin(List<ExpressPackageModel> list, String content, int type) {
+        if (!TextUtils.isEmpty(content)) {
+            if (null != list && list.size() > 0) {
+                int pic = 0;
+                if (1 == type) {
+                    //TODO 包编号
+                    for (ExpressPackageModel model : list) {
+                        if ("true".equals(model.getIsSelect())) {
+                            pic++;
+                        }
+                        if (content.equals(model.getBag_lable_code()) && "true".equals(model.getIsSelect())) {
+                            //TODO 重复扫描
+                            MscManager.getInstance().speech("重复扫描");
+                            return;
+                        }
+                    }
+                    MscManager.getInstance().speech(pic + "件包编号");
+                } else if (2 == type) {
+                    //TODO 运单号
+                    for (int i = 0; i < list.size(); i++) {
+                        if (null != list.get(i).getCn_list() && list.get(i).getCn_list().size() > 0) {
+                            for (int j = 0; j < list.get(i).getCn_list().size(); j++) {
+                                if ("true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
+                                    pic++;
+                                }
+                                if (content.equals(list.get(i).getCn_list().get(j).getShipper_hawbcode()) && "true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
+                                    //TODO 重复扫描
+                                    MscManager.getInstance().speech("重复扫描");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    MscManager.getInstance().speech(pic + "件运单号");
+                }
+
+            }
+        }
+
+    }
     @Override
     public void onResult(int Id, String result) {
         switch (Id) {
             case ShipmentsContract.REQUEST_FAIL_ID:
+                MscManager.getInstance().speech(result);
                 showTipDialog(result);
                 break;
             case ShipmentsContract.REQUEST_SUCCESS_ID:
@@ -470,6 +518,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                 case 100:
                     if (null != data && 0 != data.getIntExtra("type", 0)) {
                         //TODO 生成主单成功，重新刷新数据
+                        MscManager.getInstance().speech("操作成功");
                         getDepltList();
                     } else {
 
