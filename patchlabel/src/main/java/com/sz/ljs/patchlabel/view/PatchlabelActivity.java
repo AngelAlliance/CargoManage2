@@ -104,16 +104,21 @@ public class PatchlabelActivity extends BaseActivity implements View.OnClickList
             popuwindow.showPopupWindow(tv_type);
         } else if (id == R.id.ll_dayin) {
             //TODO 打印
+            if(TextUtils.isEmpty(et_danhao.getText().toString().trim())){
+                showTip("请输入要打印的运单号或者包编号");
+                return;
+            }
             List<String> str = new ArrayList<>();
             if (!TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
                 int num = Integer.parseInt(et_jianshu.getText().toString().trim());
-                if (num > 20) {
+                if (num > 19) {
                     showTip("输入件数太多，无法打印");
                     return;
                 }
-                if (num == 1) {
+                if (num == 0) {
                     str.add(et_danhao.getText().toString().trim());
                 }else {
+                    num++;
                     for (int i = 1; i <= num; i++) {
                         str.add(et_danhao.getText().toString().trim() + "-00" + i);
                     }

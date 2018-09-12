@@ -463,6 +463,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         if (getResources().getString(R.string.str_tmbh).equals(tv_yundanhao.getText().toString().trim())) {
             //TODO 待出运
             if (null != danChuYunlistData && danChuYunlistData.size() > 0) {
+                yunDanHaoSpeackYuYin(danChuYunlistData, result);
                 for (int i = 0; i < danChuYunlistData.size(); i++) {
                     if (result.equals(danChuYunlistData.get(i).getShipper_hawbcode())
                             && ("false".equals(danChuYunlistData.get(i).getIsSelect())
@@ -479,13 +480,13 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                 et_yundanhao.setText("");
                 et_yundanhao.setFocusable(true);
                 fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
-                yunDanHaoSpeackYuYin(danChuYunlistData, result);
             }
         } else if (getResources().getString(R.string.str_ydh).equals(tv_yundanhao.getText().toString().trim())) {
             //TODO 已扫描
             if (null != yiSaoMiaolistData && yiSaoMiaolistData.size() > 0) {
                 if (result.contains("PPNO")) {
                     //TODO 证明扫描的是包编号
+                    baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 1);
                     for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
                         if (result.equals(yiSaoMiaolistData.get(i).getBag_lable_code())
                                 && ("false".equals(yiSaoMiaolistData.get(i).getIsSelect())
@@ -502,9 +503,9 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     et_yundanhao.setText("");
                     et_yundanhao.setFocusable(true);
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
-                    baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 1);
                 } else {
                     //TODO 扫描的是子单号
+                    baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 2);
                     for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
                         if (null != yiSaoMiaolistData.get(i).getCn_list() && yiSaoMiaolistData.get(i).getCn_list().size() > 0) {
                             for (int j = 0; j < yiSaoMiaolistData.get(i).getCn_list().size(); j++) {
@@ -526,7 +527,6 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     et_yundanhao.setText("");
                     et_yundanhao.setFocusable(true);
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
-                    baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 2);
                 }
             }
         }
@@ -549,7 +549,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             return;
                         }
                     }
-                    MscManager.getInstance().speech(pic + "件包编号");
+                    MscManager.getInstance().speech((pic+1) + "件包编号");
                 } else if (2 == type) {
                     //TODO 运单号
                     for (int i = 0; i < list.size(); i++) {
@@ -566,7 +566,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             }
                         }
                     }
-                    MscManager.getInstance().speech(pic + "件运单号");
+                    MscManager.getInstance().speech((pic+1) + "件运单号");
                 }
 
             }
@@ -589,7 +589,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         return;
                     }
                 }
-                MscManager.getInstance().speech(pic + "件运单号");
+                MscManager.getInstance().speech((pic + 1) + "件运单号");
             }
         }
     }

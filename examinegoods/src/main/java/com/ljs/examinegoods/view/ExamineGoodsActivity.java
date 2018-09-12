@@ -107,6 +107,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     private Bitmap bitmaps;
     private String yunDanHao = "";
     private String pice = "";
+    private RadioButton yes_jianshu;
+    private LinearLayout ll_wentimiaoshu;
 
 
     @Override
@@ -138,7 +140,9 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         tv_goods_type = (TextView) findViewById(R.id.tv_goods_type);
         gv_photo = (GridView) findViewById(R.id.gv_photo);
         ll_photo = (LinearLayout) findViewById(R.id.ll_photo);
+        ll_wentimiaoshu = (LinearLayout) findViewById(R.id.ll_wentimiaoshu);
         bt_yes = (Button) findViewById(R.id.bt_yes);
+        yes_jianshu = (RadioButton) findViewById(R.id.yes_jianshu);
         inspectionAdapter = new InspectionItemAdapter(this, detectionList);
         listview.setAdapter(inspectionAdapter);
         setListViewHeight(listview);
@@ -326,6 +330,8 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        yes_jianshu.setChecked(true);
+                        isWenTiJian=false;
                         if (null != ExamineGoodsModel.getInstance().getOrderModel() && null != ExamineGoodsModel.getInstance().getOrderModel().getData()) {
                             if (null == orderModel) {
                                 orderModel = new OrderModel();
@@ -422,9 +428,9 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
 
                                         } else {
                                             if (TextUtils.isEmpty(pice)) {
-                                                print(2, yunDanHao);
+                                                print(1, yunDanHao);
                                             } else {
-                                                print(Integer.parseInt(pice)+1
+                                                print(Integer.parseInt(pice)
                                                         , yunDanHao);
                                             }
                                         }
@@ -457,6 +463,19 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         }
     }
 
+    //TODO 问题描述和拍照布局是否显示(只有是问题件的时候才显示)
+    private void showWenTiMiaoShu(boolean isShow){
+        if(isShow){
+            ll_wentimiaoshu.setVisibility(View.VISIBLE);
+            gv_photo.setVisibility(View.VISIBLE);
+            ll_photo.setVisibility(View.VISIBLE);
+        }else {
+            ll_wentimiaoshu.setVisibility(View.GONE);
+            gv_photo.setVisibility(View.GONE);
+            ll_photo.setVisibility(View.GONE);
+        }
+    }
+
     //TODO 打印标签
     private void print(int pices, String code) {
         List<String> str = new ArrayList<>();
@@ -481,7 +500,6 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
     //TODO 提交问题件或者保存验货单
     private void saveDetecTionOrder() {
         //TODO 检查是否是问题件
-        isWenTiJian = false;
         if (null != detectionList && detectionList.size() > 0) {
             for (DetectionByModel.DataBean model : detectionList) {
                 if (true == model.isChaYi()) {

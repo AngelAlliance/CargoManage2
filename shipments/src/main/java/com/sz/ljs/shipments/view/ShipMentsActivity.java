@@ -297,6 +297,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
         if (null != listData && listData.size() > 0) {
             if (result.contains("PPNO")) {
                 //TODO 证明扫描的是包编号
+                baoBianHaoSpeackYuYin(listData,result,1);
                 for (int i = 0; i < listData.size(); i++) {
                     if (result.equals(listData.get(i).getBag_lable_code())
                             && ("false".equals(listData.get(i).getIsSelect())
@@ -312,9 +313,9 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                     }
                 }
                 fs_listView.setContentData(listData);
-                baoBianHaoSpeackYuYin(listData,result,1);
             } else {
                 //TODO 扫描的是子单号
+                baoBianHaoSpeackYuYin(listData,result,2);
                 for (int i = 0; i < listData.size(); i++) {
                     if (null != listData.get(i).getCn_list() && listData.get(i).getCn_list().size() > 0) {
                         for (int j = 0; j < listData.get(i).getCn_list().size(); j++) {
@@ -334,7 +335,6 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                     }
                 }
                 fs_listView.setContentData(listData);
-                baoBianHaoSpeackYuYin(listData,result,2);
             }
         }
     }
@@ -356,7 +356,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                             return;
                         }
                     }
-                    MscManager.getInstance().speech(pic + "件包编号");
+                    MscManager.getInstance().speech((pic+1) + "件包编号");
                 } else if (2 == type) {
                     //TODO 运单号
                     for (int i = 0; i < list.size(); i++) {
@@ -373,7 +373,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                             }
                         }
                     }
-                    MscManager.getInstance().speech(pic + "件运单号");
+                    MscManager.getInstance().speech((pic+1) + "件运单号");
                 }
 
             }

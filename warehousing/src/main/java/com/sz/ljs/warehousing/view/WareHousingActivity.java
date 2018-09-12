@@ -179,11 +179,31 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     ll_duojian.setBackgroundResource(R.drawable.pack_btn_clickbg);
                     ll_duojian.setClickable(false);
                 } else {
-                    if (!TextUtils.isEmpty(s)) {
+                    if (!TextUtils.isEmpty(s) && Integer.parseInt(s.toString()) > 1) {
                         pice = Integer.parseInt(s.toString());
                         ll_changkuangao.setVisibility(View.GONE);
                         ll_duojian.setBackgroundResource(R.drawable.pack_btn_bg);
                         ll_duojian.setClickable(true);
+                        //TODO 2018-09-12提出输入多件的时候要直接跳转到添加多件的界面
+                        Intent intent = new Intent(WareHousingActivity.this, AddSubunitActivity.class);
+                        if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
+                            intent.putExtra("pice", 0);
+                        } else {
+                            intent.putExtra("pice", Integer.valueOf(et_jianshu.getText().toString().trim()));
+                        }
+
+                        if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
+                            intent.putExtra("orderId", "");
+                        } else {
+                            intent.putExtra("orderId", et_yundanhao.getText().toString().trim());
+                        }
+                        if (null != selectCurrentDayBatchEntity) {
+                            intent.putExtra("arrival_date", selectCurrentDayBatchEntity.getArrival_date());
+                        } else {
+                            intent.putExtra("arrival_date", "");
+                        }
+                        intent.putExtra("customerId", customerId);
+                        startActivityForResult(intent, 1000);
                     }
                 }
             }
@@ -659,16 +679,16 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         et_xiaoshouchanpin.setText(WareHouSingModel.getInstance().getOrderModel().getData().getProduct_cnname());
                     }
 
-                    if (null != orderModel.getData()&& orderModel.getData().getExtraservice().size() > 0) {
+                    if (null != orderModel.getData() && orderModel.getData().getExtraservice().size() > 0) {
                         WareHouSingModel.getInstance().setExtrasList(orderModel.getData().getExtraservice());
                         serviceList.clear();
                         for (int i = 0; i < orderModel.getData().getExtraservice().size(); i++) {
                             ServiceModel models;
-                            if(!TextUtils.isEmpty(orderModel.getData().getExtraservice().get(i).getExtra_servicevalue())){
-                                models= new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
+                            if (!TextUtils.isEmpty(orderModel.getData().getExtraservice().get(i).getExtra_servicevalue())) {
+                                models = new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
                                         , "", Double.valueOf(orderModel.getData().getExtraservice().get(i).getExtra_servicevalue())
                                         , orderModel.getData().getExtraservice().get(i).getExtra_servicecode(), orderModel.getData().getExtraservice().get(i).getExtra_service_cnname(), "");
-                            }else {
+                            } else {
                                 models = new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
                                         , "", 0.0
                                         , orderModel.getData().getExtraservice().get(i).getExtra_servicecode(), orderModel.getData().getExtraservice().get(i).getExtra_service_cnname(), "");

@@ -117,6 +117,7 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() >= GenApi.ScanNumberLeng) {
                     //TODO 当运单号大于8位的时候就开始请求数据
+                    speackYuYin();
                     mPresenter.getFindExpressByID(s.toString());
                 }
             }
@@ -247,7 +248,9 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
                         return;
                     }
                 }
-                MscManager.getInstance().speech(pic + "件");
+                MscManager.getInstance().speech((pic+1) + "件");
+            }else {
+                MscManager.getInstance().speech(1 + "件");
             }
         }
     }
@@ -270,7 +273,6 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
                             et_yundanhao.setText("");
                             et_yundanhao.setFocusable(true);
                             setweightAndPices();
-                            speackYuYin();
                         }
                     }
                 });

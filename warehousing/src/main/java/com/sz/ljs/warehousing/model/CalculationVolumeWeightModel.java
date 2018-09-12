@@ -127,8 +127,8 @@ public class CalculationVolumeWeightModel {
             private String GoodsName;   //总计费重
             private String TrackNo;
             private boolean Calculated;
-            private int MaxSideLength;
-            private int Girth;
+            private double MaxSideLength;
+            private double Girth;
             private String volume_id;
 
             public double getLength() {
@@ -219,19 +219,19 @@ public class CalculationVolumeWeightModel {
                 this.Calculated = Calculated;
             }
 
-            public int getMaxSideLength() {
+            public double getMaxSideLength() {
                 return MaxSideLength;
             }
 
-            public void setMaxSideLength(int MaxSideLength) {
+            public void setMaxSideLength(double MaxSideLength) {
                 this.MaxSideLength = MaxSideLength;
             }
 
-            public int getGirth() {
+            public double getGirth() {
                 return Girth;
             }
 
-            public void setGirth(int Girth) {
+            public void setGirth(double Girth) {
                 this.Girth = Girth;
             }
 
