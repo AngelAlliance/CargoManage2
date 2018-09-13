@@ -161,7 +161,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         danChuYunlistData.get(childPosition).setIsSelect("false");
                         danChuYunlistData.get(childPosition).setOrder_status("已收件");
                     }
-                    expressCode = danChuYunlistData.get(childPosition).getShipper_hawbcode();
+                    expressCode = danChuYunlistData.get(childPosition).getChild_number();
                     fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
                 }
             }
@@ -220,7 +220,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     }
                 }
                 packGoodsCode = "";
-                packGoodsexpressCode = yiSaoMiaolistData.get(groupPosition).getCn_list().get(childPosition).getShipper_hawbcode();
+                packGoodsexpressCode = yiSaoMiaolistData.get(groupPosition).getCn_list().get(childPosition).getChild_number();
                 et_yundanhao.setText("");
                 fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
             }
@@ -241,7 +241,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             }
                         });
                         for (int i = 0; i < danChuYunlistData.size(); i++) {
-                            if (danChuYunlistData.get(i).getShipper_hawbcode().equals(expressCode)) {
+                            if (danChuYunlistData.get(i).getChild_number().equals(expressCode)) {
                                 if ("false".equals(danChuYunlistData.get(i).getIsSelect())) {
                                     danChuYunlistData.get(i).setIsSelect("true");
                                     danChuYunlistData.get(i).setOrder_status("选中");
@@ -311,7 +311,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         if (!TextUtils.isEmpty(packGoodsexpressCode)) {
                             for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
                                 for (int j = 0; j < yiSaoMiaolistData.get(i).getCn_list().size(); j++) {
-                                    if (yiSaoMiaolistData.get(i).getCn_list().get(j).getShipper_hawbcode().equals(packGoodsexpressCode)) {
+                                    if (yiSaoMiaolistData.get(i).getCn_list().get(j).getChild_number().equals(packGoodsexpressCode)) {
                                         if ("false".equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect())) {
                                             yiSaoMiaolistData.get(i).getCn_list().get(j).setIsSelect("true");
                                             yiSaoMiaolistData.get(i).getCn_list().get(j).setOrder_status("选中");
@@ -463,15 +463,15 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
         if (getResources().getString(R.string.str_tmbh).equals(tv_yundanhao.getText().toString().trim())) {
             //TODO 待出运
             if (null != danChuYunlistData && danChuYunlistData.size() > 0) {
-                yunDanHaoSpeackYuYin(danChuYunlistData, result);
                 for (int i = 0; i < danChuYunlistData.size(); i++) {
-                    if (result.equals(danChuYunlistData.get(i).getShipper_hawbcode())
+                    if (result.equals(danChuYunlistData.get(i).getChild_number())
                             && ("false".equals(danChuYunlistData.get(i).getIsSelect())
                             || TextUtils.isEmpty(danChuYunlistData.get(i).getIsSelect()))) {
+                        yunDanHaoSpeackYuYin(danChuYunlistData, result);
                         danChuYunlistData.get(i).setIsSelect("true");
                         danChuYunlistData.get(i).setOrder_status("选中");
                         break;
-                    } else if (result.equals(danChuYunlistData.get(i).getShipper_hawbcode())
+                    } else if (result.equals(danChuYunlistData.get(i).getChild_number())
                             && "true".equals(danChuYunlistData.get(i).getIsSelect())) {
 
                         break;
@@ -486,11 +486,11 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
             if (null != yiSaoMiaolistData && yiSaoMiaolistData.size() > 0) {
                 if (result.contains("PPNO")) {
                     //TODO 证明扫描的是包编号
-                    baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 1);
                     for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
                         if (result.equals(yiSaoMiaolistData.get(i).getBag_lable_code())
                                 && ("false".equals(yiSaoMiaolistData.get(i).getIsSelect())
                                 || TextUtils.isEmpty(yiSaoMiaolistData.get(i).getIsSelect()))) {
+                            baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 1);
                             yiSaoMiaolistData.get(i).setIsSelect("true");
                             packGoodsCode = result;
                             break;
@@ -505,18 +505,18 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
                 } else {
                     //TODO 扫描的是子单号
-                    baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 2);
                     for (int i = 0; i < yiSaoMiaolistData.size(); i++) {
                         if (null != yiSaoMiaolistData.get(i).getCn_list() && yiSaoMiaolistData.get(i).getCn_list().size() > 0) {
                             for (int j = 0; j < yiSaoMiaolistData.get(i).getCn_list().size(); j++) {
-                                if (result.equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getShipper_hawbcode())
+                                if (result.equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getChild_number())
                                         && ("false".equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect())
                                         || TextUtils.isEmpty(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect()))) {
+                                    baoBianHaoSpeackYuYin(yiSaoMiaolistData, result, 2);
                                     packGoodsexpressCode = result;
                                     yiSaoMiaolistData.get(i).getCn_list().get(j).setIsSelect("true");
                                     yiSaoMiaolistData.get(i).getCn_list().get(j).setOrder_status("选中");
                                     break;
-                                } else if (result.equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getShipper_hawbcode())
+                                } else if (result.equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getChild_number())
                                         && "true".equals(yiSaoMiaolistData.get(i).getCn_list().get(j).getIsSelect())) {
 
                                     break;
@@ -558,7 +558,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                                 if ("true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
                                     pic++;
                                 }
-                                if (content.equals(list.get(i).getCn_list().get(j).getShipper_hawbcode()) && "true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
+                                if (content.equals(list.get(i).getCn_list().get(j).getChild_number()) && "true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
                                     //TODO 重复扫描
                                     MscManager.getInstance().speech("重复扫描");
                                     return;
@@ -583,7 +583,7 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                     if ("true".equals(model.getIsSelect())) {
                         pic++;
                     }
-                    if (content.equals(model.getShipper_hawbcode()) && "true".equals(model.getIsSelect())) {
+                    if (content.equals(model.getChild_number()) && "true".equals(model.getIsSelect())) {
                         //TODO 重复扫描
                         MscManager.getInstance().speech("重复扫描");
                         return;

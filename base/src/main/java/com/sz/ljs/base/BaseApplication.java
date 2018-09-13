@@ -43,7 +43,7 @@ public class BaseApplication extends Application {
     public final String BUGLY_APP_ID = "112ab15512";//8ec6cc34-f6b4-4dc2-9e12-25f82cf6e666
     public final String XUNFEI_ID="5b7a7165";
     static BaseApplication instance = null;
-    //PosSDK mSDK = null;
+//    PosSDK mSDK = null;
     static PosApi mPosApi = null;
     private static String mCurDev1 = "";
     public BaseApplication(){

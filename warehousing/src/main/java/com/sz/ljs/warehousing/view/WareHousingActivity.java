@@ -82,6 +82,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
     private int pice = 0;//件数
     private boolean isWenTiDan = false;
     private AlertDialog alertDialog;
+    private boolean isDuoJianFanHui;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,25 +186,27 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         ll_duojian.setBackgroundResource(R.drawable.pack_btn_bg);
                         ll_duojian.setClickable(true);
                         //TODO 2018-09-12提出输入多件的时候要直接跳转到添加多件的界面
-                        Intent intent = new Intent(WareHousingActivity.this, AddSubunitActivity.class);
-                        if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
-                            intent.putExtra("pice", 0);
-                        } else {
-                            intent.putExtra("pice", Integer.valueOf(et_jianshu.getText().toString().trim()));
-                        }
+                        if (false == isDuoJianFanHui) {
+                            Intent intent = new Intent(WareHousingActivity.this, AddSubunitActivity.class);
+                            if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
+                                intent.putExtra("pice", 0);
+                            } else {
+                                intent.putExtra("pice", Integer.valueOf(et_jianshu.getText().toString().trim()));
+                            }
 
-                        if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
-                            intent.putExtra("orderId", "");
-                        } else {
-                            intent.putExtra("orderId", et_yundanhao.getText().toString().trim());
+                            if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
+                                intent.putExtra("orderId", "");
+                            } else {
+                                intent.putExtra("orderId", et_yundanhao.getText().toString().trim());
+                            }
+                            if (null != selectCurrentDayBatchEntity) {
+                                intent.putExtra("arrival_date", selectCurrentDayBatchEntity.getArrival_date());
+                            } else {
+                                intent.putExtra("arrival_date", "");
+                            }
+                            intent.putExtra("customerId", customerId);
+                            startActivityForResult(intent, 1000);
                         }
-                        if (null != selectCurrentDayBatchEntity) {
-                            intent.putExtra("arrival_date", selectCurrentDayBatchEntity.getArrival_date());
-                        } else {
-                            intent.putExtra("arrival_date", "");
-                        }
-                        intent.putExtra("customerId", customerId);
-                        startActivityForResult(intent, 1000);
                     }
                 }
             }
@@ -225,7 +228,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 if (false == isYuBaoKeHu) {
                     if (TextUtils.isEmpty(s)) {
                         //TODO 客户代码为空，不给其他操作
-                        et_kehucankaodanhao.setFocusable(false);
+//                        et_kehucankaodanhao.setFocusable(false);
                         ll_mudiguojia.setClickable(false);
                         ll_xiaoshouchanpin.setClickable(false);
                         et_jianshu.setFocusable(false);
@@ -236,14 +239,24 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         btn_fujiafuwu.setClickable(false);
                         btn_qianru.setClickable(false);
                     } else {
-                        et_kehucankaodanhao.setFocusable(true);
+//                        et_kehucankaodanhao.setFocusable(true);
                         ll_mudiguojia.setClickable(true);
                         ll_xiaoshouchanpin.setClickable(true);
+                        et_jianshu.setFocusableInTouchMode(true);
                         et_jianshu.setFocusable(true);
+                        et_jianshu.requestFocus();
+                        et_shizhong.setFocusableInTouchMode(true);
                         et_shizhong.setFocusable(true);
+                        et_shizhong.requestFocus();
+                        et_chang.setFocusableInTouchMode(true);
                         et_chang.setFocusable(true);
+                        et_chang.requestFocus();
+                        et_kuan.setFocusableInTouchMode(true);
                         et_kuan.setFocusable(true);
+                        et_kuan.requestFocus();
+                        et_gao.setFocusableInTouchMode(true);
                         et_gao.setFocusable(true);
+                        et_gao.requestFocus();
                         btn_fujiafuwu.setClickable(true);
                         btn_qianru.setClickable(true);
                     }
@@ -273,6 +286,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     getOrderByNumber();
                 }
             } else {
+                clean(true);
                 isYuBaoKeHu = false;
                 iv_yubaokehu.setImageResource(R.mipmap.fb_b);
             }
@@ -362,7 +376,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                 if ("没有数据".equals(result)) {
                     //TODO 没有返回订单详情的时候
                     isWenTiDan = true;
-                    et_kehucankaodanhao.setFocusable(false);
+//                    et_kehucankaodanhao.setFocusable(false);
                     ll_mudiguojia.setClickable(false);
                     ll_xiaoshouchanpin.setClickable(false);
                     et_jianshu.setFocusable(false);
@@ -650,11 +664,21 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     et_kehucankaodanhao.setFocusable(true);
                     ll_mudiguojia.setClickable(true);
                     ll_xiaoshouchanpin.setClickable(true);
+                    et_jianshu.setFocusableInTouchMode(true);
                     et_jianshu.setFocusable(true);
+                    et_jianshu.requestFocus();
+                    et_shizhong.setFocusableInTouchMode(true);
                     et_shizhong.setFocusable(true);
+                    et_shizhong.requestFocus();
+                    et_chang.setFocusableInTouchMode(true);
                     et_chang.setFocusable(true);
+                    et_chang.requestFocus();
+                    et_kuan.setFocusableInTouchMode(true);
                     et_kuan.setFocusable(true);
+                    et_kuan.requestFocus();
+                    et_gao.setFocusableInTouchMode(true);
                     et_gao.setFocusable(true);
+                    et_gao.requestFocus();
                     btn_fujiafuwu.setClickable(true);
                     btn_qianru.setClickable(true);
                     if (null == orderModel) {
@@ -698,9 +722,9 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         WareHouSingModel.getInstance().setServiceModelList(serviceList);
                     }
                     if (1 == Integer.parseInt(WareHouSingModel.getInstance().getOrderModel().getData().getOrder_pieces())) {
-                        tv_jianshu.setText("1");
-                        tv_jianshu.setVisibility(View.VISIBLE);
-                        et_jianshu.setVisibility(View.GONE);
+                        et_jianshu.setText("1");
+                        et_jianshu.setVisibility(View.VISIBLE);
+                        tv_jianshu.setVisibility(View.GONE);
                         ll_changkuangao.setVisibility(View.VISIBLE);
                         ll_duojian.setBackgroundResource(R.drawable.pack_btn_clickbg);
                         ll_duojian.setClickable(false);
@@ -720,10 +744,15 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     ll_mudiguojia.setClickable(false);
                     ll_xiaoshouchanpin.setClickable(false);
                     et_jianshu.setFocusable(false);
+                    et_jianshu.setFocusableInTouchMode(false);
                     et_shizhong.setFocusable(false);
+                    et_shizhong.setFocusableInTouchMode(false);
                     et_chang.setFocusable(false);
+                    et_chang.setFocusableInTouchMode(false);
                     et_kuan.setFocusable(false);
+                    et_kuan.setFocusableInTouchMode(false);
                     et_gao.setFocusable(false);
+                    et_gao.setFocusableInTouchMode(false);
                     btn_fujiafuwu.setClickable(false);
                     btn_qianru.setClickable(false);
                 }
@@ -756,8 +785,11 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     List<SubnitModel> list = new ArrayList<>();
                     list = WareHouSingModel.getInstance().getSubnitList();
                     subnitList.addAll(list);
+                    isDuoJianFanHui = true;
                     et_shizhong.setText("" + WareHouSingModel.getInstance().getTotalGrossWeight());
                     et_jianshu.setText("" + subnitList.size());
+                    isDuoJianFanHui = false;
+                    WareHouSingModel.getInstance().reMoveSubnitList();
                     Log.i("多件返回后", "subnitList.size()=" + subnitList.size());
                 }
                 break;
@@ -790,17 +822,48 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
 
     //TODO 清空所有内容，然后在通过传入的boolean值对控件进行对应的操作
     private void clean(boolean isA) {
-        et_kehucankaodanhao.setFocusable(isA);
-        ll_mudiguojia.setClickable(isA);
-        ll_xiaoshouchanpin.setClickable(isA);
-        et_jianshu.setFocusable(isA);
-        et_shizhong.setFocusable(isA);
-        et_chang.setFocusable(isA);
-        et_kuan.setFocusable(isA);
-        et_gao.setFocusable(isA);
-        btn_fujiafuwu.setClickable(isA);
-        btn_qianru.setClickable(isA);
+        if (isA) {
+//            Log.i("可以点击了","进来了");
+            et_kehucankaodanhao.setFocusable(true);
+            ll_mudiguojia.setClickable(true);
+            ll_xiaoshouchanpin.setClickable(true);
+            et_jianshu.setFocusableInTouchMode(true);
+            et_jianshu.setFocusable(true);
+            et_jianshu.requestFocus();
+            et_shizhong.setFocusableInTouchMode(true);
+            et_shizhong.setFocusable(true);
+            et_shizhong.requestFocus();
+            et_chang.setFocusableInTouchMode(true);
+            et_chang.setFocusable(true);
+            et_chang.requestFocus();
+            et_kuan.setFocusableInTouchMode(true);
+            et_kuan.setFocusable(true);
+            et_kuan.requestFocus();
+            et_gao.setFocusableInTouchMode(true);
+            et_gao.setFocusable(true);
+            et_gao.requestFocus();
+            btn_fujiafuwu.setClickable(true);
+            btn_qianru.setClickable(true);
+        } else {
+//            Log.i("不可以点击了","进来了");
+            et_kehucankaodanhao.setFocusable(false);
+            ll_mudiguojia.setClickable(false);
+            ll_xiaoshouchanpin.setClickable(false);
+            et_jianshu.setFocusable(false);
+            et_jianshu.setFocusableInTouchMode(false);
+            et_shizhong.setFocusable(false);
+            et_shizhong.setFocusableInTouchMode(false);
+            et_chang.setFocusable(false);
+            et_chang.setFocusableInTouchMode(false);
+            et_kuan.setFocusable(false);
+            et_kuan.setFocusableInTouchMode(false);
+            et_gao.setFocusable(false);
+            et_gao.setFocusableInTouchMode(false);
+            btn_fujiafuwu.setClickable(false);
+            btn_qianru.setClickable(false);
+        }
         et_yundanhao.setText("");
+        et_yundanhao.setFocusable(true);
         et_kehudaima.setText("");
         et_kehucankaodanhao.setText("");
         et_mudiguojia.setText("");

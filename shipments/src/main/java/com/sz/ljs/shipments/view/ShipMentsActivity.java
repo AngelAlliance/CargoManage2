@@ -129,7 +129,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                     if (!TextUtils.isEmpty(packGoodsexpressCode)) {
                         for (int i = 0; i < listData.size(); i++) {
                             for (int j = 0; j < listData.get(i).getCn_list().size(); j++) {
-                                if (listData.get(i).getCn_list().get(j).getShipper_hawbcode().equals(packGoodsexpressCode)) {
+                                if (listData.get(i).getCn_list().get(j).getChild_number().equals(packGoodsexpressCode)) {
                                     if ("false".equals(listData.get(i).getCn_list().get(j).getIsSelect())) {
                                         listData.get(i).getCn_list().get(j).setIsSelect("true");
                                         listData.get(i).getCn_list().get(j).setOrder_status("选中");
@@ -258,7 +258,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                     }
                 }
                 packGoodsCode = "";
-                packGoodsexpressCode = listData.get(groupPosition).getCn_list().get(childPosition).getShipper_hawbcode();
+                packGoodsexpressCode = listData.get(groupPosition).getCn_list().get(childPosition).getChild_number();
                 fs_listView.setContentData(listData);
             }
         });
@@ -297,11 +297,11 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
         if (null != listData && listData.size() > 0) {
             if (result.contains("PPNO")) {
                 //TODO 证明扫描的是包编号
-                baoBianHaoSpeackYuYin(listData,result,1);
                 for (int i = 0; i < listData.size(); i++) {
                     if (result.equals(listData.get(i).getBag_lable_code())
                             && ("false".equals(listData.get(i).getIsSelect())
                             || TextUtils.isEmpty(listData.get(i).getIsSelect()))) {
+                        baoBianHaoSpeackYuYin(listData,result,1);
                         listData.get(i).setIsSelect("true");
                         selectList.add(listData.get(i));
                         packGoodsCode = result;
@@ -315,18 +315,18 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                 fs_listView.setContentData(listData);
             } else {
                 //TODO 扫描的是子单号
-                baoBianHaoSpeackYuYin(listData,result,2);
                 for (int i = 0; i < listData.size(); i++) {
                     if (null != listData.get(i).getCn_list() && listData.get(i).getCn_list().size() > 0) {
                         for (int j = 0; j < listData.get(i).getCn_list().size(); j++) {
-                            if (result.equals(listData.get(i).getCn_list().get(j).getShipper_hawbcode())
+                            if (result.equals(listData.get(i).getCn_list().get(j).getChild_number())
                                     && ("false".equals(listData.get(i).getCn_list().get(j).getIsSelect())
                                     || TextUtils.isEmpty(listData.get(i).getCn_list().get(j).getIsSelect()))) {
+                                baoBianHaoSpeackYuYin(listData,result,2);
                                 listData.get(i).getCn_list().get(j).setIsSelect("true");
                                 listData.get(i).getCn_list().get(j).setOrder_status("选中");
                                 packGoodsexpressCode = result;
                                 break;
-                            } else if (result.equals(listData.get(i).getCn_list().get(j).getShipper_hawbcode())
+                            } else if (result.equals(listData.get(i).getCn_list().get(j).getChild_number())
                                     && "true".equals(listData.get(i).getCn_list().get(j).getIsSelect())) {
 
                                 break;
@@ -365,7 +365,7 @@ public class ShipMentsActivity extends BaseActivity implements View.OnClickListe
                                 if ("true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
                                     pic++;
                                 }
-                                if (content.equals(list.get(i).getCn_list().get(j).getShipper_hawbcode()) && "true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
+                                if (content.equals(list.get(i).getCn_list().get(j).getChild_number()) && "true".equals(list.get(i).getCn_list().get(j).getIsSelect())) {
                                     //TODO 重复扫描
                                     MscManager.getInstance().speech("重复扫描");
                                     return;

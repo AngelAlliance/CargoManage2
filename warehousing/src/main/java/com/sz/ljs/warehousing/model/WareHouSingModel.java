@@ -62,13 +62,12 @@ public class WareHouSingModel {
         list1.addAll(list);
         serviceModelList.clear();
         serviceModelList.addAll(list1);
-        Log.i("添加之后大小", "size=" + serviceModelList.size());
     }
 
     public List<ServiceModel> getServiceModelList() {
-        Log.i("返回这里的对象",""+this.serviceModelList);
         return this.serviceModelList;
     }
+
 
 
     public void removeServiceModel(int position) {
@@ -119,6 +118,9 @@ public class WareHouSingModel {
         subnitList.addAll(list1);
     }
 
+    public void reMoveSubnitList(){
+        subnitList.clear();
+    }
     public double getVolume() {
         return volume;
     }
