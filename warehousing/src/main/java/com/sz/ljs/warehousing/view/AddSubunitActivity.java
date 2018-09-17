@@ -243,7 +243,7 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
         if (TextUtils.isEmpty(orderId)) {
             textView.setText("00" + (position+1));
         } else {
-            textView.setText(orderId + "_00" + (position+1));
+            textView.setText(orderId + "-00" + (position+1));
         }
         ImageView ic_scan = (ImageView) view.findViewById(R.id.iv_scan);
         ic_scan.setTag(position);
