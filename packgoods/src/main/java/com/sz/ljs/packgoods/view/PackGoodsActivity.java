@@ -611,7 +611,9 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         @Override
                         public void run() {
                             et_yundanhao.setText("");
+                            et_yundanhao.setFocusableInTouchMode(true);
                             et_yundanhao.setFocusable(true);
+                            et_yundanhao.requestFocus();
                             fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
                         }
                     });
@@ -623,7 +625,9 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         @Override
                         public void run() {
                             et_yundanhao.setText("");
+                            et_yundanhao.setFocusableInTouchMode(true);
                             et_yundanhao.setFocusable(true);
+                            et_yundanhao.requestFocus();
                             fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
                         }
                     });

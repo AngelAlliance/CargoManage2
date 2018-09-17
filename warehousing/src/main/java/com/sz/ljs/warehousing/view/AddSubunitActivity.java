@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -60,6 +61,8 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //让布局向上移来显示软键盘
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_addsubunit);
         initView();
         setListener();
@@ -238,9 +241,9 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
         TextView textView = (TextView) view.findViewById(R.id.et_zidanhao);
         textView.setTag(position);
         if (TextUtils.isEmpty(orderId)) {
-            textView.setText("000" + position);
+            textView.setText("00" + (position+1));
         } else {
-            textView.setText(orderId + "_000" + position);
+            textView.setText(orderId + "_00" + (position+1));
         }
         ImageView ic_scan = (ImageView) view.findViewById(R.id.iv_scan);
         ic_scan.setTag(position);

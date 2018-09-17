@@ -418,6 +418,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                                             isWenTiDan = false;
                                             isYuBaoKeHu = true;
                                             iv_yubaokehu.setImageResource(R.mipmap.fb_g);
+                                            alertDialog.dissmiss();
                                         }
                                     });
                             alertDialog.show();
@@ -876,6 +877,8 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         et_daohuozongdan.setText("");
         et_daohuozongdan1.setText("");
         WareHouSingModel.getInstance().release();
+        subnitList.clear();
+        serviceList.clear();
     }
 
     public void showWaiting(final boolean isShow) {

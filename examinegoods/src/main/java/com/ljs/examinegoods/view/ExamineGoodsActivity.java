@@ -481,14 +481,19 @@ public class ExamineGoodsActivity extends BaseActivity implements View.OnClickLi
         List<String> str = new ArrayList<>();
         if (pices == 1) {
             str.add(code);
+            str.add(code);
         } else {
             if (pices > 20) {
                 MscManager.getInstance().speech("输入件数太多，无法打印");
                 showTipeDialog("输入件数太多，无法打印");
                 return;
             }
-            for (int i = 1; i <= pices; i++) {
-                str.add(code + "-00" + i);
+            for (int i = 0; i <= pices; i++) {
+                if(0==i){
+                    str.add(code);
+                }else {
+                    str.add(code + "-00" + i);
+                }
             }
         }
         Log.i("验货这里打印标签", "标签数据:" + str);
