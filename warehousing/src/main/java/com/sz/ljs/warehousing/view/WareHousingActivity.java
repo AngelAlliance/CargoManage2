@@ -180,7 +180,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     ll_duojian.setBackgroundResource(R.drawable.pack_btn_clickbg);
                     ll_duojian.setClickable(false);
                 } else {
-                    if (!TextUtils.isEmpty(s) && Integer.parseInt(s.toString()) > 1) {
+                    if (!TextUtils.isEmpty(s) && Integer.parseInt(s.toString()) > 1&&TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
                         pice = Integer.parseInt(s.toString());
                         ll_changkuangao.setVisibility(View.GONE);
                         ll_duojian.setBackgroundResource(R.drawable.pack_btn_bg);

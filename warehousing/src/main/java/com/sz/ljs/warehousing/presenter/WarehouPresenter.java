@@ -315,6 +315,7 @@ public class WarehouPresenter implements WarehouContract.Presenter {
         param.put(WarehouContract.COUNTRY_CODE, country_code);
         param.put(WarehouContract.ARRIVAL_DATE, arrival_date);
         param.put(WarehouContract.CUSTOMER_ID, customer_id);
+        param.put(WarehouContract.USERID, "" + UserModel.getInstance().getSt_id());
         String token = "";
         if (null != UserModel.getInstance() && null != UserModel.getInstance().getTokenModel()) {
             token = UserModel.getInstance().getTokenModel().getToken();
