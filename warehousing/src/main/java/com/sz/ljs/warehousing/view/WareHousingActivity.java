@@ -83,6 +83,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
     private boolean isWenTiDan = false;
     private AlertDialog alertDialog;
     private boolean isDuoJianFanHui;
+    private boolean isQinQiuJianShu=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,32 +181,36 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     ll_duojian.setBackgroundResource(R.drawable.pack_btn_clickbg);
                     ll_duojian.setClickable(false);
                 } else {
-                    if (!TextUtils.isEmpty(s) && Integer.parseInt(s.toString()) > 1&&TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
+                    if (!TextUtils.isEmpty(s) && Integer.parseInt(s.toString()) > 1) {
                         pice = Integer.parseInt(s.toString());
                         ll_changkuangao.setVisibility(View.GONE);
                         ll_duojian.setBackgroundResource(R.drawable.pack_btn_bg);
                         ll_duojian.setClickable(true);
-                        //TODO 2018-09-12提出输入多件的时候要直接跳转到添加多件的界面
-                        if (false == isDuoJianFanHui) {
-                            Intent intent = new Intent(WareHousingActivity.this, AddSubunitActivity.class);
-                            if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
-                                intent.putExtra("pice", 0);
-                            } else {
-                                intent.putExtra("pice", Integer.valueOf(et_jianshu.getText().toString().trim()));
-                            }
+                        if(true==isQinQiuJianShu){
+                            //TODO 如果是请求回来是多件，则不自动跳转，点击再跳转
+                        }else {
+                            //TODO 2018-09-12提出输入多件的时候要直接跳转到添加多件的界面
+                            if (false == isDuoJianFanHui) {
+                                Intent intent = new Intent(WareHousingActivity.this, AddSubunitActivity.class);
+                                if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
+                                    intent.putExtra("pice", 0);
+                                } else {
+                                    intent.putExtra("pice", Integer.valueOf(et_jianshu.getText().toString().trim()));
+                                }
 
-                            if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
-                                intent.putExtra("orderId", "");
-                            } else {
-                                intent.putExtra("orderId", et_yundanhao.getText().toString().trim());
+                                if (TextUtils.isEmpty(et_yundanhao.getText().toString().trim())) {
+                                    intent.putExtra("orderId", "");
+                                } else {
+                                    intent.putExtra("orderId", et_yundanhao.getText().toString().trim());
+                                }
+                                if (null != selectCurrentDayBatchEntity) {
+                                    intent.putExtra("arrival_date", selectCurrentDayBatchEntity.getArrival_date());
+                                } else {
+                                    intent.putExtra("arrival_date", "");
+                                }
+                                intent.putExtra("customerId", customerId);
+                                startActivityForResult(intent, 1000);
                             }
-                            if (null != selectCurrentDayBatchEntity) {
-                                intent.putExtra("arrival_date", selectCurrentDayBatchEntity.getArrival_date());
-                            } else {
-                                intent.putExtra("arrival_date", "");
-                            }
-                            intent.putExtra("customerId", customerId);
-                            startActivityForResult(intent, 1000);
                         }
                     }
                 }
@@ -307,6 +312,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
             if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
                 return;
             }
+            isQinQiuJianShu=false;
             Intent intent = new Intent(WareHousingActivity.this, AddSubunitActivity.class);
             if (TextUtils.isEmpty(et_jianshu.getText().toString().trim())) {
                 intent.putExtra("pice", 0);
@@ -723,6 +729,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         WareHouSingModel.getInstance().setServiceModelList(serviceList);
                     }
                     if (1 == Integer.parseInt(WareHouSingModel.getInstance().getOrderModel().getData().getOrder_pieces())) {
+                        isQinQiuJianShu=true;
                         et_jianshu.setText("1");
                         et_jianshu.setVisibility(View.VISIBLE);
                         tv_jianshu.setVisibility(View.GONE);
@@ -731,6 +738,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                         ll_duojian.setClickable(false);
 
                     } else if (Integer.parseInt(WareHouSingModel.getInstance().getOrderModel().getData().getOrder_pieces()) > 1) {
+                        isQinQiuJianShu=true;
                         tv_jianshu.setVisibility(View.GONE);
                         et_jianshu.setVisibility(View.VISIBLE);
                         ll_changkuangao.setVisibility(View.GONE);
@@ -877,8 +885,20 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         et_daohuozongdan.setText("");
         et_daohuozongdan1.setText("");
         WareHouSingModel.getInstance().release();
+        isQinQiuJianShu=false;
+        isDuoJianFanHui=false;
         subnitList.clear();
         serviceList.clear();
+        countryList.clear();
+        productList.clear();
+        selectCurrentDayBatchEntity=null;
+        customerId=-1;
+        orderModel=null;
+        countryModel=null;
+        productModel=null;
+        ll_changkuangao.setVisibility(View.VISIBLE);
+        ll_duojian.setBackgroundResource(R.drawable.pack_btn_clickbg);
+        ll_duojian.setClickable(false);
     }
 
     public void showWaiting(final boolean isShow) {
@@ -911,5 +931,11 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        clean(true);
+        super.onDestroy();
     }
 }

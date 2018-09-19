@@ -292,12 +292,20 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
             TextView tv_zfx_sftj = (TextView) view.findViewById(R.id.tv_zfx_sftj);
             if (TextUtils.isEmpty(tv_zfx_sftj.getText().toString().trim())) {
                 //TODO 表示还有没添加的
-                if (!TextUtils.isEmpty(et_zafeixiang.getText().toString().trim()) && !TextUtils.isEmpty(et_feiyong.getText().toString().trim())) {
-                    serviceList.add(new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
-                            , "", Double.valueOf(et_feiyong.getText().toString().trim()), tv_zfx_code.getText().toString().trim(), et_zafeixiang.getText().toString().trim(), ""));
+//                && !TextUtils.isEmpty(et_feiyong.getText().toString().trim())
+                if (!TextUtils.isEmpty(et_zafeixiang.getText().toString().trim())) {
+                    if (!TextUtils.isEmpty(et_feiyong.getText().toString().trim())){
+                        serviceList.add(new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
+                                , "", Double.valueOf(et_feiyong.getText().toString().trim()), tv_zfx_code.getText().toString().trim(), et_zafeixiang.getText().toString().trim(), ""));
+                    }else {
+                        serviceList.add(new ServiceModel(i, "", "" + UserModel.getInstance().getSt_id(), "", ""
+                                , "",0.0, tv_zfx_code.getText().toString().trim(), et_zafeixiang.getText().toString().trim(), ""));
+                    }
+
                     tv_zfx_sftj.setText("已经添加");
                 } else {
-                    Utils.showToast(getBaseActivity(), "杂费项或费用不能为空");
+                    showTipeDialog("杂费项不能为空");
+                    return;
                 }
                 break;
             } else {
@@ -306,7 +314,11 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
                     if (serviceList.get(j).getPosition() == i) {
                         //TODO 表示有此项，则只需要更改相应的参数即可
                         serviceList.get(j).setExtra_servicecode(tv_zfx_code.getText().toString().trim()); //修改杂费项代码
-                        serviceList.get(j).setExtra_servicevalue(Double.valueOf(et_feiyong.getText().toString().trim()));
+                        if(!TextUtils.isEmpty(et_feiyong.getText().toString().trim())){
+                            serviceList.get(j).setExtra_servicevalue(Double.valueOf(et_feiyong.getText().toString().trim()));
+                        }else {
+                            serviceList.get(j).setExtra_servicevalue(0.0);
+                        }
                     }
                 }
             }
@@ -329,22 +341,32 @@ public class AddServiceActivity extends BaseActivity implements View.OnClickList
         TextView tv_zfx_code = (TextView) view.findViewById(R.id.tv_zfx_code);
         EditText et_feiyong = (EditText) view.findViewById(R.id.et_feiyong);
         TextView tv_zfx_sftj = (TextView) view.findViewById(R.id.tv_zfx_sftj);
-        if (!TextUtils.isEmpty(et_zafeixiang.getText().toString().trim()) && !TextUtils.isEmpty(et_feiyong.getText().toString().trim())) {
+//         && !TextUtils.isEmpty(et_feiyong.getText().toString().trim())
+        if (!TextUtils.isEmpty(et_zafeixiang.getText().toString().trim())) {
             //TODO 这时候先检测列表中是否含有这个数据
             for (int i = 0; i < serviceList.size(); i++) {
                 if (serviceList.get(i).getPosition() == position) {
                     //TODO 表示有此项，则只需要更改相应的参数即可
                     serviceList.get(i).setExtra_servicecode(tv_zfx_code.getText().toString().trim()); //修改杂费项代码
-                    serviceList.get(i).setExtra_servicevalue(Double.valueOf(et_feiyong.getText().toString().trim()));
+                    if(!TextUtils.isEmpty(et_feiyong.getText().toString().trim())){
+                        serviceList.get(i).setExtra_servicevalue(Double.valueOf(et_feiyong.getText().toString().trim()));
+                    }else {
+                        serviceList.get(i).setExtra_servicevalue(0.0);
+                    }
                     return;
                 }
             }
             //如果集合中没有此数据，那么直接添加到集合中去
-            serviceList.add(new ServiceModel(position, "", "" + UserModel.getInstance().getSt_id(), "", ""
-                    , "", Double.valueOf(et_feiyong.getText().toString().trim()), tv_zfx_code.getText().toString().trim(), et_zafeixiang.getText().toString().trim(), ""));
+            if(!TextUtils.isEmpty(et_feiyong.getText().toString().trim())){
+                serviceList.add(new ServiceModel(position, "", "" + UserModel.getInstance().getSt_id(), "", ""
+                        , "", Double.valueOf(et_feiyong.getText().toString().trim()), tv_zfx_code.getText().toString().trim(), et_zafeixiang.getText().toString().trim(), ""));
+            }else {
+                serviceList.add(new ServiceModel(position, "", "" + UserModel.getInstance().getSt_id(), "", ""
+                        , "", 0.0, tv_zfx_code.getText().toString().trim(), et_zafeixiang.getText().toString().trim(), ""));
+            }
             tv_zfx_sftj.setText("已经添加");
         } else {
-            Utils.showToast(getBaseActivity(), "杂费项或费用不能为空");
+            showTipeDialog("杂费项不能为空");
         }
     }
 

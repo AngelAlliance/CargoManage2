@@ -206,23 +206,37 @@ public class ArticleScanActivity extends BaseActivity implements ArticleScanCont
                         @Override
                         public void run() {
                             et_yundanhao.setText("");
+                            et_yundanhao.setFocusableInTouchMode(true);
                             et_yundanhao.setFocusable(true);
+                            et_yundanhao.requestFocus();
                             shipmentBagList.clear();
                             shipmentBagList.addAll(ArticleScanModel.getInstance().getShipmentBagList());
                             dataAdapter.notifyDataSetChanged();
                         }
                     });
                 } else {
-                    shipmentBagList.clear();
-                    et_yundanhao.setText("");
-                    et_yundanhao.setFocusable(true);
-                    dataAdapter.notifyDataSetChanged();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            shipmentBagList.clear();
+                            et_yundanhao.setText("");
+                            et_yundanhao.setFocusableInTouchMode(true);
+                            et_yundanhao.setFocusable(true);
+                            et_yundanhao.requestFocus();
+                            dataAdapter.notifyDataSetChanged();
+                        }
+                    });
                     showTipeDialog("暂无数据");
                 }
                 break;
             case ArticleScanContract.BAG_RECEIVE_FAIL_ID:
-                shipmentBagList.clear();
-                dataAdapter.notifyDataSetChanged();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        shipmentBagList.clear();
+                        dataAdapter.notifyDataSetChanged();
+                    }
+                });
                 showTipeDialog("暂无数据");
                 break;
             case ArticleScanContract.BUSINESS_RECEIPT_SUCCESS_ID:

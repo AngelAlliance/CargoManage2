@@ -271,7 +271,9 @@ public class InventoryActivity extends BaseActivity implements InventoryContract
                             panKulistData.addAll(InventoryModel.getInstance().getExpressList());
                             fs_cxkcxx_list.setContentDataForNoPackage(panKulistData);
                             et_yundanhao.setText("");
+                            et_yundanhao.setFocusableInTouchMode(true);
                             et_yundanhao.setFocusable(true);
+                            et_yundanhao.requestFocus();
                             setweightAndPices();
                         }
                     }
