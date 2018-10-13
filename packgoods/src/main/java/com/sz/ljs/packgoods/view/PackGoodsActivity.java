@@ -477,8 +477,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                         break;
                     }
                 }
-                et_yundanhao.setText("");
                 et_yundanhao.setFocusable(true);
+                et_yundanhao.setText("");
                 fs_daichuyun_list.setContentDataForNoPackage(danChuYunlistData);
             }
         } else if (getResources().getString(R.string.str_ydh).equals(tv_yundanhao.getText().toString().trim())) {
@@ -500,8 +500,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             break;
                         }
                     }
-                    et_yundanhao.setText("");
                     et_yundanhao.setFocusable(true);
+                    et_yundanhao.setText("");
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
                 } else {
                     //TODO 扫描的是子单号
@@ -524,8 +524,8 @@ public class PackGoodsActivity extends BaseActivity implements View.OnClickListe
                             }
                         }
                     }
-                    et_yundanhao.setText("");
                     et_yundanhao.setFocusable(true);
+                    et_yundanhao.setText("");
                     fs_yisaomiao_list.setContentData(yiSaoMiaolistData);
                 }
             }

@@ -69,6 +69,7 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
     }
 
     private void initView() {
+        subnitList=WareHouSingModel.getInstance().getSubnitList();
         mPresenter = new WarehouPresenter(this);
         mWaitingDialog = new WaitingDialog(this);
         pices = getIntent().getIntExtra("pice", 1);
@@ -150,15 +151,17 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
                 if (null != subnitList && subnitList.size() > 0) {
                     for (int i = 0; i < subnitList.size(); i++) {
                         if (index == subnitList.get(i).getPosition()) {
+                            //TODO 表示原本就有这项数据,先减去相应的数据移除该项之后再添加
                             TotalVolumeWeight = TotalVolumeWeight - subnitList.get(i).getList().get(0).getVolumeWeight();
                             TotalChargeWeight = TotalVolumeWeight - subnitList.get(i).getList().get(0).getChargeWeight();
                             zongshizhong = zongshizhong - subnitList.get(i).getList().get(0).getGrossWeight();
-                            volume = volume + WareHouSingModel.getInstance().getCalculationVolumWeightModel().getVolume();
+                            volume = volume - subnitList.get(i).getList().get(0).getVolume();
+                            subnitList.remove(index);
                             break;
                         }
                     }
                 }
-                subnitList.add(model);
+                subnitList.add(index,model);
                 TotalVolumeWeight = TotalVolumeWeight + WareHouSingModel.getInstance().getCalculationVolumWeightModel().getTotalVolumeWeight();
                 TotalChargeWeight = TotalVolumeWeight + WareHouSingModel.getInstance().getCalculationVolumWeightModel().getTotalChargeWeight();
                 zongshizhong = zongshizhong + WareHouSingModel.getInstance().getCalculationVolumWeightModel().getTotalGrossWeight();
@@ -169,7 +172,7 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
                 TextView tv_isTiJiao = (TextView) view.findViewById(R.id.tv_isTiJiao);
                 tv_isTiJiao.setText("已提交");
                 if (true == isXinZen) {
-                    addView();
+                    addView2();
                     isXinZen = false;
                 } else if (true == isQueRen) {
                     isQueRen = false;
@@ -219,15 +222,6 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
                 addView();
             }
         }
-//        else {
-//            subnitList.remove((Integer) view.getTag());
-//            pice = 0;
-//            zongshizhong = 0;
-//            zongcaiji = 0;
-//            tv_zongjianshu.setText("");
-//            tv_zongshizhong.setText("");
-//            tv_zongcaiji.setText("");
-//        }
     }
 
     //TODO 新增
@@ -288,6 +282,82 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
                 }
             }
         });
+        if(null!=subnitList&&subnitList.size()>0 && position<subnitList.size()){
+            et_shizhong.setText(""+subnitList.get(position).getList().get(0).getGrossWeight());
+            et_chang.setText(""+subnitList.get(position).getList().get(0).getLength());
+            et_kuan.setText(""+subnitList.get(position).getList().get(0).getWidth());
+            et_gao.setText(""+subnitList.get(position).getList().get(0).getHeight());
+            tv_isTiJiao.setText("已提交");
+        }
+        ll_addView.addView(view);
+//        pice++;
+        tv_zongjianshu.setText("" + pice);
+    }
+
+    //TODO 点击新增按钮新增
+    private void addView2() {
+        View view = LayoutInflater.from(AddSubunitActivity.this).inflate(R.layout.view_subnit, null);
+        int position = ll_addView.getChildCount();
+        Button button = (Button) view.findViewById(R.id.btn_shanchu);
+        button.setTag(position);
+        button.setOnClickListener(this);
+        TextView tv_isTiJiao = (TextView) view.findViewById(R.id.tv_isTiJiao);
+        TextView textView = (TextView) view.findViewById(R.id.et_zidanhao);
+        textView.setTag(position);
+        if (TextUtils.isEmpty(orderId)) {
+            textView.setText("00" + (position+1));
+        } else {
+            textView.setText(orderId + "-00" + (position+1));
+        }
+        ImageView ic_scan = (ImageView) view.findViewById(R.id.iv_scan);
+        ic_scan.setTag(position);
+        ic_scan.setOnClickListener(this);
+        EditText et_shizhong = (EditText) view.findViewById(R.id.et_shizhong);
+        et_shizhong.setTag(position);
+
+        EditText et_chang = (EditText) view.findViewById(R.id.et_chang);
+        et_chang.setTag(position);
+        et_chang.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    et_changIndex = (Integer) v.getTag();
+                } else {
+                    inspectIsComplete(et_changIndex);
+                }
+            }
+        });
+        EditText et_kuan = (EditText) view.findViewById(R.id.et_kuan);
+        et_kuan.setTag(position);
+        et_kuan.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    et_kuanIndex = (Integer) v.getTag();
+                } else {
+                    inspectIsComplete(et_kuanIndex);
+                }
+            }
+        });
+
+        EditText et_gao = (EditText) view.findViewById(R.id.et_gao);
+        et_gao.setTag(position);
+        et_gao.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    et_gaoIndex = (Integer) v.getTag();
+                } else {
+                    inspectIsComplete(et_gaoIndex);
+                }
+            }
+        });
+//        if(null!=subnitList&&subnitList.size()>0 && position<subnitList.size()){
+//            et_shizhong.setText(""+subnitList.get(position).getList().get(0).getGrossWeight());
+//            et_chang.setText(""+subnitList.get(position).getList().get(0).getLength());
+//            et_kuan.setText(""+subnitList.get(position).getList().get(0).getWidth());
+//            et_gao.setText(""+subnitList.get(position).getList().get(0).getHeight());
+//        }
         ll_addView.addView(view);
         pice++;
         tv_zongjianshu.setText("" + pice);
@@ -303,6 +373,7 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
             EditText et_kuan = (EditText) view.findViewById(R.id.et_kuan);
             EditText et_gao = (EditText) view.findViewById(R.id.et_gao);
             if (TextUtils.isEmpty(tv_isTiJiao.getText().toString().trim())) {
+                //TODO 表示还没有提交的
                 if (TextUtils.isEmpty(et_shizhong.getText().toString().trim())) {
                     Utils.showToast(getBaseActivity(), "重量不能为空");
                     return;
@@ -317,6 +388,14 @@ public class AddSubunitActivity extends BaseActivity implements View.OnClickList
                     Utils.showToast(getBaseActivity(), "请输入完整");
                 }
                 break;
+            }else {
+                //TODO 这时候先检测列表中是否含有这个数据
+                for(int j=0;j<subnitList.size();j++){
+                    if(subnitList.get(j).getPosition()==i){
+                        //TODO 表示有此数据
+                        inspectIsComplete(i);
+                    }
+                }
             }
         }
     }

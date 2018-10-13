@@ -44,7 +44,7 @@ public class BaseApplication extends Application {
     public final String XUNFEI_ID="5b7a7165";
     static BaseApplication instance = null;
 //    PosSDK mSDK = null;
-    static PosApi mPosApi = null;
+//    static PosApi mPosApi = null;
     private static String mCurDev1 = "";
     public BaseApplication(){
         super.onCreate();
@@ -71,20 +71,20 @@ public class BaseApplication extends Application {
         Log.i("初始化讯飞","a="+a);
         Logger.addLogAdapter(new AndroidLogAdapter());
         //PosApi类初始化，该类为项目核心类，请注意务必实例化，否则将会出现无法打印和扫描等现象
-        mPosApi = PosApi.getInstance(this);
-        //根据型号进行初始化mPosApi类
-        if (Build.MODEL.contains("LTE")||android.os.Build.DISPLAY.contains("3508")||
-                android.os.Build.DISPLAY.contains("403")||
-                android.os.Build.DISPLAY.contains("35S09")) {
-            mPosApi.initPosDev("ima35s09");
-            setCurDevice("ima35s09");
-        } else if(Build.MODEL.contains("5501")){
-            mPosApi.initPosDev("ima35s12");
-            setCurDevice("ima35s12");
-        }else{
-            mPosApi.initPosDev(PosApi.PRODUCT_MODEL_IMA80M01);
-            setCurDevice(PosApi.PRODUCT_MODEL_IMA80M01);
-        }
+//        mPosApi = PosApi.getInstance(this);
+//        //根据型号进行初始化mPosApi类
+//        if (Build.MODEL.contains("LTE")||android.os.Build.DISPLAY.contains("3508")||
+//                android.os.Build.DISPLAY.contains("403")||
+//                android.os.Build.DISPLAY.contains("35S09")) {
+//            mPosApi.initPosDev("ima35s09");
+//            setCurDevice("ima35s09");
+//        } else if(Build.MODEL.contains("5501")){
+//            mPosApi.initPosDev("ima35s12");
+//            setCurDevice("ima35s12");
+//        }else{
+//            mPosApi.initPosDev(PosApi.PRODUCT_MODEL_IMA80M01);
+//            setCurDevice(PosApi.PRODUCT_MODEL_IMA80M01);
+//        }
     }
 
     public String getCurDevice() {
@@ -95,7 +95,8 @@ public class BaseApplication extends Application {
     }
     //TODO 其他地方引用mPosApi变量
     public PosApi getPosApi(){
-        return mPosApi;
+//        return mPosApi;
+        return null;
     }
 
     //TODO 启动主服务

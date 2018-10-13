@@ -71,9 +71,9 @@ public class MainActivity extends BaseActivity implements LoginContract.View {
     private void initData() {
         mPresenter.getScanNumberLeng();
 //        //TODO 启动扫描服务
-        Intent newIntent = new Intent(MainActivity.this, ScanService.class);
-        newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startService(newIntent);
+//        Intent newIntent = new Intent(MainActivity.this, ScanService.class);
+//        newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startService(newIntent);
     }
 
     @Override

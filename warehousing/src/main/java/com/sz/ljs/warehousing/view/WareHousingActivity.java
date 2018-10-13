@@ -7,6 +7,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -31,6 +32,7 @@ import com.sz.ljs.common.view.AlertDialog;
 import com.sz.ljs.common.view.ListDialog;
 import com.sz.ljs.common.view.ScanView;
 import com.sz.ljs.common.view.SelectionPopForBottomView;
+import com.sz.ljs.common.view.TitleView;
 import com.sz.ljs.common.view.WaitingDialog;
 import com.sz.ljs.warehousing.R;
 import com.sz.ljs.warehousing.contract.WarehouContract;
@@ -84,7 +86,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
     private AlertDialog alertDialog;
     private boolean isDuoJianFanHui;
     private boolean isQinQiuJianShu=false;
-
+    private TitleView tv_titleView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +128,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         tv_jianshu = (TextView) findViewById(R.id.tv_jianshu);
         btn_qianru = (Button) findViewById(R.id.btn_qianru);
         btn_fujiafuwu = (Button) findViewById(R.id.btn_fujiafuwu);
+        tv_titleView = (TitleView) findViewById(R.id.tv_titleView);
     }
 
     private void initData() {
@@ -273,7 +276,13 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
 
             }
         });
-
+        tv_titleView.setBackOnclistener(new TitleView.IBackButtonCallBack() {
+            @Override
+            public boolean onClick(View v) {
+                finish();
+                return false;
+            }
+        });
     }
 
     @Override
@@ -798,7 +807,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
                     et_shizhong.setText("" + WareHouSingModel.getInstance().getTotalGrossWeight());
                     et_jianshu.setText("" + subnitList.size());
                     isDuoJianFanHui = false;
-                    WareHouSingModel.getInstance().reMoveSubnitList();
+//                    WareHouSingModel.getInstance().reMoveSubnitList();
                     Log.i("多件返回后", "subnitList.size()=" + subnitList.size());
                 }
                 break;
@@ -884,6 +893,7 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
         et_gao.setText("");
         et_daohuozongdan.setText("");
         et_daohuozongdan1.setText("");
+        WareHouSingModel.getInstance().reMoveSubnitList();
         WareHouSingModel.getInstance().release();
         isQinQiuJianShu=false;
         isDuoJianFanHui=false;
@@ -931,6 +941,16 @@ public class WareHousingActivity extends BaseActivity implements View.OnClickLis
             }
         });
 
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
